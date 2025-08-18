@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import Onboarding from 'react-native-onboarding-swiper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { COLORS } from '../utils/constants'; // Usamos colores de constants.js
+import { COLORS } from '../utils/constants';
 
 const OnboardingScreen = () => {
   const navigation = useNavigation();
@@ -11,7 +11,7 @@ const OnboardingScreen = () => {
   const handleDone = async () => {
     try {
       await AsyncStorage.setItem('onboardingCompleted', 'true');
-      navigation.navigate('Home'); // O 'Profile' cuando lo implementemos
+      navigation.navigate('Home');
     } catch (error) {
       console.error('Error saving onboarding:', error);
       navigation.navigate('Home');
@@ -21,19 +21,19 @@ const OnboardingScreen = () => {
   return (
     <Onboarding
       onDone={handleDone}
-      onSkip={handleDone} // Skip también completa
-      showSkip={false} // No mostramos skip por ahora, para forzar swipe
+      onSkip={handleDone}
+      showSkip={false}
       DotComponent={({ selected }) => (
         <View style={[styles.dot, selected ? styles.activeDot : styles.inactiveDot]} />
       )}
       pages={[
         {
-          backgroundColor: '#fff7f0', // Beige suave
+          backgroundColor: '#fff7f0',
           image: <Image source={require('../assets/images/onboarding/hands.png')} style={styles.image} />,
           title: <Text style={styles.title}>Learn Sign Language Easily</Text>,
           subtitle: <Text style={styles.subtitle}>Dive into the world of sign language with our fun and interactive lessons. Start your journey today!</Text>,
           bottomBarColor: '#fff7f0',
-          nextLabel: 'Get Started', // Botón custom por página no directo en lib, pero usamos next como "Get Started"
+          nextLabel: 'Get Started',
         },
         {
           backgroundColor: '#ffffff',
@@ -57,7 +57,7 @@ const OnboardingScreen = () => {
           title: <Text style={styles.title}>Interactive Sign Language Lessons</Text>,
           subtitle: <Text style={styles.subtitle}>Engage with fun lessons, track your progress, and earn rewards.</Text>,
           bottomBarColor: '#ffffff',
-          doneLabel: 'Start Learning', // Último botón como "Start Learning"
+          doneLabel: 'Start Learning',
         },
       ]}
     />
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 3,
   },
   activeDot: {
-    backgroundColor: COLORS.primary, // Azul primario
+    backgroundColor: COLORS.primary,
   },
   inactiveDot: {
     backgroundColor: '#ccc',
