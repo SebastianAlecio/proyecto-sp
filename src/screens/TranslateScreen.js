@@ -8,7 +8,8 @@ import {
   SafeAreaView,
   ScrollView,
   Dimensions,
-  Animated
+  Animated,
+  Keyboard
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS } from '../utils/constants';
@@ -41,6 +42,9 @@ const TranslateScreen = () => {
 
   const handleTranslate = () => {
     if (inputText.trim()) {
+      // Ocultar el teclado
+      Keyboard.dismiss();
+      
       // Convertir texto a array de letras (sin espacios por ahora)
       const letters = inputText.toLowerCase().replace(/[^a-z]/g, '').split('');
       setTranslatedLetters(letters);
