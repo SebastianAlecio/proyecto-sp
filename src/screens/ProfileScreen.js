@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     paddingTop: 24,
-    paddingBottom: 100, // Extra space at bottom for comfortable scrolling
+    paddingBottom: 100,
   },
   userCard: {
     backgroundColor: '#FFFFFF',
