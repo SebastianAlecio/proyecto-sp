@@ -1,16 +1,79 @@
 import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
+import TranslateScreen from '../screens/TranslateScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { COLORS } from '../utils/constants';
 
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+const MainTabNavigator = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+          
+          if (route.name === 'Translate') {
+            iconName = focused ? 'language' : 'language-outline';
+          } else if (route.name === 'Profile') {
+            iconName = focused ? 'person' : 'person-outline';
+          }
+          
+          return <Icon name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: COLORS.primary,
+        tabBarInactiveTintColor: '#8E8E93',
+        tabBarStyle: {
+          backgroundColor: '#FFFFFF',
+          borderTopWidth: 0,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: -2,
+          },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          height: 85,
+          paddingBottom: 20,
+          paddingTop: 10,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+          marginTop: 4,
+        },
+      })}
+    >
+      <Tab.Screen 
+        name="Translate" 
+        component={TranslateScreen}
+        options={{
+          tabBarLabel: 'Traducir',
+        }}
+      />
+      <Tab.Screen 
+        name="Profile" 
+        component={ProfileScreen}
+        options={{
+          tabBarLabel: 'Perfil',
+        }}
+      />
+    </Tab.Navigator>
+  );
+};
 
 const AppNavigator = ({ initialRouteName }) => {
   return (
     <Stack.Navigator initialRouteName={initialRouteName} screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-      <Stack.Screen name="Home" component={HomeScreen} />
-      {/* Agregaremos más routes después, ej. Profile */}
+      <Stack.Screen name="Home" component={MainTabNavigator} />
     </Stack.Navigator>
   );
 };
