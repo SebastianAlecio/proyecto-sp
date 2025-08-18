@@ -3,9 +3,10 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import Onboarding from 'react-native-onboarding-swiper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { COLORS } from '../utils/constants';
+import { useTheme } from '../context/ThemeContext';
 
 const OnboardingScreen = () => {
+  const { theme } = useTheme();
   const navigation = useNavigation();
 
   const handleDone = async () => {
@@ -24,7 +25,10 @@ const OnboardingScreen = () => {
       onSkip={handleDone}
       showSkip={false}
       DotComponent={({ selected }) => (
-        <View style={[styles.dot, selected ? styles.activeDot : styles.inactiveDot]} />
+        <View style={[
+          styles.dot, 
+          selected ? { backgroundColor: theme.primary } : { backgroundColor: '#ccc' }
+        ]} />
       )}
       pages={[
         {
@@ -95,7 +99,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   inactiveDot: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#ccc', // Mantenemos gris para contraste en ambos temas
   },
 });
 

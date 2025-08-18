@@ -12,11 +12,12 @@ import {
   Keyboard
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { COLORS } from '../utils/constants';
+import { useTheme } from '../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
 const TranslateScreen = () => {
+  const { theme } = useTheme();
   const [inputText, setInputText] = useState('');
   const [translatedLetters, setTranslatedLetters] = useState([]);
   const [scrollHintAnim] = useState(new Animated.Value(0));
@@ -63,6 +64,8 @@ const TranslateScreen = () => {
     setTranslatedLetters([]);
   };
 
+  const styles = createStyles(theme);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -77,7 +80,7 @@ const TranslateScreen = () => {
             <TextInput
               style={styles.textInput}
               placeholder="Escribe aquí tu mensaje..."
-              placeholderTextColor="#A0A0A0"
+              placeholderTextColor={theme.placeholder}
               value={inputText}
               onChangeText={setInputText}
               multiline
@@ -85,7 +88,7 @@ const TranslateScreen = () => {
             />
             {inputText.length > 0 && (
               <TouchableOpacity style={styles.clearButton} onPress={clearText}>
-                <Icon name="close-circle" size={20} color="#A0A0A0" />
+                <Icon name="close-circle" size={20} color={theme.clearButton} />
               </TouchableOpacity>
             )}
           </View>
@@ -138,14 +141,14 @@ const TranslateScreen = () => {
                     }
                   ]}
                 >
-                  <Icon name="chevron-back" size={16} color={COLORS.primary} />
+                  <Icon name="chevron-back" size={16} color={theme.primary} />
                   <Text style={styles.scrollHintText}>Desliza para ver más</Text>
                 </Animated.View>
               )}
             </View>
           ) : (
             <View style={styles.emptyState}>
-              <Icon name="hand-left" size={60} color="#E0E0E0" />
+              <Icon name="hand-left" size={60} color={theme.emptyStateIcon} />
               <Text style={styles.emptyStateText}>
                 Escribe un mensaje para ver las señas
               </Text>
@@ -157,28 +160,28 @@ const TranslateScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: theme.background,
   },
   header: {
     paddingHorizontal: 24,
     paddingTop: 50,
     paddingBottom: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: theme.border,
   },
   headerTitle: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#1A1A1A',
+    color: theme.text,
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 16,
-    color: '#666666',
+    color: theme.textSecondary,
     fontWeight: '400',
   },
   content: {
@@ -194,16 +197,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   textInput: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.inputBackground,
     borderRadius: 16,
     padding: 20,
     fontSize: 16,
-    color: '#1A1A1A',
+    color: theme.text,
     minHeight: 120,
     textAlignVertical: 'top',
     borderWidth: 2,
-    borderColor: '#F0F0F0',
-    shadowColor: '#000',
+    borderColor: theme.border,
+    shadowColor: theme.shadow,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -219,14 +222,14 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   translateButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: theme.primary,
     borderRadius: 16,
     paddingVertical: 16,
     paddingHorizontal: 24,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: COLORS.primary,
+    shadowColor: theme.primary,
     shadowOffset: {
       width: 0,
       height: 4,
@@ -236,7 +239,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   translateButtonDisabled: {
-    backgroundColor: '#D0D0D0',
+    backgroundColor: theme.placeholder,
     shadowOpacity: 0,
     elevation: 0,
   },
@@ -254,7 +257,7 @@ const styles = StyleSheet.create({
   resultsTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: theme.text,
     marginBottom: 16,
   },
   lettersWrapper: {
@@ -270,7 +273,7 @@ const styles = StyleSheet.create({
   letterCard: {
     alignItems: 'center',
     marginRight: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.cardBackground,
     borderRadius: 12,
     padding: 12,
     shadowColor: '#000',
@@ -285,23 +288,23 @@ const styles = StyleSheet.create({
   letterImagePlaceholder: {
     width: 80,
     height: 80,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: theme.background,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
     borderWidth: 2,
-    borderColor: COLORS.primary,
+    borderColor: theme.primary,
   },
   letterText: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: theme.primary,
   },
   letterLabel: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#666666',
+    color: theme.textSecondary,
   },
   emptyState: {
     flex: 1,
@@ -311,7 +314,7 @@ const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 16,
-    color: '#A0A0A0',
+    color: theme.placeholder,
     textAlign: 'center',
     marginTop: 16,
     lineHeight: 24,
@@ -322,7 +325,7 @@ const styles = StyleSheet.create({
     top: '50%',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: theme.scrollHintBackground,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
@@ -337,7 +340,7 @@ const styles = StyleSheet.create({
   },
   scrollHintText: {
     fontSize: 12,
-    color: COLORS.primary,
+    color: theme.primary,
     fontWeight: '500',
     marginLeft: 4,
   },

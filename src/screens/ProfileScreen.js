@@ -8,9 +8,13 @@ import {
   ScrollView 
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { COLORS } from '../utils/constants';
+import { useTheme } from '../context/ThemeContext';
+import { useNavigation } from '@react-navigation/native';
 
 const ProfileScreen = () => {
+  const { theme } = useTheme();
+  const navigation = useNavigation();
+
   const profileOptions = [
     {
       id: 1,
@@ -24,7 +28,7 @@ const ProfileScreen = () => {
       title: 'Configuración',
       subtitle: 'Personaliza tu experiencia',
       icon: 'settings',
-      onPress: () => console.log('Settings pressed'),
+      onPress: () => navigation.navigate('Settings'),
     },
     {
       id: 3,
@@ -42,6 +46,8 @@ const ProfileScreen = () => {
     },
   ];
 
+  const styles = createStyles(theme);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -53,14 +59,14 @@ const ProfileScreen = () => {
         {/* User Info Card */}
         <View style={styles.userCard}>
           <View style={styles.avatarContainer}>
-            <Icon name="person" size={40} color={COLORS.primary} />
+            <Icon name="person" size={40} color={theme.primary} />
           </View>
           <View style={styles.userInfo}>
             <Text style={styles.userName}>Usuario</Text>
             <Text style={styles.userEmail}>Aprendiz de Lenguaje de Señas</Text>
           </View>
           <TouchableOpacity style={styles.editButton}>
-            <Icon name="pencil" size={16} color={COLORS.primary} />
+            <Icon name="pencil" size={16} color={theme.primary} />
           </TouchableOpacity>
         </View>
 
@@ -85,13 +91,13 @@ const ProfileScreen = () => {
               onPress={option.onPress}
             >
               <View style={styles.optionIcon}>
-                <Icon name={option.icon} size={24} color={COLORS.primary} />
+                <Icon name={option.icon} size={24} color={theme.primary} />
               </View>
               <View style={styles.optionContent}>
                 <Text style={styles.optionTitle}>{option.title}</Text>
                 <Text style={styles.optionSubtitle}>{option.subtitle}</Text>
               </View>
-              <Icon name="chevron-forward" size={20} color="#C0C0C0" />
+              <Icon name="chevron-forward" size={20} color={theme.placeholder} />
             </TouchableOpacity>
           ))}
         </View>
@@ -100,28 +106,28 @@ const ProfileScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: theme.background,
   },
   header: {
     paddingHorizontal: 24,
     paddingTop: 50,
     paddingBottom: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: theme.border,
   },
   headerTitle: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#1A1A1A',
+    color: theme.text,
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 16,
-    color: '#666666',
+    color: theme.textSecondary,
     fontWeight: '400',
   },
   content: {
@@ -131,7 +137,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   userCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.surface,
     borderRadius: 16,
     padding: 20,
     flexDirection: 'row',
@@ -150,7 +156,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: theme.background,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
@@ -161,18 +167,18 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: theme.text,
     marginBottom: 4,
   },
   userEmail: {
     fontSize: 14,
-    color: '#666666',
+    color: theme.textSecondary,
   },
   editButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: theme.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -183,7 +189,7 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.surface,
     borderRadius: 16,
     padding: 20,
     alignItems: 'center',
@@ -199,17 +205,17 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 28,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: theme.primary,
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#666666',
+    color: theme.textSecondary,
     textAlign: 'center',
     fontWeight: '500',
   },
   optionsContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.surface,
     borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -226,13 +232,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#F8F9FA',
+    borderBottomColor: theme.border,
   },
   optionIcon: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: theme.background,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
@@ -243,12 +249,12 @@ const styles = StyleSheet.create({
   optionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: theme.text,
     marginBottom: 2,
   },
   optionSubtitle: {
     fontSize: 14,
-    color: '#666666',
+    color: theme.textSecondary,
   },
 });
 

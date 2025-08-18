@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ThemeProvider } from './src/context/ThemeContext';
 import AppNavigator from './src/navigation/AppNavigator';
 
 const App = () => {
@@ -24,9 +25,11 @@ const App = () => {
   }
 
   return (
-    <NavigationContainer>
-      <AppNavigator initialRouteName={isOnboardingCompleted ? 'Home' : 'Onboarding'} />
-    </NavigationContainer>
+    <ThemeProvider>
+      <NavigationContainer>
+        <AppNavigator initialRouteName={isOnboardingCompleted ? 'Home' : 'Onboarding'} />
+      </NavigationContainer>
+    </ThemeProvider>
   );
 };
 
