@@ -337,7 +337,7 @@ const TranslateScreen = () => {
                 })}
               </ScrollView>
               
-              {/* Hint de scroll - solo aparece si hay más de 3 señas */}
+              {/* scroll solo aparece si hay más de 3 señas */}
               {translatedSigns.length > 3 && (
                 <Animated.View 
                   style={[
