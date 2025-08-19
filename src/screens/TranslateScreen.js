@@ -11,9 +11,7 @@ import {
   Animated,
   Keyboard,
   Image,
-  ActivityIndicator,
-  Modal,
-  StatusBar
+  ActivityIndicator
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
@@ -27,8 +25,7 @@ const TranslateScreen = () => {
   const [translatedSigns, setTranslatedSigns] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [scrollHintAnim] = useState(new Animated.Value(0));
-  const [expandedCardIndex, setExpandedCardIndex] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [expandedCard, setExpandedCard] = useState(null);
 
   // Animación para el hint de scroll
   const startScrollHintAnimation = () => {
@@ -122,54 +119,45 @@ const TranslateScreen = () => {
   const clearText = () => {
     setInputText('');
     setTranslatedSigns([]);
-    setExpandedCardIndex(null);
-    setModalVisible(false);
+    setExpandedCard(null);
   };
 
-  const openExpandedCard = (index) => {
-    // Solo abrir si es una seña (no un espacio)
-    if (translatedSigns[index] && translatedSigns[index].type === 'sign') {
-      setExpandedCardIndex(index);
-      setModalVisible(true);
+  const openExpandedCard = (sign, index) => {
+    if (sign && sign.type === 'sign') {
+      setExpandedCard({ ...sign, index });
     }
   };
 
   const closeExpandedCard = () => {
-    setModalVisible(false);
-    setExpandedCardIndex(null);
+    setExpandedCard(null);
   };
 
   const navigateCard = (direction) => {
-    if (expandedCardIndex === null) return;
+    if (!expandedCard) return;
     
     const signsOnly = translatedSigns
       .map((item, index) => ({ item, originalIndex: index }))
       .filter(({ item }) => item.type === 'sign');
     
-    const currentSignIndex = signsOnly.findIndex(({ originalIndex }) => originalIndex === expandedCardIndex);
+    const currentSignIndex = signsOnly.findIndex(({ originalIndex }) => originalIndex === expandedCard.index);
     
     if (direction === 'next' && currentSignIndex < signsOnly.length - 1) {
-      setExpandedCardIndex(signsOnly[currentSignIndex + 1].originalIndex);
+      const nextSign = signsOnly[currentSignIndex + 1];
+      setExpandedCard({ ...nextSign.item, index: nextSign.originalIndex });
     } else if (direction === 'prev' && currentSignIndex > 0) {
-      setExpandedCardIndex(signsOnly[currentSignIndex - 1].originalIndex);
+      const prevSign = signsOnly[currentSignIndex - 1];
+      setExpandedCard({ ...prevSign.item, index: prevSign.originalIndex });
     }
-  };
-
-  const getCurrentSign = () => {
-    if (expandedCardIndex !== null && translatedSigns[expandedCardIndex]) {
-      return translatedSigns[expandedCardIndex];
-    }
-    return null;
   };
 
   const getNavigationInfo = () => {
-    if (expandedCardIndex === null) return { current: 0, total: 0, canGoPrev: false, canGoNext: false };
+    if (!expandedCard) return { current: 0, total: 0, canGoPrev: false, canGoNext: false };
     
     const signsOnly = translatedSigns
       .map((item, index) => ({ item, originalIndex: index }))
       .filter(({ item }) => item.type === 'sign');
     
-    const currentSignIndex = signsOnly.findIndex(({ originalIndex }) => originalIndex === expandedCardIndex);
+    const currentSignIndex = signsOnly.findIndex(({ originalIndex }) => originalIndex === expandedCard.index);
     
     return {
       current: currentSignIndex + 1,
@@ -180,6 +168,80 @@ const TranslateScreen = () => {
   };
 
   const styles = createStyles(theme);
+
+  // Si hay una tarjeta expandida, mostrar la vista expandida
+  if (expandedCard) {
+    const navInfo = getNavigationInfo();
+    
+    return (
+      <View style={styles.expandedContainer}>
+        {/* Header */}
+        <View style={styles.expandedHeader}>
+          <TouchableOpacity 
+            style={styles.expandedCloseButton}
+            onPress={closeExpandedCard}
+          >
+            <Icon name="close" size={24} color={theme.text} />
+          </TouchableOpacity>
+          
+          <View style={styles.expandedCounter}>
+            <Text style={styles.expandedCounterText}>
+              {navInfo.current} de {navInfo.total}
+            </Text>
+          </View>
+          
+          <View style={styles.headerSpacer} />
+        </View>
+
+        {/* Contenido Principal */}
+        <View style={styles.expandedMainContent}>
+          {/* Botón Anterior */}
+          {navInfo.canGoPrev && (
+            <TouchableOpacity 
+              style={[styles.navButton, styles.navButtonLeft]}
+              onPress={() => navigateCard('prev')}
+            >
+              <Icon name="chevron-back" size={28} color={theme.text} />
+            </TouchableOpacity>
+          )}
+
+          {/* Botón Siguiente */}
+          {navInfo.canGoNext && (
+            <TouchableOpacity 
+              style={[styles.navButton, styles.navButtonRight]}
+              onPress={() => navigateCard('next')}
+            >
+              <Icon name="chevron-forward" size={28} color={theme.text} />
+            </TouchableOpacity>
+          )}
+
+          {/* Tarjeta Expandida */}
+          <View style={styles.expandedCard}>
+            <View style={styles.expandedImageContainer}>
+              <Image
+                source={{ uri: expandedCard.image_url }}
+                style={styles.expandedSignImage}
+                resizeMode="contain"
+              />
+            </View>
+            
+            <View style={styles.expandedCardInfo}>
+              <Text style={styles.expandedCharacter}>
+                {expandedCard.character}
+              </Text>
+              <Text style={styles.expandedType}>
+                {expandedCard.type === 'letter' ? 'Letra' : 
+                 expandedCard.type === 'number' ? 'Número' : 'Especial'}
+              </Text>
+              <Text style={styles.expandedDescription}>
+                {expandedCard.description}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -252,7 +314,7 @@ const TranslateScreen = () => {
                     <TouchableOpacity 
                       key={`${element.character}-${index}`} 
                       style={styles.letterCard}
-                      onPress={() => openExpandedCard(index)}
+                      onPress={() => openExpandedCard(element, index)}
                       activeOpacity={0.7}
                     >
                       <View style={styles.letterImageContainer}>
@@ -303,98 +365,6 @@ const TranslateScreen = () => {
           )}
         </View>
       </View>
-
-      {/* Modal para tarjeta expandida */}
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={closeExpandedCard}
-      >
-        <StatusBar barStyle="light-content" />
-        <View style={styles.modalOverlay}>
-          <TouchableOpacity 
-            style={styles.modalOverlay} 
-            activeOpacity={1} 
-            onPress={closeExpandedCard}
-          >
-            <View style={styles.modalContent}>
-              {/* Header del Modal */}
-              <View style={styles.modalHeader}>
-                <TouchableOpacity 
-                  style={styles.modalCloseButton}
-                  onPress={closeExpandedCard}
-                >
-                  <Icon name="close" size={24} color="#FFFFFF" />
-                </TouchableOpacity>
-                
-                <View style={styles.modalCounter}>
-                  <Text style={styles.modalCounterText}>
-                    {getNavigationInfo().current} de {getNavigationInfo().total}
-                  </Text>
-                </View>
-                
-                <View style={styles.headerSpacer} />
-              </View>
-
-              {/* Contenido Principal */}
-              <View style={styles.modalMainContent}>
-                {/* Botón Anterior */}
-                {getNavigationInfo().canGoPrev && (
-                  <TouchableOpacity 
-                    style={[styles.navButton, styles.navButtonLeft]}
-                    onPress={() => navigateCard('prev')}
-                  >
-                    <Icon name="chevron-back" size={28} color="#FFFFFF" />
-                  </TouchableOpacity>
-                )}
-
-                {/* Botón Siguiente */}
-                {getNavigationInfo().canGoNext && (
-                  <TouchableOpacity 
-                    style={[styles.navButton, styles.navButtonRight]}
-                    onPress={() => navigateCard('next')}
-                  >
-                    <Icon name="chevron-forward" size={28} color="#FFFFFF" />
-                  </TouchableOpacity>
-                )}
-
-                {/* Tarjeta Expandida */}
-                <TouchableOpacity 
-                  activeOpacity={1} 
-                  style={styles.expandedCard}
-                  onPress={(e) => e.stopPropagation()}
-                >
-                  {getCurrentSign() && (
-                    <>
-                      <View style={styles.expandedImageContainer}>
-                        <Image
-                          source={{ uri: getCurrentSign().image_url }}
-                          style={styles.expandedSignImage}
-                          resizeMode="contain"
-                        />
-                      </View>
-                      
-                      <View style={styles.expandedCardInfo}>
-                        <Text style={styles.expandedCharacter}>
-                          {getCurrentSign().character}
-                        </Text>
-                        <Text style={styles.expandedType}>
-                          {getCurrentSign().type === 'letter' ? 'Letra' : 
-                           getCurrentSign().type === 'number' ? 'Número' : 'Especial'}
-                        </Text>
-                        <Text style={styles.expandedDescription}>
-                          {getCurrentSign().description}
-                        </Text>
-                      </View>
-                    </>
-                  )}
-                </TouchableOpacity>
-              </View>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 };
@@ -592,7 +562,6 @@ const createStyles = (theme) => StyleSheet.create({
     marginLeft: 4,
   },
   spaceIndicator: {
-    
     justifyContent: 'center',
     width: 40,
   },
@@ -601,48 +570,45 @@ const createStyles = (theme) => StyleSheet.create({
     color: theme.textSecondary,
     fontWeight: 'bold',
   },
-  // Modal Styles
-  modalOverlay: {
+  // Expanded View Styles
+  expandedContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.95)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: theme.background,
   },
-  modalContent: {
-    flex: 1,
-    width: '100%',
-  },
-  modalHeader: {
+  expandedHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingTop: 50,
     paddingBottom: 20,
+    backgroundColor: theme.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.border,
   },
-  modalCloseButton: {
+  expandedCloseButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: theme.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  modalCounter: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  expandedCounter: {
+    backgroundColor: theme.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
   },
-  modalCounterText: {
+  expandedCounterText: {
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
   },
-  modalHeaderSpacer: {
+  headerSpacer: {
     width: 44,
   },
-  modalMainContent: {
+  expandedMainContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -654,10 +620,18 @@ const createStyles = (theme) => StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: theme.surface,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   navButtonLeft: {
     left: 24,
@@ -665,11 +639,8 @@ const createStyles = (theme) => StyleSheet.create({
   navButtonRight: {
     right: 24,
   },
-  navButtonDisabled: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-  },
   expandedCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.surface,
     borderRadius: 24,
     padding: 32,
     alignItems: 'center',
@@ -680,14 +651,14 @@ const createStyles = (theme) => StyleSheet.create({
       width: 0,
       height: 8,
     },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.1,
     shadowRadius: 16,
-    elevation: 16,
+    elevation: 8,
   },
   expandedImageContainer: {
     width: 200,
     height: 200,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: theme.background,
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -712,14 +683,14 @@ const createStyles = (theme) => StyleSheet.create({
   expandedType: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#666666',
+    color: theme.textSecondary,
     marginBottom: 12,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   expandedDescription: {
     fontSize: 16,
-    color: '#333333',
+    color: theme.text,
     textAlign: 'center',
     lineHeight: 24,
   },
