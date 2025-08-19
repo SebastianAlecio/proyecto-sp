@@ -440,11 +440,13 @@ const createStyles = (theme) => StyleSheet.create({
     justifyContent: 'center',
     marginHorizontal: 8,
     paddingVertical: 10,
+    width: 40,
   },
   spaceText: {
     fontSize: 24,
     color: theme.textSecondary,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
