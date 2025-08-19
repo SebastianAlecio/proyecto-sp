@@ -444,7 +444,6 @@ const createStyles = (theme) => StyleSheet.create({
     fontSize: 24,
     color: theme.textSecondary,
     fontWeight: 'bold',
-    textAlign: 'center',
   },
 });
 
