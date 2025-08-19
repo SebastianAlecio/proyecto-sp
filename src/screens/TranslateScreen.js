@@ -69,10 +69,10 @@ const TranslateScreen = () => {
           // Verificar si es RR o LL
           if (char === 'r' && text[i + 1] === 'r') {
             elements.push({ type: 'character', character: 'RR' });
-            i++; // Saltar el siguiente 'r'
+            i++;
           } else if (char === 'l' && text[i + 1] === 'l') {
             elements.push({ type: 'character', character: 'LL' });
-            i++; // Saltar el siguiente 'l'
+            i++;
           } else if (/[a-zñ0-9]/.test(char)) {
             elements.push({ type: 'character', character: char.toUpperCase() });
           }
