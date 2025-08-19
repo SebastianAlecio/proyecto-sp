@@ -301,6 +301,98 @@ const TranslateScreen = () => {
           )}
         </View>
       </View>
+
+      {/* Modal para tarjeta expandida */}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={closeExpandedCard}
+      >
+        <StatusBar barStyle="light-content" />
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity 
+            style={styles.modalOverlay} 
+            activeOpacity={1} 
+            onPress={closeExpandedCard}
+          >
+            <View style={styles.modalContent}>
+              {/* Header del Modal */}
+              <View style={styles.modalHeader}>
+                <TouchableOpacity 
+                  style={styles.modalCloseButton}
+                  onPress={closeExpandedCard}
+                >
+                  <Icon name="close" size={24} color="#FFFFFF" />
+                </TouchableOpacity>
+                
+                <View style={styles.modalCounter}>
+                  <Text style={styles.modalCounterText}>
+                    {getNavigationInfo().current} de {getNavigationInfo().total}
+                  </Text>
+                </View>
+                
+                <View style={styles.headerSpacer} />
+              </View>
+
+              {/* Contenido Principal */}
+              <View style={styles.modalMainContent}>
+                {/* Botón Anterior */}
+                {getNavigationInfo().canGoPrev && (
+                  <TouchableOpacity 
+                    style={[styles.navButton, styles.navButtonLeft]}
+                    onPress={() => navigateCard('prev')}
+                  >
+                    <Icon name="chevron-back" size={28} color="#FFFFFF" />
+                  </TouchableOpacity>
+                )}
+
+                {/* Botón Siguiente */}
+                {getNavigationInfo().canGoNext && (
+                  <TouchableOpacity 
+                    style={[styles.navButton, styles.navButtonRight]}
+                    onPress={() => navigateCard('next')}
+                  >
+                    <Icon name="chevron-forward" size={28} color="#FFFFFF" />
+                  </TouchableOpacity>
+                )}
+
+                {/* Tarjeta Expandida */}
+                <TouchableOpacity 
+                  activeOpacity={1} 
+                  style={styles.expandedCard}
+                  onPress={(e) => e.stopPropagation()}
+                >
+                  {getCurrentSign() && (
+                    <>
+                      <View style={styles.expandedImageContainer}>
+                        <Image
+                          source={{ uri: getCurrentSign().image_url }}
+                          style={styles.expandedSignImage}
+                          resizeMode="contain"
+                        />
+                      </View>
+                      
+                      <View style={styles.expandedCardInfo}>
+                        <Text style={styles.expandedCharacter}>
+                          {getCurrentSign().character}
+                        </Text>
+                        <Text style={styles.expandedType}>
+                          {getCurrentSign().type === 'letter' ? 'Letra' : 
+                           getCurrentSign().type === 'number' ? 'Número' : 'Especial'}
+                        </Text>
+                        <Text style={styles.expandedDescription}>
+                          {getCurrentSign().description}
+                        </Text>
+                      </View>
+                    </>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
