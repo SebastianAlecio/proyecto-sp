@@ -171,6 +171,7 @@ const TranslateScreen = () => {
 
   // Si hay una tarjeta expandida, mostrar la vista expandida
   if (expandedCard) {
+    console.log('🎯 Rendering expanded card:', expandedCard);
     const navInfo = getNavigationInfo();
     
     return (
