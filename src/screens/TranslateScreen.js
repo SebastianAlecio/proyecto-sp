@@ -142,17 +142,25 @@ const TranslateScreen = () => {
   const navigateCard = (direction) => {
     if (!expandedCard) return;
     
+    // Obtener solo las señas (no espacios) con sus índices originales
     const signsOnly = translatedSigns
       .map((item, index) => ({ item, originalIndex: index }))
-      .filter(({ item }) => item.type === 'sign');
+      .filter(({ item }) => item.type !== 'space' && item.character && item.image_url);
+    
+    console.log('🔄 navigateCard:', direction);
+    console.log('📋 signsOnly:', signsOnly);
+    console.log('🎯 expandedCard.index:', expandedCard.index);
     
     const currentSignIndex = signsOnly.findIndex(({ originalIndex }) => originalIndex === expandedCard.index);
+    console.log('📍 currentSignIndex:', currentSignIndex);
     
     if (direction === 'next' && currentSignIndex < signsOnly.length - 1) {
       const nextSign = signsOnly[currentSignIndex + 1];
+      console.log('➡️ Going to next:', nextSign);
       setExpandedCard({ ...nextSign.item, index: nextSign.originalIndex });
     } else if (direction === 'prev' && currentSignIndex > 0) {
       const prevSign = signsOnly[currentSignIndex - 1];
+      console.log('⬅️ Going to prev:', prevSign);
       setExpandedCard({ ...prevSign.item, index: prevSign.originalIndex });
     }
   };
@@ -160,9 +168,10 @@ const TranslateScreen = () => {
   const getNavigationInfo = () => {
     if (!expandedCard) return { current: 0, total: 0, canGoPrev: false, canGoNext: false };
     
+    // Obtener solo las señas (no espacios)
     const signsOnly = translatedSigns
       .map((item, index) => ({ item, originalIndex: index }))
-      .filter(({ item }) => item.type === 'sign');
+      .filter(({ item }) => item.type !== 'space' && item.character && item.image_url);
     
     const currentSignIndex = signsOnly.findIndex(({ originalIndex }) => originalIndex === expandedCard.index);
     
