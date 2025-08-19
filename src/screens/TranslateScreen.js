@@ -123,15 +123,8 @@ const TranslateScreen = () => {
   };
 
   const openExpandedCard = (sign, index) => {
-    console.log('🚀 openExpandedCard called with:', { sign, index });
     if (sign && sign.character && sign.image_url) {
-      console.log('✅ Setting expanded card:', { ...sign, index });
       setExpandedCard({ ...sign, index });
-    } else {
-      console.log('❌ Invalid sign data:', sign);
-      console.log('❌ Sign type:', sign?.type);
-      console.log('❌ Sign character:', sign?.character);
-      console.log('❌ Sign image_url:', sign?.image_url);
     }
   };
 
@@ -147,20 +140,13 @@ const TranslateScreen = () => {
       .map((item, index) => ({ item, originalIndex: index }))
       .filter(({ item }) => item.type !== 'space' && item.character && item.image_url);
     
-    console.log('🔄 navigateCard:', direction);
-    console.log('📋 signsOnly:', signsOnly);
-    console.log('🎯 expandedCard.index:', expandedCard.index);
-    
     const currentSignIndex = signsOnly.findIndex(({ originalIndex }) => originalIndex === expandedCard.index);
-    console.log('📍 currentSignIndex:', currentSignIndex);
     
     if (direction === 'next' && currentSignIndex < signsOnly.length - 1) {
       const nextSign = signsOnly[currentSignIndex + 1];
-      console.log('➡️ Going to next:', nextSign);
       setExpandedCard({ ...nextSign.item, index: nextSign.originalIndex });
     } else if (direction === 'prev' && currentSignIndex > 0) {
       const prevSign = signsOnly[currentSignIndex - 1];
-      console.log('⬅️ Going to prev:', prevSign);
       setExpandedCard({ ...prevSign.item, index: prevSign.originalIndex });
     }
   };
@@ -187,19 +173,13 @@ const TranslateScreen = () => {
 
   // Si hay una tarjeta expandida, mostrar la vista expandida
   if (expandedCard) {
-    console.log('🎯 Rendering expanded card:', expandedCard);
     const navInfo = getNavigationInfo();
     
     return (
       <View style={styles.expandedContainer}>
         {/* Header */}
         <View style={styles.expandedHeader}>
-          <TouchableOpacity 
-            style={styles.expandedCloseButton}
-            onPress={closeExpandedCard}
-          >
-            <Icon name="close" size={24} color={theme.text} />
-          </TouchableOpacity>
+          <View style={styles.headerSpacer} />
           
           <View style={styles.expandedCounter}>
             <Text style={styles.expandedCounterText}>
@@ -207,7 +187,12 @@ const TranslateScreen = () => {
             </Text>
           </View>
           
-          <View style={styles.headerSpacer} />
+          <TouchableOpacity 
+            style={styles.expandedCloseButton}
+            onPress={closeExpandedCard}
+          >
+            <Icon name="close" size={24} color={theme.text} />
+          </TouchableOpacity>
         </View>
 
         {/* Contenido Principal */}
@@ -332,7 +317,6 @@ const TranslateScreen = () => {
                       key={`${element.character}-${index}`} 
                       style={styles.letterCard}
                       onPress={() => {
-                        console.log('🎯 TOUCH DETECTED!', element.character, index);
                         openExpandedCard(element, index);
                       }}
                       activeOpacity={0.7}
