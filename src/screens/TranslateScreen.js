@@ -446,7 +446,6 @@ const createStyles = (theme) => StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     alignItems: 'center',
-    justifyContent: 'center',
   },
 });
 
