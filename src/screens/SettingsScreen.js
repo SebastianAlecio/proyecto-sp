@@ -113,7 +113,10 @@ const SettingsScreen = ({ navigation }) => {
             </View>
             <View style={[styles.infoItem, styles.lastInfoItem]}>
               <Text style={styles.infoLabel}>Desarrollado por</Text>
-              <Text style={styles.infoValue}>Alessandro Alecio y Aldo Reyes</Text>
+              <View style={styles.developersContainer}>
+                <Text style={styles.infoValue}>Alessandro Alecio</Text>
+                <Text style={styles.infoValue}>Aldo Reyes</Text>
+              </View>
             </View>
           </View>
         </View>
@@ -248,9 +251,11 @@ const createStyles = (theme) => StyleSheet.create({
   infoValue: {
     fontSize: 16,
     color: theme.textSecondary,
-    flex: 1,
     textAlign: 'right',
-    flexWrap: 'wrap',
+  },
+  developersContainer: {
+    flex: 1,
+    alignItems: 'flex-end',
   },
 });
 
