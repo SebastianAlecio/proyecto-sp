@@ -124,11 +124,14 @@ const TranslateScreen = () => {
 
   const openExpandedCard = (sign, index) => {
     console.log('🚀 openExpandedCard called with:', { sign, index });
-    if (sign && sign.type === 'sign') {
+    if (sign && sign.character && sign.image_url) {
       console.log('✅ Setting expanded card:', { ...sign, index });
       setExpandedCard({ ...sign, index });
     } else {
       console.log('❌ Invalid sign data:', sign);
+      console.log('❌ Sign type:', sign?.type);
+      console.log('❌ Sign character:', sign?.character);
+      console.log('❌ Sign image_url:', sign?.image_url);
     }
   };
 
