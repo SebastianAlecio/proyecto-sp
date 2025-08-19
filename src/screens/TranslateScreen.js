@@ -179,59 +179,6 @@ const TranslateScreen = () => {
     };
   };
 
-  const openExpandedCard = (index) => {
-    // Solo abrir si es una seña (no un espacio)
-    if (translatedSigns[index] && translatedSigns[index].type === 'sign') {
-      setExpandedCardIndex(index);
-      setModalVisible(true);
-    }
-  };
-
-  const closeExpandedCard = () => {
-    setModalVisible(false);
-    setExpandedCardIndex(null);
-  };
-
-  const navigateCard = (direction) => {
-    if (expandedCardIndex === null) return;
-    
-    const signsOnly = translatedSigns
-      .map((item, index) => ({ item, originalIndex: index }))
-      .filter(({ item }) => item.type === 'sign');
-    
-    const currentSignIndex = signsOnly.findIndex(({ originalIndex }) => originalIndex === expandedCardIndex);
-    
-    if (direction === 'next' && currentSignIndex < signsOnly.length - 1) {
-      setExpandedCardIndex(signsOnly[currentSignIndex + 1].originalIndex);
-    } else if (direction === 'prev' && currentSignIndex > 0) {
-      setExpandedCardIndex(signsOnly[currentSignIndex - 1].originalIndex);
-    }
-  };
-
-  const getCurrentSign = () => {
-    if (expandedCardIndex !== null && translatedSigns[expandedCardIndex]) {
-      return translatedSigns[expandedCardIndex];
-    }
-    return null;
-  };
-
-  const getNavigationInfo = () => {
-    if (expandedCardIndex === null) return { current: 0, total: 0, canGoPrev: false, canGoNext: false };
-    
-    const signsOnly = translatedSigns
-      .map((item, index) => ({ item, originalIndex: index }))
-      .filter(({ item }) => item.type === 'sign');
-    
-    const currentSignIndex = signsOnly.findIndex(({ originalIndex }) => originalIndex === expandedCardIndex);
-    
-    return {
-      current: currentSignIndex + 1,
-      total: signsOnly.length,
-      canGoPrev: currentSignIndex > 0,
-      canGoNext: currentSignIndex < signsOnly.length - 1
-    };
-  };
-
   const styles = createStyles(theme);
 
   return (
