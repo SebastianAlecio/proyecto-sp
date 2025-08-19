@@ -14,8 +14,6 @@ import {
   ActivityIndicator,
   Modal,
   StatusBar
-  Modal,
-  StatusBar
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
