@@ -52,30 +52,55 @@ const TranslateScreen = () => {
       Keyboard.dismiss();
       
       try {
-        // Convertir texto a array de caracteres (letras, números, y caracteres especiales)
+        // Convertir texto a array de caracteres y espacios
         const text = inputText.toLowerCase();
-        const characters = [];
+        const elements = [];
         
         for (let i = 0; i < text.length; i++) {
           const char = text[i];
+          
+          // Si es un espacio, agregarlo como separador
+          if (char === ' ') {
+            elements.push({ type: 'space', character: ' ' });
+            continue;
+          }
+          
           // Verificar si es RR o LL
           if (char === 'r' && text[i + 1] === 'r') {
-            characters.push('RR');
+            elements.push({ type: 'character', character: 'RR' });
             i++; // Saltar el siguiente 'r'
           } else if (char === 'l' && text[i + 1] === 'l') {
-            characters.push('LL');
+            elements.push({ type: 'character', character: 'LL' });
             i++; // Saltar el siguiente 'l'
           } else if (/[a-zñ0-9]/.test(char)) {
-            characters.push(char.toUpperCase());
+            elements.push({ type: 'character', character: char.toUpperCase() });
           }
         }
         
-        // Obtener las señas de la base de datos
-        const signs = await signLanguageAPI.getSignsByCharacters(characters);
-        setTranslatedSigns(signs);
+        // Separar caracteres de espacios
+        const charactersOnly = elements
+          .filter(el => el.type === 'character')
+          .map(el => el.character);
+        
+        // Obtener las señas de la base de datos solo para los caracteres
+        const signs = await signLanguageAPI.getSignsByCharacters(charactersOnly);
+        
+        // Crear el array final mezclando señas y espacios
+        let signIndex = 0;
+        const finalElements = elements.map(element => {
+          if (element.type === 'space') {
+            return { type: 'space', character: ' ' };
+          } else {
+            const sign = signs[signIndex];
+            signIndex++;
+            return { type: 'sign', ...sign };
+          }
+        });
+        
+        setTranslatedSigns(finalElements);
       
         // Si hay más de 3 señas, mostrar animación de hint
-        if (signs.length > 3) {
+        if (finalElements.length > 3) {
           setTimeout(() => {
             startScrollHintAnimation();
           }, 500);
@@ -155,22 +180,32 @@ const TranslateScreen = () => {
                 style={styles.lettersContainer}
                 contentContainerStyle={styles.lettersContent}
               >
-                {translatedSigns.map((sign, index) => (
-                  <View key={`${sign.character}-${index}`} style={styles.letterCard}>
-                    <View style={styles.letterImageContainer}>
-                      <Image
-                        source={{ uri: sign.image_url }}
-                        style={styles.signImage}
-                        resizeMode="contain"
-                      />
+                {translatedSigns.map((element, index) => {
+                  if (element.type === 'space') {
+                    return (
+                      <View key={`space-${index}`} style={styles.spaceIndicator}>
+                        <Text style={styles.spaceText}>•</Text>
+                      </View>
+                    );
+                  }
+                  
+                  return (
+                    <View key={`${element.character}-${index}`} style={styles.letterCard}>
+                      <View style={styles.letterImageContainer}>
+                        <Image
+                          source={{ uri: element.image_url }}
+                          style={styles.signImage}
+                          resizeMode="contain"
+                        />
+                      </View>
+                      <Text style={styles.letterLabel}>{element.character}</Text>
+                      <Text style={styles.signType}>
+                        {element.type === 'letter' ? 'Letra' : 
+                         element.type === 'number' ? 'Número' : 'Especial'}
+                      </Text>
                     </View>
-                    <Text style={styles.letterLabel}>{sign.character}</Text>
-                    <Text style={styles.signType}>
-                      {sign.type === 'letter' ? 'Letra' : 
-                       sign.type === 'number' ? 'Número' : 'Especial'}
-                    </Text>
-                  </View>
-                ))}
+                  );
+                })}
               </ScrollView>
               
               {/* Hint de scroll - solo aparece si hay más de 3 señas */}
@@ -399,6 +434,17 @@ const createStyles = (theme) => StyleSheet.create({
     color: theme.primary,
     fontWeight: '500',
     marginLeft: 4,
+  },
+  spaceIndicator: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 8,
+    paddingVertical: 20,
+  },
+  spaceText: {
+    fontSize: 24,
+    color: theme.textSecondary,
+    fontWeight: 'bold',
   },
 });
 
