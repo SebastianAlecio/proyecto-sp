@@ -315,8 +315,13 @@ const TranslateScreen = () => {
                     <TouchableOpacity 
                       key={`${element.character}-${index}`} 
                       style={styles.letterCard}
-                      onPress={() => openExpandedCard(element, index)}
+                      onPress={() => {
+                        console.log('🎯 TOUCH DETECTED!', element.character, index);
+                        openExpandedCard(element, index);
+                      }}
                       activeOpacity={0.7}
+                      accessible={true}
+                      accessibilityRole="button"
                     >
                       <View style={styles.letterImageContainer}>
                         <Image
@@ -476,9 +481,11 @@ const createStyles = (theme) => StyleSheet.create({
   },
   lettersContainer: {
     flex: 1,
+    zIndex: 0,
   },
   lettersContent: {
     paddingVertical: 8,
+    paddingHorizontal: 4,
   },
   letterCard: {
     alignItems: 'center',
@@ -495,6 +502,8 @@ const createStyles = (theme) => StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     minWidth: 100,
+    minHeight: 120,
+    zIndex: 1,
   },
   letterImageContainer: {
     width: 80,
