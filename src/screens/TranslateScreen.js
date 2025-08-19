@@ -438,9 +438,6 @@ const createStyles = (theme) => StyleSheet.create({
   spaceIndicator: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 40,
-    height: 80,
-    marginHorizontal: 8,
   },
   spaceText: {
     fontSize: 24,
