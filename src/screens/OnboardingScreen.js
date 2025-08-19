@@ -97,7 +97,7 @@ const OnboardingScreen = () => {
     if (slideIndex !== currentIndex) {
       setCurrentIndex(slideIndex);
       
-      // Animate progress bar
+      // Barra animada 
       Animated.timing(progressAnim, {
         toValue: (slideIndex + 1) / onboardingData.length,
         duration: 300,
