@@ -8,8 +8,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// Helper functions for the sign language app
 export const signLanguageAPI = {
   // Get all letters
   async getAllLetters() {
