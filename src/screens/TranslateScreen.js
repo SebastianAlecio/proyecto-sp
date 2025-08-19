@@ -441,7 +441,7 @@ const createStyles = (theme) => StyleSheet.create({
     width: 40,
   },
   spaceText: {
-    fontSize: 24,
+    fontSize: 10,
     color: theme.textSecondary,
     fontWeight: 'bold',
     textAlign: 'center',
