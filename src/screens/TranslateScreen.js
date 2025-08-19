@@ -507,6 +507,128 @@ const createStyles = (theme) => StyleSheet.create({
     color: theme.textSecondary,
     fontWeight: 'bold',
   },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.95)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    flex: 1,
+    width: '100%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    paddingTop: 60,
+    paddingBottom: 20,
+  },
+  modalCloseButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalCounter: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  modalCounterText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  modalHeaderSpacer: {
+    width: 44,
+  },
+  modalMainContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  navButton: {
+    position: 'absolute',
+    top: '50%',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  navButtonLeft: {
+    left: 24,
+  },
+  navButtonRight: {
+    right: 24,
+  },
+  navButtonDisabled: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  expandedCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 32,
+    alignItems: 'center',
+    maxWidth: 320,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 16,
+  },
+  expandedImageContainer: {
+    width: 200,
+    height: 200,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+    borderWidth: 3,
+    borderColor: theme.primary,
+    overflow: 'hidden',
+  },
+  expandedSignImage: {
+    width: '100%',
+    height: '100%',
+  },
+  expandedCardInfo: {
+    alignItems: 'center',
+  },
+  expandedCharacter: {
+    fontSize: 48,
+    fontWeight: '700',
+    color: theme.primary,
+    marginBottom: 8,
+  },
+  expandedType: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#666666',
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  expandedDescription: {
+    fontSize: 16,
+    color: '#333333',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
 });
 
 export default TranslateScreen;
