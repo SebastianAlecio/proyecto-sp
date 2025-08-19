@@ -11,7 +11,7 @@ const App = () => {
     const checkOnboarding = async () => {
       try {
         // TEMPORAL: Descomenta la línea de abajo para resetear el onboarding
-        // await AsyncStorage.removeItem('onboardingCompleted');
+        await AsyncStorage.removeItem('onboardingCompleted');
         
         const value = await AsyncStorage.getItem('onboardingCompleted');
         setIsOnboardingCompleted(value === 'true');
