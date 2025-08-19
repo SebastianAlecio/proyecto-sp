@@ -77,7 +77,6 @@ const OnboardingScreen = () => {
         animated: true,
       });
       
-      // Animate progress bar
       Animated.timing(progressAnim, {
         toValue: (nextIndex + 1) / onboardingData.length,
         duration: 300,
