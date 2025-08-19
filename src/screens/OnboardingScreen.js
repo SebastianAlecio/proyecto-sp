@@ -95,12 +95,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginHorizontal: 3,
   },
-  activeDot: {
-    backgroundColor: COLORS.primary,
-  },
-  inactiveDot: {
-    backgroundColor: '#ccc', // Mantenemos gris para contraste en ambos temas
-  },
 });
 
 export default OnboardingScreen;
