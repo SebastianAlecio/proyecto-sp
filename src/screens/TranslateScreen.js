@@ -438,7 +438,7 @@ const createStyles = (theme) => StyleSheet.create({
   spaceIndicator: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 5,
+    marginHorizontal: 8,
     paddingVertical: 20,
   },
   spaceText: {
