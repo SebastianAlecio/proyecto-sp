@@ -236,7 +236,7 @@ const TranslateScreen = () => {
                  expandedCard.type === 'number' ? 'Número' : 'Especial'}
               </Text>
               <Text style={styles.expandedDescription}>
-                {expandedCard.description}
+                
               </Text>
             </View>
           </View>
