@@ -29,8 +29,6 @@ const TranslateScreen = () => {
   const [scrollHintAnim] = useState(new Animated.Value(0));
   const [expandedCardIndex, setExpandedCardIndex] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [expandedCardIndex, setExpandedCardIndex] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
 
   // Animación para el hint de scroll
   const startScrollHintAnimation = () => {
