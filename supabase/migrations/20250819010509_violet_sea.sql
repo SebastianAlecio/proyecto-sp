@@ -1,23 +1,3 @@
-/*
-  # Create Sign Language Database Schema
-
-  1. New Tables
-    - `letters`
-      - `id` (uuid, primary key)
-      - `character` (text, the letter/number/special character)
-      - `type` (text, 'letter', 'number', or 'special')
-      - `image_url` (text, URL to the sign image)
-      - `description` (text, description of the sign)
-      - `created_at` (timestamp)
-    
-  2. Security
-    - Enable RLS on `letters` table
-    - Add policy for public read access (since it's educational content)
-    
-  3. Data
-    - Insert all 39 sign language images (A-Z, Ñ, RR, LL, 1-10)
-*/
-
 -- Create the letters table
 CREATE TABLE IF NOT EXISTS letters (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
