@@ -27,7 +27,7 @@ const TranslateScreen = () => {
   const [scrollHintAnim] = useState(new Animated.Value(0));
   const [expandedCard, setExpandedCard] = useState(null);
 
-  // Animación para el hint de scroll
+  // Animación para saber que el usuario puede hacer scroll
   const startScrollHintAnimation = () => {
     Animated.loop(
       Animated.sequence([
@@ -42,7 +42,7 @@ const TranslateScreen = () => {
           useNativeDriver: true,
         }),
       ]),
-      { iterations: 3 } // Se repite 3 veces y se detiene
+      { iterations: 2 } // Se repite 2 veces y se detiene
     ).start();
   };
 
