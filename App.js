@@ -10,7 +10,7 @@ const App = () => {
   useEffect(() => {
     const checkOnboarding = async () => {
       try {
-        // TEMPORAL: Descomenta la línea de abajo para resetear el onboarding
+        // Descomenta la linea de abajo para poder ver las onoboarding screens o reinicia el local storage
         // await AsyncStorage.removeItem('onboardingCompleted');
         
         const value = await AsyncStorage.getItem('onboardingCompleted');
