@@ -100,7 +100,7 @@ const TranslateScreen = () => {
         
         setTranslatedSigns(finalElements);
       
-        // Si hay más de 3 señas, mostrar animación del scroll
+        // Si hay más de 3 señas, mostrar animación del scroll, ya que se lo maximo que aparece en pantalla
         if (finalElements.length > 3) {
           setTimeout(() => {
             startScrollHintAnimation();
