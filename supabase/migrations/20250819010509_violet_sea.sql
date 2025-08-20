@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS letters (
 -- Enable Row Level Security
 ALTER TABLE letters ENABLE ROW LEVEL SECURITY;
 
--- Create policy for public read access (educational content should be accessible to all)
+-- Create policy for public read access
 CREATE POLICY "Letters are publicly readable"
   ON letters
   FOR SELECT
