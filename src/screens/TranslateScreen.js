@@ -135,7 +135,7 @@ const TranslateScreen = () => {
   const navigateCard = (direction) => {
     if (!expandedCard) return;
     
-    // Obtener solo las señas (no espacios) con sus índices originales
+    // Obtener solo las señas con sus índices originales
     const signsOnly = translatedSigns
       .map((item, index) => ({ item, originalIndex: index }))
       .filter(({ item }) => item.type !== 'space' && item.character && item.image_url);
