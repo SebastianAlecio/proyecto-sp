@@ -24,7 +24,7 @@ const App = () => {
   }, []);
 
   if (isOnboardingCompleted === null) {
-    return null; // Loading state while checking
+    return null;
   }
 
   return (
