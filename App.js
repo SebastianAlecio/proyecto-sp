@@ -17,7 +17,7 @@ const App = () => {
         setIsOnboardingCompleted(value === 'true');
       } catch (error) {
         console.error('Error checking onboarding:', error);
-        setIsOnboardingCompleted(false); // Default to show onboarding
+        setIsOnboardingCompleted(false);
       }
     };
     checkOnboarding();
