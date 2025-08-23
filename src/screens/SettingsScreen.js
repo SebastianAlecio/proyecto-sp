@@ -34,14 +34,6 @@ const SettingsScreen = ({ navigation }) => {
     },
     {
       id: 3,
-      title: 'Idioma',
-      subtitle: 'Español',
-      icon: 'language',
-      type: 'arrow',
-      onPress: () => console.log('Language pressed'),
-    },
-    {
-      id: 4,
       title: 'Privacidad',
       subtitle: 'Controla tu información personal',
       icon: 'shield-checkmark',
