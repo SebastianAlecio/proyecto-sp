@@ -44,7 +44,7 @@ const OnboardingScreen = () => {
       id: 3,
       icon: 'camera',
       title: 'Practica en Tiempo Real',
-      subtitle: 'Usa tu cámara para practicar señas y recibe retroalimentación instantánea sobre tu progreso.',
+      subtitle: 'Usa tu cámara para practicar señas y mejorar tu técnica de forma visual.',
       backgroundColor: '#4ECDC420',
       iconColor: '#4ECDC4',
     },
