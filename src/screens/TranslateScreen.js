@@ -13,6 +13,7 @@ import {
   Image,
   ActivityIndicator
 } from 'react-native';
+import { Video } from 'expo-av';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
 import { signLanguageAPI } from '../lib/supabase';
@@ -242,10 +243,14 @@ const TranslateScreen = () => {
             {expandedCard.type === 'word' ? (
               // Mostrar video para palabras completas
               <View style={styles.expandedVideoContainer}>
-                <Text style={styles.expandedWordTitle}>Video no disponible en preview</Text>
-                <Text style={styles.expandedVideoNote}>
-                  URL: {expandedCard.video_url}
-                </Text>
+                <Video
+                  source={{ uri: expandedCard.video_url }}
+                  style={styles.expandedVideo}
+                  useNativeControls
+                  resizeMode="contain"
+                  isLooping
+                  shouldPlay={false}
+                />
               </View>
             ) : (
               // Mostrar imagen para letras
