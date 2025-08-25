@@ -16,6 +16,7 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
 import { signLanguageAPI } from '../lib/supabase';
+import { wordsAPI } from '../lib/supabase';
 
 const { width } = Dimensions.get('window');
 
@@ -53,55 +54,68 @@ const TranslateScreen = () => {
       Keyboard.dismiss();
       
       try {
-        // Convertir texto a array de caracteres y espacios
-        const text = inputText.toLowerCase();
-        const elements = [];
+        // Dividir el texto en palabras
+        const words = inputText.toLowerCase().trim().split(/\s+/);
+        const allElements = [];
         
-        for (let i = 0; i < text.length; i++) {
-          const char = text[i];
+        for (let wordIndex = 0; wordIndex < words.length; wordIndex++) {
+          const word = words[wordIndex];
           
-          // Si es un espacio, agregarlo como separador
-          if (char === ' ') {
-            elements.push({ type: 'space', character: ' ' });
-            continue;
+          // Agregar espacio entre palabras (excepto la primera)
+          if (wordIndex > 0) {
+            allElements.push({ type: 'space', character: ' ' });
           }
           
-          // Verificar si es RR o LL
-          if (char === 'r' && text[i + 1] === 'r') {
-            elements.push({ type: 'character', character: 'RR' });
-            i++;
-          } else if (char === 'l' && text[i + 1] === 'l') {
-            elements.push({ type: 'character', character: 'LL' });
-            i++;
-          } else if (/[a-zñ0-9]/.test(char)) {
-            elements.push({ type: 'character', character: char.toUpperCase() });
+          try {
+            // Intentar buscar la palabra completa en videos
+            const wordVideo = await wordsAPI.getWordVideo(word);
+            
+            // Si existe el video, agregarlo como palabra completa
+            allElements.push({
+              type: 'word',
+              word: wordVideo.word,
+              video_url: wordVideo.video_url,
+              description: wordVideo.description,
+              category: wordVideo.category
+            });
+            
+          } catch (error) {
+            // Si no existe el video, deletrear letra por letra
+            const elements = [];
+            
+            for (let i = 0; i < word.length; i++) {
+              const char = word[i];
+              
+              // Verificar si es RR o LL
+              if (char === 'r' && word[i + 1] === 'r') {
+                elements.push({ type: 'character', character: 'RR' });
+                i++;
+              } else if (char === 'l' && word[i + 1] === 'l') {
+                elements.push({ type: 'character', character: 'LL' });
+                i++;
+              } else if (/[a-zñ0-9]/.test(char)) {
+                elements.push({ type: 'character', character: char.toUpperCase() });
+              }
+            }
+            
+            // Obtener las señas de la base de datos solo para los caracteres
+            const charactersOnly = elements.map(el => el.character);
+            const signs = await signLanguageAPI.getSignsByCharacters(charactersOnly);
+            
+            // Agregar las letras al array principal
+            elements.forEach((element, index) => {
+              const sign = signs[index];
+              if (sign) {
+                allElements.push({ type: 'sign', ...sign });
+              }
+            });
           }
         }
         
-        // Separar caracteres de espacios
-        const charactersOnly = elements
-          .filter(el => el.type === 'character')
-          .map(el => el.character);
-        
-        // Obtener las señas de la base de datos solo para los caracteres
-        const signs = await signLanguageAPI.getSignsByCharacters(charactersOnly);
-        
-        // Crear el array final mezclando señas y espacios
-        let signIndex = 0;
-        const finalElements = elements.map(element => {
-          if (element.type === 'space') {
-            return { type: 'space', character: ' ' };
-          } else {
-            const sign = signs[signIndex];
-            signIndex++;
-            return { type: 'sign', ...sign };
-          }
-        });
-        
-        setTranslatedSigns(finalElements);
+        setTranslatedSigns(allElements);
       
         // Si hay más de 3 señas, mostrar animación del scroll, ya que se lo maximo que aparece en pantalla
-        if (finalElements.length > 3) {
+        if (allElements.length > 3) {
           setTimeout(() => {
             startScrollHintAnimation();
           }, 500);
@@ -123,7 +137,7 @@ const TranslateScreen = () => {
   };
 
   const openExpandedCard = (sign, index) => {
-    if (sign && sign.character && sign.image_url) {
+    if (sign && ((sign.character && sign.image_url) || (sign.word && sign.video_url))) {
       setExpandedCard({ ...sign, index });
     }
   };
@@ -138,7 +152,10 @@ const TranslateScreen = () => {
     // Obtener solo las señas con sus índices originales
     const signsOnly = translatedSigns
       .map((item, index) => ({ item, originalIndex: index }))
-      .filter(({ item }) => item.type !== 'space' && item.character && item.image_url);
+      .filter(({ item }) => 
+        item.type !== 'space' && 
+        ((item.character && item.image_url) || (item.word && item.video_url))
+      );
     
     const currentSignIndex = signsOnly.findIndex(({ originalIndex }) => originalIndex === expandedCard.index);
     
@@ -157,7 +174,10 @@ const TranslateScreen = () => {
     // Obtener solo las señas
     const signsOnly = translatedSigns
       .map((item, index) => ({ item, originalIndex: index }))
-      .filter(({ item }) => item.type !== 'space' && item.character && item.image_url);
+      .filter(({ item }) => 
+        item.type !== 'space' && 
+        ((item.character && item.image_url) || (item.word && item.video_url))
+      );
     
     const currentSignIndex = signsOnly.findIndex(({ originalIndex }) => originalIndex === expandedCard.index);
     
@@ -219,22 +239,46 @@ const TranslateScreen = () => {
 
           {/* Tarjeta Expandida */}
           <View style={styles.expandedCard}>
-            <View style={styles.expandedImageContainer}>
-              <Image
-                source={{ uri: expandedCard.image_url }}
-                style={styles.expandedSignImage}
-                resizeMode="contain"
-              />
-            </View>
+            {expandedCard.type === 'word' ? (
+              // Mostrar video para palabras completas
+              <View style={styles.expandedVideoContainer}>
+                <Text style={styles.expandedWordTitle}>Video no disponible en preview</Text>
+                <Text style={styles.expandedVideoNote}>
+                  URL: {expandedCard.video_url}
+                </Text>
+              </View>
+            ) : (
+              // Mostrar imagen para letras
+              <View style={styles.expandedImageContainer}>
+                <Image
+                  source={{ uri: expandedCard.image_url }}
+                  style={styles.expandedSignImage}
+                  resizeMode="contain"
+                />
+              </View>
+            )}
             
             <View style={styles.expandedCardInfo}>
-              <Text style={styles.expandedCharacter}>
-                {expandedCard.character}
-              </Text>
-              <Text style={styles.expandedType}>
-                {expandedCard.type === 'letter' ? 'Letra' : 
-                 expandedCard.type === 'number' ? 'Número' : 'Especial'}
-              </Text>
+              {expandedCard.type === 'word' ? (
+                <>
+                  <Text style={styles.expandedCharacter}>
+                    {expandedCard.word}
+                  </Text>
+                  <Text style={styles.expandedType}>
+                    {expandedCard.category}
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.expandedCharacter}>
+                    {expandedCard.character}
+                  </Text>
+                  <Text style={styles.expandedType}>
+                    {expandedCard.type === 'letter' ? 'Letra' : 
+                     expandedCard.type === 'number' ? 'Número' : 'Especial'}
+                  </Text>
+                </>
+              )}
             </View>
           </View>
         </View>
@@ -309,6 +353,31 @@ const TranslateScreen = () => {
                     );
                   }
                   
+                  // Renderizar palabras completas
+                  if (element.type === 'word') {
+                    return (
+                      <TouchableOpacity 
+                        key={`${element.word}-${index}`} 
+                        style={[styles.letterCard, styles.wordCard]}
+                        onPress={() => {
+                          openExpandedCard(element, index);
+                        }}
+                        activeOpacity={0.7}
+                        accessible={true}
+                        accessibilityRole="button"
+                      >
+                        <View style={[styles.letterImageContainer, styles.wordImageContainer]}>
+                          <Icon name="play-circle" size={40} color={theme.primary} />
+                        </View>
+                        <Text style={styles.letterLabel}>{element.word}</Text>
+                        <Text style={styles.signType}>
+                          {element.category}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  }
+                  
+                  // Renderizar letras individuales
                   return (
                     <TouchableOpacity 
                       key={`${element.character}-${index}`} 
@@ -700,6 +769,39 @@ const createStyles = (theme) => StyleSheet.create({
     color: theme.text,
     textAlign: 'center',
     lineHeight: 24,
+  },
+  // Estilos para palabras completas
+  wordCard: {
+    backgroundColor: theme.primary + '10',
+    borderWidth: 2,
+    borderColor: theme.primary,
+  },
+  wordImageContainer: {
+    backgroundColor: theme.primary + '20',
+    borderColor: theme.primary,
+  },
+  expandedVideoContainer: {
+    width: 200,
+    height: 200,
+    backgroundColor: theme.background,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+    borderWidth: 3,
+    borderColor: theme.primary,
+  },
+  expandedWordTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.text,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  expandedVideoNote: {
+    fontSize: 12,
+    color: theme.textSecondary,
+    textAlign: 'center',
   },
 });
 
