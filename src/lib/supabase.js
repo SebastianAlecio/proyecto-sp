@@ -87,3 +87,65 @@ export const signLanguageAPI = {
   },
 
 };
+
+// Words API for complete sign language words
+export const wordsAPI = {
+  // Check if a word exists in the database
+  async checkWordExists(word) {
+    const { data, error } = await supabase
+      .from('words')
+      .select('word')
+      .eq('word', word.toLowerCase())
+      .single();
+    
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows found
+    return !!data;
+  },
+
+  // Get word video by word
+  async getWordVideo(word) {
+    const { data, error } = await supabase
+      .from('words')
+      .select('*')
+      .eq('word', word.toLowerCase())
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Get words by category
+  async getWordsByCategory(category) {
+    const { data, error } = await supabase
+      .from('words')
+      .select('*')
+      .eq('category', category)
+      .order('word');
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Get all words
+  async getAllWords() {
+    const { data, error } = await supabase
+      .from('words')
+      .select('*')
+      .order('category')
+      .order('word');
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Get all categories
+  async getAllCategories() {
+    const { data, error } = await supabase
+      .from('words')
+      .select('category')
+      .order('category');
+    
+    if (error) throw error;
+    return [...new Set(data.map(item => item.category))];
+  },
+};
