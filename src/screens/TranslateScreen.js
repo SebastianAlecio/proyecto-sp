@@ -249,7 +249,7 @@ const TranslateScreen = () => {
                   useNativeControls
                   resizeMode="contain"
                   isLooping
-                  shouldPlay={false}
+                  shouldPlay={true}
                 />
               </View>
             ) : (
