@@ -785,23 +785,14 @@ const createStyles = (theme) => StyleSheet.create({
     height: 200,
     backgroundColor: theme.background,
     borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 24,
     borderWidth: 3,
     borderColor: theme.primary,
+    overflow: 'hidden',
   },
-  expandedWordTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.text,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  expandedVideoNote: {
-    fontSize: 12,
-    color: theme.textSecondary,
-    textAlign: 'center',
+  expandedVideo: {
+    width: '100%',
+    height: '100%',
   },
 });
 
