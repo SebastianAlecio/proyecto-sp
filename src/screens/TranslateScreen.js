@@ -34,10 +34,10 @@ const TranslateScreen = ({ navigation }) => {
           const word = words[wordIndex];
           
           try {
-            // Intentar buscar la palabra completa en videos
+            // Intentar buscar la palabra completa en la tabla words
             const wordVideo = await wordsAPI.getWordVideo(word);
             
-            // Si existe el video, agregarlo como palabra completa
+            // Si existe en la tabla words, agregarlo como palabra completa
             translatedWords.push({
               originalWord: word,
               hasVideo: true,
@@ -51,7 +51,7 @@ const TranslateScreen = ({ navigation }) => {
             });
             
           } catch (error) {
-            // Si no existe el video, deletrear letra por letra
+            // Si no existe en words table, deletrear letra por letra
             const elements = [];
             
             for (let i = 0; i < word.length; i++) {
