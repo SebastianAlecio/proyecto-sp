@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
 import { signLanguageAPI } from '../lib/supabase';
 import { wordsAPI } from '../lib/supabase';
+import { getInfinitiveForm } from '../utils/verbConjugations';
 
 const TranslateScreen = ({ navigation }) => {
   const { theme } = useTheme();
@@ -33,6 +34,119 @@ const TranslateScreen = ({ navigation }) => {
         for (let wordIndex = 0; wordIndex < words.length; wordIndex++) {
           const word = words[wordIndex];
           
+          // Primero verificar si existe la palabra original
+          const wordExists = await wordsAPI.checkWordExists(word);
+          
+          if (wordExists) {
+            // Si existe, obtener el video
+            const wordVideo = await wordsAPI.getWordVideo(word);
+            
+            translatedWords.push({
+              originalWord: word,
+              hasVideo: true,
+              signs: [{
+                type: 'word',
+                word: wordVideo.word,
+                video_url: wordVideo.video_url,
+                description: wordVideo.description,
+                category: wordVideo.category
+              }]
+            });
+          } else {
+            // Si no existe, verificar si es una conjugación
+            const infinitiveForm = getInfinitiveForm(word);
+            
+            if (infinitiveForm !== word.toLowerCase()) {
+              // Es una conjugación, verificar si existe el infinitivo
+              const infinitiveExists = await wordsAPI.checkWordExists(infinitiveForm);
+              
+              if (infinitiveExists) {
+                const wordVideo = await wordsAPI.getWordVideo(infinitiveForm);
+                
+                translatedWords.push({
+                  originalWord: word,
+                  hasVideo: true,
+                  signs: [{
+                    type: 'word',
+                    word: wordVideo.word,
+                    video_url: wordVideo.video_url,
+                    description: wordVideo.description,
+                    category: wordVideo.category
+                  }]
+                });
+              } else {
+                // No existe ni la palabra ni su infinitivo, deletrear
+                const wordSigns = await this.getSpelledWord(word);
+                translatedWords.push({
+                  originalWord: word,
+                  hasVideo: false,
+                  signs: wordSigns
+                });
+              }
+            } else {
+              // No es una conjugación conocida, deletrear
+              const wordSigns = await this.getSpelledWord(word);
+              translatedWords.push({
+                originalWord: word,
+                hasVideo: false,
+                signs: wordSigns
+              });
+            }
+          }
+        }
+        
+        // Navegar a la pantalla de resultados
+        navigation.navigate('TranslationResults', {
+          translatedWords,
+          originalText: inputText.trim()
+        });
+        
+      } catch (error) {
+        console.error('Error translating text:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  // Función auxiliar para deletrear palabras
+  const getSpelledWord = async (word) => {
+    const elements = [];
+    
+    for (let i = 0; i < word.length; i++) {
+      const char = word[i];
+      // Normalizar caracteres con tildes para deletreo
+      const normalizedChar = char.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      
+      // Verificar si es RR o LL
+      if (normalizedChar === 'r' && word[i + 1] === 'r') {
+        elements.push({ type: 'character', character: 'RR' });
+        i++;
+      } else if (normalizedChar === 'l' && word[i + 1] === 'l') {
+        elements.push({ type: 'character', character: 'LL' });
+        i++;
+      } else if (/[a-zñ0-9]/.test(normalizedChar)) {
+        elements.push({ type: 'character', character: normalizedChar.toUpperCase() });
+      }
+    }
+    
+    // Obtener las señas de la base de datos solo para los caracteres
+    const charactersOnly = elements.map(el => el.character);
+    const signs = await signLanguageAPI.getSignsByCharacters(charactersOnly);
+    
+    // Crear array de señas para esta palabra
+    const wordSigns = [];
+    elements.forEach((element, index) => {
+      const sign = signs[index];
+      if (sign) {
+        wordSigns.push({ type: 'sign', ...sign });
+      }
+    });
+    
+    return wordSigns;
+  };
+
+  const clearText = () => {
           try {
             // Intentar buscar la palabra completa en la tabla words
             const wordVideo = await wordsAPI.getWordVideo(word);
