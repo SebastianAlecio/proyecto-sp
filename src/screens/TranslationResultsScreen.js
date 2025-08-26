@@ -600,5 +600,3 @@ const createStyles = (theme) => StyleSheet.create({
 });
 
 export default TranslationResultsScreen;
-
-export default TranslationResultsScreen
