@@ -76,7 +76,7 @@ const TranslateScreen = ({ navigation }) => {
                 });
               } else {
                 // No existe ni la palabra ni su infinitivo, deletrear
-                const wordSigns = await this.getSpelledWord(word);
+                const wordSigns = await getSpelledWord(word);
                 translatedWords.push({
                   originalWord: word,
                   hasVideo: false,
@@ -85,7 +85,7 @@ const TranslateScreen = ({ navigation }) => {
               }
             } else {
               // No es una conjugación conocida, deletrear
-              const wordSigns = await this.getSpelledWord(word);
+              const wordSigns = await getSpelledWord(word);
               translatedWords.push({
                 originalWord: word,
                 hasVideo: false,
@@ -144,80 +144,6 @@ const TranslateScreen = ({ navigation }) => {
     });
     
     return wordSigns;
-  };
-
-  const clearText = () => {
-          try {
-            // Intentar buscar la palabra completa en la tabla words
-            const wordVideo = await wordsAPI.getWordVideo(word);
-            
-            // Si existe en la tabla words, agregarlo como palabra completa
-            translatedWords.push({
-              originalWord: word,
-              hasVideo: true,
-              signs: [{
-                type: 'word',
-                word: wordVideo.word,
-                video_url: wordVideo.video_url,
-                description: wordVideo.description,
-                category: wordVideo.category
-              }]
-            });
-            
-          } catch (error) {
-            // Si no existe en words table, deletrear letra por letra
-            const elements = [];
-            
-            for (let i = 0; i < word.length; i++) {
-              const char = word[i];
-              // Normalizar caracteres con tildes para deletreo
-              const normalizedChar = char.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-              
-              // Verificar si es RR o LL
-              if (normalizedChar === 'r' && word[i + 1] === 'r') {
-                elements.push({ type: 'character', character: 'RR' });
-                i++;
-              } else if (normalizedChar === 'l' && word[i + 1] === 'l') {
-                elements.push({ type: 'character', character: 'LL' });
-                i++;
-              } else if (/[a-zñ0-9]/.test(normalizedChar)) {
-                elements.push({ type: 'character', character: normalizedChar.toUpperCase() });
-              }
-            }
-            
-            // Obtener las señas de la base de datos solo para los caracteres
-            const charactersOnly = elements.map(el => el.character);
-            const signs = await signLanguageAPI.getSignsByCharacters(charactersOnly);
-            
-            // Crear array de señas para esta palabra
-            const wordSigns = [];
-            elements.forEach((element, index) => {
-              const sign = signs[index];
-              if (sign) {
-                wordSigns.push({ type: 'sign', ...sign });
-              }
-            });
-            
-            translatedWords.push({
-              originalWord: word,
-              hasVideo: false,
-              signs: wordSigns
-            });
-          }
-        }
-        
-        // Navegar a la pantalla de resultados
-        navigation.navigate('TranslationResults', {
-          translatedWords,
-          originalText: inputText.trim()
-        });
-        
-      } catch (error) {
-        console.error('Error translating text:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
   };
 
   const clearText = () => {
