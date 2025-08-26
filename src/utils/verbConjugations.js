@@ -482,7 +482,6 @@ export const verbConjugations = {
   'escribe': 'escribir',
   'escribimos': 'escribir',
   'escriben': 'escribir',
-  'escribí': 'escribir',
   'escribiste': 'escribir',
   'escribió': 'escribir',
   'escribieron': 'escribir',
