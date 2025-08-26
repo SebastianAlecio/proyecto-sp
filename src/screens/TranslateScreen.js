@@ -27,11 +27,78 @@ const TranslateScreen = ({ navigation }) => {
       Keyboard.dismiss();
       
       try {
-        // Dividir el texto en palabras
-        const words = inputText.toLowerCase().trim().split(/\s+/);
+        // Limpiar el texto de puntuación y dividir en palabras
+        const cleanText = inputText.toLowerCase().trim().replace(/[.,;:!?¿¡]/g, '');
+        const words = cleanText.split(/\s+/);
         const translatedWords = [];
         
-        for (let wordIndex = 0; wordIndex < words.length; wordIndex++) {
+        let wordIndex = 0;
+        while (wordIndex < words.length) {
+          // Primero intentar frases de 3 palabras
+          if (wordIndex + 2 < words.length) {
+            const threeWordPhrase = `${words[wordIndex]} ${words[wordIndex + 1]} ${words[wordIndex + 2]}`;
+            let phraseExists = false;
+            try {
+              phraseExists = await wordsAPI.checkWordExists(threeWordPhrase);
+            } catch (error) {
+              phraseExists = false;
+            }
+            
+            if (phraseExists) {
+              try {
+                const phraseVideo = await wordsAPI.getWordVideo(threeWordPhrase);
+                translatedWords.push({
+                  originalWord: threeWordPhrase,
+                  hasVideo: true,
+                  signs: [{
+                    type: 'word',
+                    word: phraseVideo.word,
+                    video_url: phraseVideo.video_url,
+                    description: phraseVideo.description,
+                    category: phraseVideo.category
+                  }]
+                });
+                wordIndex += 3; // Saltar las 3 palabras procesadas
+                continue;
+              } catch (error) {
+                // Si hay error, continuar con frases de 2 palabras
+              }
+            }
+          }
+          
+          // Luego intentar frases de 2 palabras
+          if (wordIndex + 1 < words.length) {
+            const twoWordPhrase = `${words[wordIndex]} ${words[wordIndex + 1]}`;
+            let phraseExists = false;
+            try {
+              phraseExists = await wordsAPI.checkWordExists(twoWordPhrase);
+            } catch (error) {
+              phraseExists = false;
+            }
+            
+            if (phraseExists) {
+              try {
+                const phraseVideo = await wordsAPI.getWordVideo(twoWordPhrase);
+                translatedWords.push({
+                  originalWord: twoWordPhrase,
+                  hasVideo: true,
+                  signs: [{
+                    type: 'word',
+                    word: phraseVideo.word,
+                    video_url: phraseVideo.video_url,
+                    description: phraseVideo.description,
+                    category: phraseVideo.category
+                  }]
+                });
+                wordIndex += 2; // Saltar las 2 palabras procesadas
+                continue;
+              } catch (error) {
+                // Si hay error, continuar con palabra individual
+              }
+            }
+          }
+          
+          // Finalmente, procesar palabra individual
           const word = words[wordIndex];
           
           // Primero verificar si existe la palabra original
@@ -123,6 +190,8 @@ const TranslateScreen = ({ navigation }) => {
               });
             }
           }
+          
+          wordIndex++; // Avanzar a la siguiente palabra
         }
         
         // Navegar a la pantalla de resultados
