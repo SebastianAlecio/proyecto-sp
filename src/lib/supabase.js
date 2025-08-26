@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { getInfinitiveForm, normalizeWord } from '../utils/verbConjugations';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
@@ -92,26 +93,63 @@ export const signLanguageAPI = {
 export const wordsAPI = {
   // Check if a word exists in the database
   async checkWordExists(word) {
+    // Primero intentar con la palabra original
     const { data, error } = await supabase
       .from('words')
       .select('word')
-      .eq('word', word.toLowerCase())
+      .ilike('word', word.toLowerCase())
       .single();
     
-    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows found
-    return !!data;
+    if (!error && data) {
+      return true;
+    }
+    
+    // Si no se encuentra, intentar con la forma infinitiva
+    const infinitiveForm = getInfinitiveForm(word);
+    if (infinitiveForm !== word.toLowerCase()) {
+      const { data: infinitiveData, error: infinitiveError } = await supabase
+        .from('words')
+        .select('word')
+        .ilike('word', infinitiveForm)
+        .single();
+      
+      if (!infinitiveError && infinitiveData) {
+        return true;
+      }
+    }
+    
+    return false;
   },
 
   // Get word video by word
   async getWordVideo(word) {
+    // Primero intentar con la palabra original
     const { data, error } = await supabase
       .from('words')
       .select('*')
-      .eq('word', word.toLowerCase())
+      .ilike('word', word.toLowerCase())
       .single();
     
-    if (error) throw error;
-    return data;
+    if (!error && data) {
+      return data;
+    }
+    
+    // Si no se encuentra, intentar con la forma infinitiva (para verbos conjugados)
+    const infinitiveForm = getInfinitiveForm(word);
+    if (infinitiveForm !== word.toLowerCase()) {
+      const { data: infinitiveData, error: infinitiveError } = await supabase
+        .from('words')
+        .select('*')
+        .ilike('word', infinitiveForm)
+        .single();
+      
+      if (!infinitiveError && infinitiveData) {
+        return infinitiveData;
+      }
+    }
+    
+    // Si no se encuentra de ninguna manera, lanzar el error original
+    throw error;
   },
 
   // Get words by category
@@ -119,7 +157,7 @@ export const wordsAPI = {
     const { data, error } = await supabase
       .from('words')
       .select('*')
-      .eq('category', category)
+      .ilike('category', category)
       .order('word');
     
     if (error) throw error;
