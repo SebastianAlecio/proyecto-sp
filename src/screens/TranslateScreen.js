@@ -34,145 +34,90 @@ const TranslateScreen = ({ navigation }) => {
         
         let wordIndex = 0;
         while (wordIndex < words.length) {
-          // Primero intentar frases de 3 palabras
+          // PRIORIDAD 1: Intentar frases de 3 palabras PRIMERO
           if (wordIndex + 2 < words.length) {
             const threeWordPhrase = `${words[wordIndex]} ${words[wordIndex + 1]} ${words[wordIndex + 2]}`;
-            let phraseExists = false;
             try {
-              phraseExists = await wordsAPI.checkWordExists(threeWordPhrase);
-            } catch (error) {
-              phraseExists = false;
-            }
-            
-            if (phraseExists) {
-              try {
-                const phraseVideo = await wordsAPI.getWordVideo(threeWordPhrase);
-                translatedWords.push({
-                  originalWord: threeWordPhrase,
-                  hasVideo: true,
-                  signs: [{
-                    type: 'word',
-                    word: phraseVideo.word,
-                    video_url: phraseVideo.video_url,
-                    description: phraseVideo.description,
-                    category: phraseVideo.category
-                  }]
-                });
-                wordIndex += 3; // Saltar las 3 palabras procesadas
-                continue;
-              } catch (error) {
-                // Si hay error, continuar con frases de 2 palabras
-              }
-            }
-          }
-          
-          // Luego intentar frases de 2 palabras
-          if (wordIndex + 1 < words.length) {
-            const twoWordPhrase = `${words[wordIndex]} ${words[wordIndex + 1]}`;
-            let phraseExists = false;
-            try {
-              phraseExists = await wordsAPI.checkWordExists(twoWordPhrase);
-            } catch (error) {
-              phraseExists = false;
-            }
-            
-            if (phraseExists) {
-              try {
-                const phraseVideo = await wordsAPI.getWordVideo(twoWordPhrase);
-                translatedWords.push({
-                  originalWord: twoWordPhrase,
-                  hasVideo: true,
-                  signs: [{
-                    type: 'word',
-                    word: phraseVideo.word,
-                    video_url: phraseVideo.video_url,
-                    description: phraseVideo.description,
-                    category: phraseVideo.category
-                  }]
-                });
-                wordIndex += 2; // Saltar las 2 palabras procesadas
-                continue;
-              } catch (error) {
-                // Si hay error, continuar con palabra individual
-              }
-            }
-          }
-          
-          // Finalmente, procesar palabra individual
-          const word = words[wordIndex];
-          
-          // Primero verificar si existe la palabra original
-          let wordExists = false;
-          try {
-            wordExists = await wordsAPI.checkWordExists(word);
-          } catch (error) {
-            wordExists = false;
-          }
-          
-          if (wordExists) {
-            // Si existe, obtener el video
-            try {
-              const wordVideo = await wordsAPI.getWordVideo(word);
-            
+              const phraseVideo = await wordsAPI.getWordVideo(threeWordPhrase);
               translatedWords.push({
-                originalWord: word,
+                originalWord: threeWordPhrase,
                 hasVideo: true,
                 signs: [{
                   type: 'word',
-                  word: wordVideo.word,
-                  video_url: wordVideo.video_url,
-                  description: wordVideo.description,
-                  category: wordVideo.category
+                  word: phraseVideo.word,
+                  video_url: phraseVideo.video_url,
+                  description: phraseVideo.description,
+                  category: phraseVideo.category
                 }]
               });
+              wordIndex += 3; // Saltar las 3 palabras procesadas
+              continue;
             } catch (error) {
-              // Si hay error, deletrear
-              const wordSigns = await getSpelledWord(word);
-              translatedWords.push({
-                originalWord: word,
-                hasVideo: false,
-                signs: wordSigns
-              });
+              // Si no existe como frase de 3 palabras, continuar
             }
-          } else {
-            // Si no existe, verificar si es una conjugación
+          }
+          
+          // PRIORIDAD 2: Intentar frases de 2 palabras
+          if (wordIndex + 1 < words.length) {
+            const twoWordPhrase = `${words[wordIndex]} ${words[wordIndex + 1]}`;
+            try {
+              const phraseVideo = await wordsAPI.getWordVideo(twoWordPhrase);
+              translatedWords.push({
+                originalWord: twoWordPhrase,
+                hasVideo: true,
+                signs: [{
+                  type: 'word',
+                  word: phraseVideo.word,
+                  video_url: phraseVideo.video_url,
+                  description: phraseVideo.description,
+                  category: phraseVideo.category
+                }]
+              });
+              wordIndex += 2; // Saltar las 2 palabras procesadas
+              continue;
+            } catch (error) {
+              // Si no existe como frase de 2 palabras, continuar
+            }
+          }
+          
+          // PRIORIDAD 3: Procesar palabra individual
+          const word = words[wordIndex];
+          
+          // Buscar palabra original en base de datos
+          try {
+            const wordVideo = await wordsAPI.getWordVideo(word);
+            translatedWords.push({
+              originalWord: word,
+              hasVideo: true,
+              signs: [{
+                type: 'word',
+                word: wordVideo.word,
+                video_url: wordVideo.video_url,
+                description: wordVideo.description,
+                category: wordVideo.category
+              }]
+            });
+          } catch (error) {
+            // Si no existe la palabra, verificar si es una conjugación
             const infinitiveForm = getInfinitiveForm(word);
             
             if (infinitiveForm !== word.toLowerCase()) {
-              // Es una conjugación, verificar si existe el infinitivo
-              let infinitiveExists = false;
+              // Es una conjugación, buscar el infinitivo
               try {
-                infinitiveExists = await wordsAPI.checkWordExists(infinitiveForm);
+                const wordVideo = await wordsAPI.getWordVideo(infinitiveForm);
+                translatedWords.push({
+                  originalWord: word,
+                  hasVideo: true,
+                  signs: [{
+                    type: 'word',
+                    word: wordVideo.word,
+                    video_url: wordVideo.video_url,
+                    description: wordVideo.description,
+                    category: wordVideo.category
+                  }]
+                });
               } catch (error) {
-                infinitiveExists = false;
-              }
-              
-              if (infinitiveExists) {
-                try {
-                  const wordVideo = await wordsAPI.getWordVideo(infinitiveForm);
-                
-                  translatedWords.push({
-                    originalWord: word,
-                    hasVideo: true,
-                    signs: [{
-                      type: 'word',
-                      word: wordVideo.word,
-                      video_url: wordVideo.video_url,
-                      description: wordVideo.description,
-                      category: wordVideo.category
-                    }]
-                  });
-                } catch (error) {
-                  // Si hay error, deletrear
-                  const wordSigns = await getSpelledWord(word);
-                  translatedWords.push({
-                    originalWord: word,
-                    hasVideo: false,
-                    signs: wordSigns
-                  });
-                }
-              } else {
-                // No existe ni la palabra ni su infinitivo, deletrear
+                // No existe el infinitivo, deletrear
                 const wordSigns = await getSpelledWord(word);
                 translatedWords.push({
                   originalWord: word,
@@ -181,7 +126,7 @@ const TranslateScreen = ({ navigation }) => {
                 });
               }
             } else {
-              // No es una conjugación conocida, deletrear
+              // No es una conjugación, deletrear
               const wordSigns = await getSpelledWord(word);
               translatedWords.push({
                 originalWord: word,
