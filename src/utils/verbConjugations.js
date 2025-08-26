@@ -175,6 +175,9 @@ export const verbConjugations = {
   'comiste': 'comer',
   'comió': 'comer',
   'comieron': 'comer',
+  'comí': 'comer',
+  'comiste': 'comer',
+  'comió': 'comer',
   
   // Compartir
   'comparto': 'compartir',

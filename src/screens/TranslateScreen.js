@@ -56,16 +56,18 @@ const TranslateScreen = ({ navigation }) => {
             
             for (let i = 0; i < word.length; i++) {
               const char = word[i];
+              // Normalizar caracteres con tildes para deletreo
+              const normalizedChar = char.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
               
               // Verificar si es RR o LL
-              if (char === 'r' && word[i + 1] === 'r') {
+              if (normalizedChar === 'r' && word[i + 1] === 'r') {
                 elements.push({ type: 'character', character: 'RR' });
                 i++;
-              } else if (char === 'l' && word[i + 1] === 'l') {
+              } else if (normalizedChar === 'l' && word[i + 1] === 'l') {
                 elements.push({ type: 'character', character: 'LL' });
                 i++;
-              } else if (/[a-zñ0-9]/.test(char)) {
-                elements.push({ type: 'character', character: char.toUpperCase() });
+              } else if (/[a-zñ0-9]/.test(normalizedChar)) {
+                elements.push({ type: 'character', character: normalizedChar.toUpperCase() });
               }
             }
             
