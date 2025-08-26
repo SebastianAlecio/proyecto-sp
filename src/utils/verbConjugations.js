@@ -670,7 +670,6 @@ export const verbConjugations = {
   'manda': 'mandar',
   'mandamos': 'mandar',
   'mandan': 'mandar',
-  'mandé': 'mandar',
   'mandaste': 'mandar',
   'mandó': 'mandar',
   'mandaron': 'mandar',
