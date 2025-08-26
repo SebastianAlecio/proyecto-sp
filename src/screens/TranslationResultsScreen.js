@@ -224,7 +224,7 @@ const TranslationResultsScreen = ({ route, navigation }) => {
                         style={styles.video}
                         resizeMode="contain"
                         isLooping={true}
-                        shouldPlay={false}
+                        shouldPlay={true}
                       />
                       <View style={styles.videoOverlay}>
                         <Icon name="play-circle" size={48} color="rgba(255,255,255,0.9)" />
