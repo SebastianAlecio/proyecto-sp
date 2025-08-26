@@ -485,7 +485,7 @@ export const verbConjugations = {
   'escribiste': 'escribir',
   'escribió': 'escribir',
   'escribieron': 'escribir',
-  'escribí': 'escribir',
+  'escribi': 'escribir',
   
   // Esperar
   'espero': 'esperar',
@@ -673,7 +673,7 @@ export const verbConjugations = {
   'mandaste': 'mandar',
   'mandó': 'mandar',
   'mandaron': 'mandar',
-  'mandé': 'mandar',
+  'mande': 'mandar',
   
   // Mejorar
   'mejoro': 'mejorar',
@@ -907,5 +907,8 @@ export const normalizeWord = (word) => {
 // Función para obtener la forma infinitiva de un verbo
 export const getInfinitiveForm = (word) => {
   const normalizedWord = normalizeWord(word);
-  return verbConjugations[normalizedWord] || word.toLowerCase();
+  console.log(`🔄 Buscando conjugación: "${word}" → normalizado: "${normalizedWord}"`);
+  const infinitive = verbConjugations[normalizedWord] || word.toLowerCase();
+  console.log(`🔄 Resultado: "${infinitive}"`);
+  return infinitive;
 };
