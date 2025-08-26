@@ -1,189 +1,342 @@
-import { createClient } from '@supabase/supabase-js';
-import { getInfinitiveForm, normalizeWord } from '../utils/verbConjugations';
-
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-export const signLanguageAPI = {
-  // Get all letters
-  async getAllLetters() {
-    const { data, error } = await supabase
-      .from('letters')
-      .select('*')
-      .eq('type', 'letter')
-      .order('character');
-    
-    if (error) throw error;
-    return data;
-  },
-
-  // Get all numbers
-  async getAllNumbers() {
-    const { data, error } = await supabase
-      .from('letters')
-      .select('*')
-      .eq('type', 'number')
-      .order('character');
-    
-    if (error) throw error;
-    return data;
-  },
-
-  // Get special characters (RR, LL)
-  async getSpecialCharacters() {
-    const { data, error } = await supabase
-      .from('letters')
-      .select('*')
-      .eq('type', 'special')
-      .order('character');
-    
-    if (error) throw error;
-    return data;
-  },
-
-  // Get sign by character
-  async getSignByCharacter(character) {
-    const { data, error } = await supabase
-      .from('letters')
-      .select('*')
-      .eq('character', character.toUpperCase())
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  // Get multiple signs by characters (for translating words)
-  async getSignsByCharacters(characters) {
-    const upperCaseChars = characters.map(char => char.toUpperCase());
-    
-    const { data, error } = await supabase
-      .from('letters')
-      .select('*')
-      .in('character', upperCaseChars);
-    
-    if (error) throw error;
-    
-    // Return in the same order as requested
-    return upperCaseChars.map(char => 
-      data.find(item => item.character === char)
-    ).filter(Boolean);
-  },
-
-  // Get all signs (letters, numbers, and special)
-  async getAllSigns() {
-    const { data, error } = await supabase
-      .from('letters')
-      .select('*')
-      .order('type', { ascending: true })
-      .order('character', { ascending: true });
-    
-    if (error) throw error;
-    return data;
-  },
-
+// Mapeo de conjugaciones verbales a sus formas infinitivas
+const verbConjugations = {
+  // Presente
+  'quiero': 'querer',
+  'quieres': 'querer',
+  'quiere': 'querer',
+  'queremos': 'querer',
+  'quieren': 'querer',
+  'como': 'comer',
+  'comes': 'comer',
+  'come': 'comer',
+  'comemos': 'comer',
+  'comen': 'comer',
+  'escribo': 'escribir',
+  'escribes': 'escribir',
+  'escribe': 'escribir',
+  'escribimos': 'escribir',
+  'escriben': 'escribir',
+  'hablo': 'hablar',
+  'hablas': 'hablar',
+  'habla': 'hablar',
+  'hablamos': 'hablar',
+  'hablan': 'hablar',
+  'corro': 'correr',
+  'corres': 'correr',
+  'corre': 'correr',
+  'corremos': 'correr',
+  'corren': 'correr',
+  'salto': 'saltar',
+  'saltas': 'saltar',
+  'salta': 'saltar',
+  'saltamos': 'saltar',
+  'saltan': 'saltar',
+  'agarro': 'agarrar',
+  'agarras': 'agarrar',
+  'agarra': 'agarrar',
+  'agarramos': 'agarrar',
+  'agarran': 'agarrar',
+  'mando': 'mandar',
+  'mandas': 'mandar',
+  'manda': 'mandar',
+  'mandamos': 'mandar',
+  'mandan': 'mandar',
+  'estudio': 'estudiar',
+  'estudias': 'estudiar',
+  'estudia': 'estudiar',
+  'estudiamos': 'estudiar',
+  'estudian': 'estudiar',
+  'aprendo': 'aprender',
+  'aprendes': 'aprender',
+  'aprende': 'aprender',
+  'aprendemos': 'aprender',
+  'aprenden': 'aprender',
+  'bebo': 'beber',
+  'bebes': 'beber',
+  'bebe': 'beber',
+  'bebemos': 'beber',
+  'beben': 'beber',
+  'canto': 'cantar',
+  'cantas': 'cantar',
+  'canta': 'cantar',
+  'cantamos': 'cantar',
+  'cantan': 'cantar',
+  'juego': 'jugar',
+  'juegas': 'jugar',
+  'juega': 'jugar',
+  'jugamos': 'jugar',
+  'juegan': 'jugar',
+  'camino': 'caminar',
+  'caminas': 'caminar',
+  'camina': 'caminar',
+  'caminamos': 'caminar',
+  'caminan': 'caminar',
+  'nado': 'nadar',
+  'nadas': 'nadar',
+  'nada': 'nadar',
+  'nadamos': 'nadar',
+  'nadan': 'nadar',
+  'pinto': 'pintar',
+  'pintas': 'pintar',
+  'pinta': 'pintar',
+  'pintamos': 'pintar',
+  'pintan': 'pintar',
+  'hago': 'hacer',
+  'haces': 'hacer',
+  'hace': 'hacer',
+  'hacemos': 'hacer',
+  'hacen': 'hacer',
+  'tengo': 'tener',
+  'tienes': 'tener',
+  'tiene': 'tener',
+  'tenemos': 'tener',
+  'tienen': 'tener',
+  'soy': 'ser',
+  'eres': 'ser',
+  'es': 'ser',
+  'somos': 'ser',
+  'son': 'ser',
+  'estoy': 'estar',
+  'estas': 'estar',
+  'esta': 'estar',
+  'estamos': 'estar',
+  'estan': 'estar',
+  'doy': 'dar',
+  'das': 'dar',
+  'da': 'dar',
+  'damos': 'dar',
+  'dan': 'dar',
+  'voy': 'ir',
+  'vas': 'ir',
+  'va': 'ir',
+  'vamos': 'ir',
+  'van': 'ir',
+  
+  // Pasado (pretérito perfecto simple)
+  'quise': 'querer',
+  'quisiste': 'querer',
+  'quiso': 'querer',
+  'quisimos': 'querer',
+  'quisieron': 'querer',
+  'comi': 'comer',
+  'comiste': 'comer',
+  'comio': 'comer',
+  'comimos': 'comer',
+  'comieron': 'comer',
+  'escribi': 'escribir',
+  'escribiste': 'escribir',
+  'escribio': 'escribir',
+  'escribimos': 'escribir',
+  'escribieron': 'escribir',
+  'hable': 'hablar',
+  'hablaste': 'hablar',
+  'hablo': 'hablar',
+  'hablamos': 'hablar',
+  'hablaron': 'hablar',
+  'corri': 'correr',
+  'corriste': 'correr',
+  'corrio': 'correr',
+  'corrimos': 'correr',
+  'corrieron': 'correr',
+  'salte': 'saltar',
+  'saltaste': 'saltar',
+  'salto': 'saltar',
+  'saltamos': 'saltar',
+  'saltaron': 'saltar',
+  'agarre': 'agarrar',
+  'agarraste': 'agarrar',
+  'agarro': 'agarrar',
+  'agarramos': 'agarrar',
+  'agarraron': 'agarrar',
+  'mande': 'mandar',
+  'mandaste': 'mandar',
+  'mando': 'mandar',
+  'mandamos': 'mandar',
+  'mandaron': 'mandar',
+  'estudie': 'estudiar',
+  'estudiaste': 'estudiar',
+  'estudio': 'estudiar',
+  'estudiamos': 'estudiar',
+  'estudiaron': 'estudiar',
+  'aprendi': 'aprender',
+  'aprendiste': 'aprender',
+  'aprendio': 'aprender',
+  'aprendimos': 'aprender',
+  'aprendieron': 'aprender',
+  'bebi': 'beber',
+  'bebiste': 'beber',
+  'bebio': 'beber',
+  'bebimos': 'beber',
+  'bebieron': 'beber',
+  'cante': 'cantar',
+  'cantaste': 'cantar',
+  'canto': 'cantar',
+  'cantamos': 'cantar',
+  'cantaron': 'cantar',
+  'jugue': 'jugar',
+  'jugaste': 'jugar',
+  'jugo': 'jugar',
+  'jugamos': 'jugar',
+  'jugaron': 'jugar',
+  'camine': 'caminar',
+  'caminaste': 'caminar',
+  'camino': 'caminar',
+  'caminamos': 'caminar',
+  'caminaron': 'caminar',
+  'nade': 'nadar',
+  'nadaste': 'nadar',
+  'nado': 'nadar',
+  'nadamos': 'nadar',
+  'nadaron': 'nadar',
+  'pinte': 'pintar',
+  'pintaste': 'pintar',
+  'pinto': 'pintar',
+  'pintamos': 'pintar',
+  'pintaron': 'pintar',
+  'hice': 'hacer',
+  'hiciste': 'hacer',
+  'hizo': 'hacer',
+  'hicimos': 'hacer',
+  'hicieron': 'hacer',
+  'tuve': 'tener',
+  'tuviste': 'tener',
+  'tuvo': 'tener',
+  'tuvimos': 'tener',
+  'tuvieron': 'tener',
+  'fui': 'ser',
+  'fuiste': 'ser',
+  'fue': 'ser',
+  'fuimos': 'ser',
+  'fueron': 'ser',
+  'estuve': 'estar',
+  'estuviste': 'estar',
+  'estuvo': 'estar',
+  'estuvimos': 'estar',
+  'estuvieron': 'estar',
+  'di': 'dar',
+  'diste': 'dar',
+  'dio': 'dar',
+  'dimos': 'dar',
+  'dieron': 'dar',
+  
+  // Futuro
+  'querre': 'querer',
+  'querras': 'querer',
+  'querra': 'querer',
+  'querremos': 'querer',
+  'querran': 'querer',
+  'comere': 'comer',
+  'comeras': 'comer',
+  'comera': 'comer',
+  'comeremos': 'comer',
+  'comeran': 'comer',
+  'escribire': 'escribir',
+  'escribiras': 'escribir',
+  'escribira': 'escribir',
+  'escribiremos': 'escribir',
+  'escribiran': 'escribir',
+  'hablare': 'hablar',
+  'hablaras': 'hablar',
+  'hablara': 'hablar',
+  'hablaremos': 'hablar',
+  'hablaran': 'hablar',
+  'correre': 'correr',
+  'correras': 'correr',
+  'correra': 'correr',
+  'correremos': 'correr',
+  'correran': 'correr',
+  'saltare': 'saltar',
+  'saltaras': 'saltar',
+  'saltara': 'saltar',
+  'saltaremos': 'saltar',
+  'saltaran': 'saltar',
+  'agarrare': 'agarrar',
+  'agarraras': 'agarrar',
+  'agarrara': 'agarrar',
+  'agarraremos': 'agarrar',
+  'agarraran': 'agarrar',
+  'mandare': 'mandar',
+  'mandaras': 'mandar',
+  'mandara': 'mandar',
+  'mandaremos': 'mandar',
+  'mandaran': 'mandar',
+  'estudiare': 'estudiar',
+  'estudiaras': 'estudiar',
+  'estudiara': 'estudiar',
+  'estudiaremos': 'estudiar',
+  'estudiaran': 'estudiar',
+  'aprendere': 'aprender',
+  'aprenderas': 'aprender',
+  'aprendera': 'aprender',
+  'aprenderemos': 'aprender',
+  'aprenderan': 'aprender',
+  'bebere': 'beber',
+  'beberas': 'beber',
+  'bebera': 'beber',
+  'beberemos': 'beber',
+  'beberan': 'beber',
+  'cantare': 'cantar',
+  'cantaras': 'cantar',
+  'cantara': 'cantar',
+  'cantaremos': 'cantar',
+  'cantaran': 'cantar',
+  'jugare': 'jugar',
+  'jugaras': 'jugar',
+  'jugara': 'jugar',
+  'jugaremos': 'jugar',
+  'jugaran': 'jugar',
+  'caminare': 'caminar',
+  'caminaras': 'caminar',
+  'caminara': 'caminar',
+  'caminaremos': 'caminar',
+  'caminaran': 'caminar',
+  'nadare': 'nadar',
+  'nadaras': 'nadar',
+  'nadara': 'nadar',
+  'nadaremos': 'nadar',
+  'nadaran': 'nadar',
+  'pintare': 'pintar',
+  'pintaras': 'pintar',
+  'pintara': 'pintar',
+  'pintaremos': 'pintar',
+  'pintaran': 'pintar',
+  'hare': 'hacer',
+  'haras': 'hacer',
+  'hara': 'hacer',
+  'haremos': 'hacer',
+  'haran': 'hacer',
+  'tendre': 'tener',
+  'tendras': 'tener',
+  'tendra': 'tener',
+  'tendremos': 'tener',
+  'tendran': 'tener',
+  'sere': 'ser',
+  'seras': 'ser',
+  'sera': 'ser',
+  'seremos': 'ser',
+  'seran': 'ser',
+  'estare': 'estar',
+  'estaras': 'estar',
+  'estara': 'estar',
+  'estaremos': 'estar',
+  'estaran': 'estar',
+  'dare': 'dar',
+  'daras': 'dar',
+  'dara': 'dar',
+  'daremos': 'dar',
+  'daran': 'dar',
 };
 
-// Words API for complete sign language words
-export const wordsAPI = {
-  // Check if a word exists in the database
-  async checkWordExists(word) {
-    // Primero intentar con la palabra original
-    const { data, error } = await supabase
-      .from('words')
-      .select('word')
-      .ilike('word', word.toLowerCase())
-      .single();
-    
-    if (!error && data) {
-      return true;
-    }
-    
-    // Si no se encuentra, intentar con la forma infinitiva
-    const infinitiveForm = getInfinitiveForm(word);
-    if (infinitiveForm !== word.toLowerCase()) {
-      const { data: infinitiveData, error: infinitiveError } = await supabase
-        .from('words')
-        .select('word')
-        .ilike('word', infinitiveForm)
-        .single();
-      
-      if (!infinitiveError && infinitiveData) {
-        return true;
-      }
-    }
-    
-    return false;
-  },
+// Función para normalizar palabras (quitar tildes y convertir a minúsculas)
+export const normalizeWord = (word) => {
+  return word
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+};
 
-  // Get word video by word
-  async getWordVideo(word) {
-    // Primero intentar con la palabra original
-    const { data, error } = await supabase
-      .from('words')
-      .select('*')
-      .ilike('word', word.toLowerCase())
-      .single();
-    
-    if (!error && data) {
-      return data;
-    }
-    
-    // Si no se encuentra, intentar con la forma infinitiva (para verbos conjugados)
-    const infinitiveForm = getInfinitiveForm(word);
-    if (infinitiveForm !== word.toLowerCase()) {
-      const { data: infinitiveData, error: infinitiveError } = await supabase
-        .from('words')
-        .select('*')
-        .ilike('word', infinitiveForm)
-        .single();
-      
-      if (!infinitiveError && infinitiveData) {
-        return infinitiveData;
-      }
-    }
-    
-    // Si no se encuentra de ninguna manera, lanzar el error original
-    throw error;
-  },
-
-  // Get words by category
-  async getWordsByCategory(category) {
-    const { data, error } = await supabase
-      .from('words')
-      .select('*')
-      .ilike('category', category)
-      .order('word');
-    
-    if (error) throw error;
-    return data;
-  },
-
-  // Get all words
-  async getAllWords() {
-    const { data, error } = await supabase
-      .from('words')
-      .select('*')
-      .order('category')
-      .order('word');
-    
-    if (error) throw error;
-    return data;
-  },
-
-  // Get all categories
-  async getAllCategories() {
-    const { data, error } = await supabase
-      .from('words')
-      .select('category')
-      .order('category');
-    
-    if (error) throw error;
-    return [...new Set(data.map(item => item.category))];
-  },
+// Función para obtener la forma infinitiva de un verbo conjugado
+export const getInfinitiveForm = (word) => {
+  const normalizedWord = normalizeWord(word);
+  return verbConjugations[normalizedWord] || word.toLowerCase();
 };

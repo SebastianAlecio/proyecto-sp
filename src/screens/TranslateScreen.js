@@ -34,16 +34,16 @@ const TranslateScreen = ({ navigation }) => {
         for (let wordIndex = 0; wordIndex < words.length; wordIndex++) {
           const word = words[wordIndex];
           
-          // Primero verificar si existe la palabra original (manteniendo tildes)
+          // Primero verificar si existe la palabra original
           let wordExists = false;
           try {
             wordExists = await wordsAPI.checkWordExists(word);
           } catch (error) {
-            // Error silencioso
+            wordExists = false;
           }
           
           if (wordExists) {
-            // Si existe, obtener el video (manteniendo tildes)
+            // Si existe, obtener el video
             try {
               const wordVideo = await wordsAPI.getWordVideo(word);
             
@@ -59,7 +59,7 @@ const TranslateScreen = ({ navigation }) => {
                 }]
               });
             } catch (error) {
-              // Si hay error, deletrear (aquí sí normalizamos para deletreo)
+              // Si hay error, deletrear
               const wordSigns = await getSpelledWord(word);
               translatedWords.push({
                 originalWord: word,
@@ -68,16 +68,16 @@ const TranslateScreen = ({ navigation }) => {
               });
             }
           } else {
-            // Si no existe, verificar si es una conjugación (normalizar solo para buscar)
+            // Si no existe, verificar si es una conjugación
             const infinitiveForm = getInfinitiveForm(word);
             
             if (infinitiveForm !== word.toLowerCase()) {
-              // Es una conjugación, verificar si existe el infinitivo (manteniendo tildes del infinitivo)
+              // Es una conjugación, verificar si existe el infinitivo
               let infinitiveExists = false;
               try {
                 infinitiveExists = await wordsAPI.checkWordExists(infinitiveForm);
               } catch (error) {
-                // Error silencioso
+                infinitiveExists = false;
               }
               
               if (infinitiveExists) {
@@ -96,7 +96,7 @@ const TranslateScreen = ({ navigation }) => {
                     }]
                   });
                 } catch (error) {
-                  // Si hay error, deletrear (aquí sí normalizamos)
+                  // Si hay error, deletrear
                   const wordSigns = await getSpelledWord(word);
                   translatedWords.push({
                     originalWord: word,
@@ -105,7 +105,7 @@ const TranslateScreen = ({ navigation }) => {
                   });
                 }
               } else {
-                // No existe ni la palabra ni su infinitivo, deletrear (aquí sí normalizamos)
+                // No existe ni la palabra ni su infinitivo, deletrear
                 const wordSigns = await getSpelledWord(word);
                 translatedWords.push({
                   originalWord: word,
@@ -114,7 +114,7 @@ const TranslateScreen = ({ navigation }) => {
                 });
               }
             } else {
-              // No es una conjugación conocida, deletrear (aquí sí normalizamos)
+              // No es una conjugación conocida, deletrear
               const wordSigns = await getSpelledWord(word);
               translatedWords.push({
                 originalWord: word,
@@ -145,7 +145,6 @@ const TranslateScreen = ({ navigation }) => {
     
     for (let i = 0; i < word.length; i++) {
       const char = word[i];
-      // Normalizar caracteres con tildes para deletreo
       const normalizedChar = char.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       
       // Verificar si es RR o LL
