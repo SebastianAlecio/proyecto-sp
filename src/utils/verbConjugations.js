@@ -486,6 +486,7 @@ export const verbConjugations = {
   'escribiste': 'escribir',
   'escribió': 'escribir',
   'escribieron': 'escribir',
+  'escribí': 'escribir',
   
   // Esperar
   'espero': 'esperar',
@@ -674,6 +675,7 @@ export const verbConjugations = {
   'mandaste': 'mandar',
   'mandó': 'mandar',
   'mandaron': 'mandar',
+  'mandé': 'mandar',
   
   // Mejorar
   'mejoro': 'mejorar',
