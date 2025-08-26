@@ -34,48 +34,88 @@ const TranslateScreen = ({ navigation }) => {
         for (let wordIndex = 0; wordIndex < words.length; wordIndex++) {
           const word = words[wordIndex];
           
+          console.log(`🔍 Procesando palabra: "${word}"`);
+          
           // Primero verificar si existe la palabra original
-          const wordExists = await wordsAPI.checkWordExists(word);
+          let wordExists = false;
+          try {
+            wordExists = await wordsAPI.checkWordExists(word);
+            console.log(`📝 Palabra "${word}" existe en DB:`, wordExists);
+          } catch (error) {
+            console.log(`❌ Error buscando "${word}":`, error.message);
+          }
           
           if (wordExists) {
             // Si existe, obtener el video
-            const wordVideo = await wordsAPI.getWordVideo(word);
+            try {
+              const wordVideo = await wordsAPI.getWordVideo(word);
+              console.log(`🎥 Video encontrado para "${word}":`, wordVideo.word);
             
-            translatedWords.push({
-              originalWord: word,
-              hasVideo: true,
-              signs: [{
-                type: 'word',
-                word: wordVideo.word,
-                video_url: wordVideo.video_url,
-                description: wordVideo.description,
-                category: wordVideo.category
-              }]
-            });
+              translatedWords.push({
+                originalWord: word,
+                hasVideo: true,
+                signs: [{
+                  type: 'word',
+                  word: wordVideo.word,
+                  video_url: wordVideo.video_url,
+                  description: wordVideo.description,
+                  category: wordVideo.category
+                }]
+              });
+            } catch (error) {
+              console.log(`❌ Error obteniendo video para "${word}":`, error.message);
+              // Si hay error, deletrear
+              const wordSigns = await getSpelledWord(word);
+              translatedWords.push({
+                originalWord: word,
+                hasVideo: false,
+                signs: wordSigns
+              });
+            }
           } else {
             // Si no existe, verificar si es una conjugación
             const infinitiveForm = getInfinitiveForm(word);
+            console.log(`🔄 Forma infinitiva de "${word}": "${infinitiveForm}"`);
             
             if (infinitiveForm !== word.toLowerCase()) {
               // Es una conjugación, verificar si existe el infinitivo
-              const infinitiveExists = await wordsAPI.checkWordExists(infinitiveForm);
+              let infinitiveExists = false;
+              try {
+                infinitiveExists = await wordsAPI.checkWordExists(infinitiveForm);
+                console.log(`📝 Infinitivo "${infinitiveForm}" existe en DB:`, infinitiveExists);
+              } catch (error) {
+                console.log(`❌ Error buscando infinitivo "${infinitiveForm}":`, error.message);
+              }
               
               if (infinitiveExists) {
-                const wordVideo = await wordsAPI.getWordVideo(infinitiveForm);
+                try {
+                  const wordVideo = await wordsAPI.getWordVideo(infinitiveForm);
+                  console.log(`🎥 Video encontrado para infinitivo "${infinitiveForm}":`, wordVideo.word);
                 
-                translatedWords.push({
-                  originalWord: word,
-                  hasVideo: true,
-                  signs: [{
-                    type: 'word',
-                    word: wordVideo.word,
-                    video_url: wordVideo.video_url,
-                    description: wordVideo.description,
-                    category: wordVideo.category
-                  }]
-                });
+                  translatedWords.push({
+                    originalWord: word,
+                    hasVideo: true,
+                    signs: [{
+                      type: 'word',
+                      word: wordVideo.word,
+                      video_url: wordVideo.video_url,
+                      description: wordVideo.description,
+                      category: wordVideo.category
+                    }]
+                  });
+                } catch (error) {
+                  console.log(`❌ Error obteniendo video para infinitivo "${infinitiveForm}":`, error.message);
+                  // Si hay error, deletrear
+                  const wordSigns = await getSpelledWord(word);
+                  translatedWords.push({
+                    originalWord: word,
+                    hasVideo: false,
+                    signs: wordSigns
+                  });
+                }
               } else {
                 // No existe ni la palabra ni su infinitivo, deletrear
+                console.log(`📝 Deletreando "${word}" - no encontrado en DB`);
                 const wordSigns = await getSpelledWord(word);
                 translatedWords.push({
                   originalWord: word,
@@ -85,6 +125,7 @@ const TranslateScreen = ({ navigation }) => {
               }
             } else {
               // No es una conjugación conocida, deletrear
+              console.log(`📝 Deletreando "${word}" - no es conjugación conocida`);
               const wordSigns = await getSpelledWord(word);
               translatedWords.push({
                 originalWord: word,
@@ -111,12 +152,14 @@ const TranslateScreen = ({ navigation }) => {
 
   // Función auxiliar para deletrear palabras
   const getSpelledWord = async (word) => {
+    console.log(`🔤 Deletreando palabra: "${word}"`);
     const elements = [];
     
     for (let i = 0; i < word.length; i++) {
       const char = word[i];
       // Normalizar caracteres con tildes para deletreo
       const normalizedChar = char.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      console.log(`🔤 Caracter "${char}" → normalizado "${normalizedChar}"`);
       
       // Verificar si es RR o LL
       if (normalizedChar === 'r' && word[i + 1] === 'r') {
