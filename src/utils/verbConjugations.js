@@ -1,914 +1,189 @@
-// Mapeo de conjugaciones de verbos a su forma infinitiva
-export const verbConjugations = {
-  // Agarrar
-  'agarro': 'agarrar',
-  'agarras': 'agarrar',
-  'agarra': 'agarrar',
-  'agarramos': 'agarrar',
-  'agarran': 'agarrar',
-  'agarré': 'agarrar',
-  'agarraste': 'agarrar',
-  'agarró': 'agarrar',
-  'agarraron': 'agarrar',
-  
-  // Agradecer
-  'agradezco': 'agradecer',
-  'agradeces': 'agradecer',
-  'agradece': 'agradecer',
-  'agradecemos': 'agradecer',
-  'agradecen': 'agradecer',
-  'agradecí': 'agradecer',
-  'agradeciste': 'agradecer',
-  'agradeció': 'agradecer',
-  'agradecieron': 'agradecer',
-  
-  // Alcanzar
-  'alcanzo': 'alcanzar',
-  'alcanzas': 'alcanzar',
-  'alcanza': 'alcanzar',
-  'alcanzamos': 'alcanzar',
-  'alcanzan': 'alcanzar',
-  'alcancé': 'alcanzar',
-  'alcanzaste': 'alcanzar',
-  'alcanzó': 'alcanzar',
-  'alcanzaron': 'alcanzar',
-  
-  // Analizar
-  'analizo': 'analizar',
-  'analizas': 'analizar',
-  'analiza': 'analizar',
-  'analizamos': 'analizar',
-  'analizan': 'analizar',
-  'analicé': 'analizar',
-  'analizaste': 'analizar',
-  'analizó': 'analizar',
-  'analizaron': 'analizar',
-  
-  // Animar
-  'animo': 'animar',
-  'animas': 'animar',
-  'anima': 'animar',
-  'animamos': 'animar',
-  'animan': 'animar',
-  'animé': 'animar',
-  'animaste': 'animar',
-  'animó': 'animar',
-  'animaron': 'animar',
-  
-  // Anunciar
-  'anuncio': 'anunciar',
-  'anuncias': 'anunciar',
-  'anuncia': 'anunciar',
-  'anunciamos': 'anunciar',
-  'anuncian': 'anunciar',
-  'anuncié': 'anunciar',
-  'anunciaste': 'anunciar',
-  'anunció': 'anunciar',
-  'anunciaron': 'anunciar',
-  
-  // Aprender
-  'aprendo': 'aprender',
-  'aprendes': 'aprender',
-  'aprende': 'aprender',
-  'aprendemos': 'aprender',
-  'aprenden': 'aprender',
-  'aprendí': 'aprender',
-  'aprendiste': 'aprender',
-  'aprendió': 'aprender',
-  'aprendieron': 'aprender',
-  
-  // Aprobar
-  'apruebo': 'aprobar',
-  'apruebas': 'aprobar',
-  'aprueba': 'aprobar',
-  'aprobamos': 'aprobar',
-  'aprueban': 'aprobar',
-  'aprobé': 'aprobar',
-  'aprobaste': 'aprobar',
-  'aprobó': 'aprobar',
-  'aprobaron': 'aprobar',
-  
-  // Ayudar
-  'ayudo': 'ayudar',
-  'ayudas': 'ayudar',
-  'ayuda': 'ayudar',
-  'ayudamos': 'ayudar',
-  'ayudan': 'ayudar',
-  'ayudé': 'ayudar',
-  'ayudaste': 'ayudar',
-  'ayudó': 'ayudar',
-  'ayudaron': 'ayudar',
-  
-  // Beber
-  'bebo': 'beber',
-  'bebes': 'beber',
-  'bebe': 'beber',
-  'bebemos': 'beber',
-  'beben': 'beber',
-  'bebí': 'beber',
-  'bebiste': 'beber',
-  'bebió': 'beber',
-  'bebieron': 'beber',
-  
-  // Borrar
-  'borro': 'borrar',
-  'borras': 'borrar',
-  'borra': 'borrar',
-  'borramos': 'borrar',
-  'borran': 'borrar',
-  'borré': 'borrar',
-  'borraste': 'borrar',
-  'borró': 'borrar',
-  'borraron': 'borrar',
-  
-  // Caminar
-  'camino': 'caminar',
-  'caminas': 'caminar',
-  'camina': 'caminar',
-  'caminamos': 'caminar',
-  'caminan': 'caminar',
-  'caminé': 'caminar',
-  'caminaste': 'caminar',
-  'caminó': 'caminar',
-  'caminaron': 'caminar',
-  
-  // Cantar
-  'canto': 'cantar',
-  'cantas': 'cantar',
-  'canta': 'cantar',
-  'cantamos': 'cantar',
-  'cantan': 'cantar',
-  'canté': 'cantar',
-  'cantaste': 'cantar',
-  'cantó': 'cantar',
-  'cantaron': 'cantar',
-  
-  // Clasificar
-  'clasifico': 'clasificar',
-  'clasificas': 'clasificar',
-  'clasifica': 'clasificar',
-  'clasificamos': 'clasificar',
-  'clasifican': 'clasificar',
-  'clasifiqué': 'clasificar',
-  'clasificaste': 'clasificar',
-  'clasificó': 'clasificar',
-  'clasificaron': 'clasificar',
-  
-  // Cobrar
-  'cobro': 'cobrar',
-  'cobras': 'cobrar',
-  'cobra': 'cobrar',
-  'cobramos': 'cobrar',
-  'cobran': 'cobrar',
-  'cobré': 'cobrar',
-  'cobraste': 'cobrar',
-  'cobró': 'cobrar',
-  'cobraron': 'cobrar',
-  
-  // Comer
-  'como': 'comer',
-  'comes': 'comer',
-  'come': 'comer',
-  'comemos': 'comer',
-  'comen': 'comer',
-  'comí': 'comer',
-  'comiste': 'comer',
-  'comió': 'comer',
-  'comieron': 'comer',
-  'comí': 'comer',
-  'comiste': 'comer',
-  'comió': 'comer',
-  
-  // Compartir
-  'comparto': 'compartir',
-  'compartes': 'compartir',
-  'comparte': 'compartir',
-  'compartimos': 'compartir',
-  'comparten': 'compartir',
-  'compartí': 'compartir',
-  'compartiste': 'compartir',
-  'compartió': 'compartir',
-  'compartieron': 'compartir',
-  
-  // Comprar
-  'compro': 'comprar',
-  'compras': 'comprar',
-  'compra': 'comprar',
-  'compramos': 'comprar',
-  'compran': 'comprar',
-  'compré': 'comprar',
-  'compraste': 'comprar',
-  'compró': 'comprar',
-  'compraron': 'comprar',
-  
-  // Conectar
-  'conecto': 'conectar',
-  'conectas': 'conectar',
-  'conecta': 'conectar',
-  'conectamos': 'conectar',
-  'conectan': 'conectar',
-  'conecté': 'conectar',
-  'conectaste': 'conectar',
-  'conectó': 'conectar',
-  'conectaron': 'conectar',
-  
-  // Confundir
-  'confundo': 'confundir',
-  'confundes': 'confundir',
-  'confunde': 'confundir',
-  'confundimos': 'confundir',
-  'confunden': 'confundir',
-  'confundí': 'confundir',
-  'confundiste': 'confundir',
-  'confundió': 'confundir',
-  'confundieron': 'confundir',
-  
-  // Conocer
-  'conozco': 'conocer',
-  'conoces': 'conocer',
-  'conoce': 'conocer',
-  'conocemos': 'conocer',
-  'conocen': 'conocer',
-  'conocí': 'conocer',
-  'conociste': 'conocer',
-  'conoció': 'conocer',
-  'conocieron': 'conocer',
-  
-  // Construir
-  'construyo': 'construir',
-  'construyes': 'construir',
-  'construye': 'construir',
-  'construimos': 'construir',
-  'construyen': 'construir',
-  'construí': 'construir',
-  'construiste': 'construir',
-  'construyó': 'construir',
-  'construyeron': 'construir',
-  
-  // Copiar
-  'copio': 'copiar',
-  'copias': 'copiar',
-  'copia': 'copiar',
-  'copiamos': 'copiar',
-  'copian': 'copiar',
-  'copié': 'copiar',
-  'copiaste': 'copiar',
-  'copió': 'copiar',
-  'copiaron': 'copiar',
-  
-  // Correr
-  'corro': 'correr',
-  'corres': 'correr',
-  'corre': 'correr',
-  'corremos': 'correr',
-  'corren': 'correr',
-  'corrí': 'correr',
-  'corriste': 'correr',
-  'corrió': 'correr',
-  'corrieron': 'correr',
-  
-  // Cortar
-  'corto': 'cortar',
-  'cortas': 'cortar',
-  'corta': 'cortar',
-  'cortamos': 'cortar',
-  'cortan': 'cortar',
-  'corté': 'cortar',
-  'cortaste': 'cortar',
-  'cortó': 'cortar',
-  'cortaron': 'cortar',
-  
-  // Crecer
-  'crezco': 'crecer',
-  'creces': 'crecer',
-  'crece': 'crecer',
-  'crecemos': 'crecer',
-  'crecen': 'crecer',
-  'crecí': 'crecer',
-  'creciste': 'crecer',
-  'creció': 'crecer',
-  'crecieron': 'crecer',
-  
-  // Dar
-  'doy': 'dar',
-  'das': 'dar',
-  'da': 'dar',
-  'damos': 'dar',
-  'dan': 'dar',
-  'di': 'dar',
-  'diste': 'dar',
-  'dio': 'dar',
-  'dieron': 'dar',
-  
-  // Deber
-  'debo': 'deber',
-  'debes': 'deber',
-  'debe': 'deber',
-  'debemos': 'deber',
-  'deben': 'deber',
-  'debí': 'deber',
-  'debiste': 'deber',
-  'debió': 'deber',
-  'debieron': 'deber',
-  
-  // Denunciar
-  'denuncio': 'denunciar',
-  'denuncias': 'denunciar',
-  'denuncia': 'denunciar',
-  'denunciamos': 'denunciar',
-  'denuncian': 'denunciar',
-  'denuncié': 'denunciar',
-  'denunciaste': 'denunciar',
-  'denunció': 'denunciar',
-  'denunciaron': 'denunciar',
-  
-  // Desarrollar
-  'desarrollo': 'desarrollar',
-  'desarrollas': 'desarrollar',
-  'desarrolla': 'desarrollar',
-  'desarrollamos': 'desarrollar',
-  'desarrollan': 'desarrollar',
-  'desarrollé': 'desarrollar',
-  'desarrollaste': 'desarrollar',
-  'desarrolló': 'desarrollar',
-  'desarrollaron': 'desarrollar',
-  
-  // Desconectar
-  'desconecto': 'desconectar',
-  'desconectas': 'desconectar',
-  'desconecta': 'desconectar',
-  'desconectamos': 'desconectar',
-  'desconectan': 'desconectar',
-  'desconecté': 'desconectar',
-  'desconectaste': 'desconectar',
-  'desconectó': 'desconectar',
-  'desconectaron': 'desconectar',
-  
-  // Desear
-  'deseo': 'desear',
-  'deseas': 'desear',
-  'desea': 'desear',
-  'deseamos': 'desear',
-  'desean': 'desear',
-  'deseé': 'desear',
-  'deseaste': 'desear',
-  'deseó': 'desear',
-  'desearon': 'desear',
-  
-  // Destruir
-  'destruyo': 'destruir',
-  'destruyes': 'destruir',
-  'destruye': 'destruir',
-  'destruimos': 'destruir',
-  'destruyen': 'destruir',
-  'destruí': 'destruir',
-  'destruiste': 'destruir',
-  'destruyó': 'destruir',
-  'destruyeron': 'destruir',
-  
-  // Discutir
-  'discuto': 'discutir',
-  'discutes': 'discutir',
-  'discute': 'discutir',
-  'discutimos': 'discutir',
-  'discuten': 'discutir',
-  'discutí': 'discutir',
-  'discutiste': 'discutir',
-  'discutió': 'discutir',
-  'discutieron': 'discutir',
-  
-  // Educar
-  'educo': 'educar',
-  'educas': 'educar',
-  'educa': 'educar',
-  'educamos': 'educar',
-  'educan': 'educar',
-  'eduqué': 'educar',
-  'educaste': 'educar',
-  'educó': 'educar',
-  'educaron': 'educar',
-  
-  // Elaborar
-  'elaboro': 'elaborar',
-  'elaboras': 'elaborar',
-  'elabora': 'elaborar',
-  'elaboramos': 'elaborar',
-  'elaboran': 'elaborar',
-  'elaboré': 'elaborar',
-  'elaboraste': 'elaborar',
-  'elaboró': 'elaborar',
-  'elaboraron': 'elaborar',
-  
-  // Elegir
-  'elijo': 'elegir',
-  'eliges': 'elegir',
-  'elige': 'elegir',
-  'elegimos': 'elegir',
-  'eligen': 'elegir',
-  'elegí': 'elegir',
-  'elegiste': 'elegir',
-  'eligió': 'elegir',
-  'eligieron': 'elegir',
-  
-  // Eliminar
-  'elimino': 'eliminar',
-  'eliminas': 'eliminar',
-  'elimina': 'eliminar',
-  'eliminamos': 'eliminar',
-  'eliminan': 'eliminar',
-  'eliminé': 'eliminar',
-  'eliminaste': 'eliminar',
-  'eliminó': 'eliminar',
-  'eliminaron': 'eliminar',
-  
-  // Empezar
-  'empiezo': 'empezar',
-  'empiezas': 'empezar',
-  'empieza': 'empezar',
-  'empezamos': 'empezar',
-  'empiezan': 'empezar',
-  'empecé': 'empezar',
-  'empezaste': 'empezar',
-  'empezó': 'empezar',
-  'empezaron': 'empezar',
-  
-  // Enseñar
-  'enseño': 'enseñar',
-  'enseñas': 'enseñar',
-  'enseña': 'enseñar',
-  'enseñamos': 'enseñar',
-  'enseñan': 'enseñar',
-  'enseñé': 'enseñar',
-  'enseñaste': 'enseñar',
-  'enseñó': 'enseñar',
-  'enseñaron': 'enseñar',
-  
-  // Ensuciar
-  'ensucio': 'ensuciar',
-  'ensucias': 'ensuciar',
-  'ensucia': 'ensuciar',
-  'ensuciamos': 'ensuciar',
-  'ensucian': 'ensuciar',
-  'ensucié': 'ensuciar',
-  'ensuciaste': 'ensuciar',
-  'ensució': 'ensuciar',
-  'ensuciaron': 'ensuciar',
-  
-  // Entender
-  'entiendo': 'entender',
-  'entiendes': 'entender',
-  'entiende': 'entender',
-  'entendemos': 'entender',
-  'entienden': 'entender',
-  'entendí': 'entender',
-  'entendiste': 'entender',
-  'entendió': 'entender',
-  'entendieron': 'entender',
-  
-  // Entrar
-  'entro': 'entrar',
-  'entras': 'entrar',
-  'entra': 'entrar',
-  'entramos': 'entrar',
-  'entran': 'entrar',
-  'entré': 'entrar',
-  'entraste': 'entrar',
-  'entró': 'entrar',
-  'entraron': 'entrar',
-  
-  // Escribir
-  'escribo': 'escribir',
-  'escribes': 'escribir',
-  'escribe': 'escribir',
-  'escribimos': 'escribir',
-  'escriben': 'escribir',
-  'escribiste': 'escribir',
-  'escribio': 'escribir',
-  'escribieron': 'escribir',
-  'escribi': 'escribir',
-  
-  // Esperar
-  'espero': 'esperar',
-  'esperas': 'esperar',
-  'espera': 'esperar',
-  'esperamos': 'esperar',
-  'esperan': 'esperar',
-  'esperé': 'esperar',
-  'esperaste': 'esperar',
-  'esperó': 'esperar',
-  'esperaron': 'esperar',
-  
-  // Estar
-  'estoy': 'estar',
-  'estás': 'estar',
-  'está': 'estar',
-  'estamos': 'estar',
-  'están': 'estar',
-  'estuve': 'estar',
-  'estuviste': 'estar',
-  'estuvo': 'estar',
-  'estuvieron': 'estar',
-  
-  // Estudiar
-  'estudio': 'estudiar',
-  'estudias': 'estudiar',
-  'estudia': 'estudiar',
-  'estudiamos': 'estudiar',
-  'estudian': 'estudiar',
-  'estudié': 'estudiar',
-  'estudiaste': 'estudiar',
-  'estudió': 'estudiar',
-  'estudiaron': 'estudiar',
-  
-  // Experimentar
-  'experimento': 'experimentar',
-  'experimentas': 'experimentar',
-  'experimenta': 'experimentar',
-  'experimentamos': 'experimentar',
-  'experimentan': 'experimentar',
-  'experimenté': 'experimentar',
-  'experimentaste': 'experimentar',
-  'experimentó': 'experimentar',
-  'experimentaron': 'experimentar',
-  
-  // Explicar
-  'explico': 'explicar',
-  'explicas': 'explicar',
-  'explica': 'explicar',
-  'explicamos': 'explicar',
-  'explican': 'explicar',
-  'expliqué': 'explicar',
-  'explicaste': 'explicar',
-  'explicó': 'explicar',
-  'explicaron': 'explicar',
-  
-  // Graduar
-  'gradúo': 'graduar',
-  'gradúas': 'graduar',
-  'gradúa': 'graduar',
-  'graduamos': 'graduar',
-  'gradúan': 'graduar',
-  'gradué': 'graduar',
-  'graduaste': 'graduar',
-  'graduó': 'graduar',
-  'graduaron': 'graduar',
-  
-  // Gritar
-  'grito': 'gritar',
-  'gritas': 'gritar',
-  'grita': 'gritar',
-  'gritamos': 'gritar',
-  'gritan': 'gritar',
-  'grité': 'gritar',
-  'gritaste': 'gritar',
-  'gritó': 'gritar',
-  'gritaron': 'gritar',
-  
-  // Haber
-  'he': 'haber',
-  'has': 'haber',
-  'ha': 'haber',
-  'hemos': 'haber',
-  'han': 'haber',
-  'hube': 'haber',
-  'hubiste': 'haber',
-  'hubo': 'haber',
-  'hubieron': 'haber',
-  'hay': 'haber',
-  
-  // Hablar
-  'hablo': 'hablar',
-  'hablas': 'hablar',
-  'habla': 'hablar',
-  'hablamos': 'hablar',
-  'hablan': 'hablar',
-  'hablé': 'hablar',
-  'hablaste': 'hablar',
-  'habló': 'hablar',
-  'hablaron': 'hablar',
-  
-  // Hacer
-  'hago': 'hacer',
-  'haces': 'hacer',
-  'hace': 'hacer',
-  'hacemos': 'hacer',
-  'hacen': 'hacer',
-  'hice': 'hacer',
-  'hiciste': 'hacer',
-  'hizo': 'hacer',
-  'hicieron': 'hacer',
-  
-  // Informar
-  'informo': 'informar',
-  'informas': 'informar',
-  'informa': 'informar',
-  'informamos': 'informar',
-  'informan': 'informar',
-  'informé': 'informar',
-  'informaste': 'informar',
-  'informó': 'informar',
-  'informaron': 'informar',
-  
-  // Intentar
-  'intento': 'intentar',
-  'intentas': 'intentar',
-  'intenta': 'intentar',
-  'intentamos': 'intentar',
-  'intentan': 'intentar',
-  'intenté': 'intentar',
-  'intentaste': 'intentar',
-  'intentó': 'intentar',
-  'intentaron': 'intentar',
-  
-  // Inventar
-  'invento': 'inventar',
-  'inventas': 'inventar',
-  'inventa': 'inventar',
-  'inventamos': 'inventar',
-  'inventan': 'inventar',
-  'inventé': 'inventar',
-  'inventaste': 'inventar',
-  'inventó': 'inventar',
-  'inventaron': 'inventar',
-  
-  // Jugar
-  'juego': 'jugar',
-  'juegas': 'jugar',
-  'juega': 'jugar',
-  'jugamos': 'jugar',
-  'juegan': 'jugar',
-  'jugué': 'jugar',
-  'jugaste': 'jugar',
-  'jugó': 'jugar',
-  'jugaron': 'jugar',
-  
-  // Levantar
-  'levanto': 'levantar',
-  'levantas': 'levantar',
-  'levanta': 'levantar',
-  'levantamos': 'levantar',
-  'levantan': 'levantar',
-  'levanté': 'levantar',
-  'levantaste': 'levantar',
-  'levantó': 'levantar',
-  'levantaron': 'levantar',
-  
-  // Limpiar
-  'limpio': 'limpiar',
-  'limpias': 'limpiar',
-  'limpia': 'limpiar',
-  'limpiamos': 'limpiar',
-  'limpian': 'limpiar',
-  'limpié': 'limpiar',
-  'limpiaste': 'limpiar',
-  'limpió': 'limpiar',
-  'limpiaron': 'limpiar',
-  
-  // Mandar
-  'mando': 'mandar',
-  'mandas': 'mandar',
-  'manda': 'mandar',
-  'mandamos': 'mandar',
-  'mandan': 'mandar',
-  'mandaste': 'mandar',
-  'mandó': 'mandar',
-  'mandaron': 'mandar',
-  'mande': 'mandar',
-  
-  // Mejorar
-  'mejoro': 'mejorar',
-  'mejoras': 'mejorar',
-  'mejora': 'mejorar',
-  'mejoramos': 'mejorar',
-  'mejoran': 'mejorar',
-  'mejoré': 'mejorar',
-  'mejoraste': 'mejorar',
-  'mejoró': 'mejorar',
-  'mejoraron': 'mejorar',
-  
-  // Modificar
-  'modifico': 'modificar',
-  'modificas': 'modificar',
-  'modifica': 'modificar',
-  'modificamos': 'modificar',
-  'modifican': 'modificar',
-  'modifiqué': 'modificar',
-  'modificaste': 'modificar',
-  'modificó': 'modificar',
-  'modificaron': 'modificar',
-  
-  // Morder
-  'muerdo': 'morder',
-  'muerdes': 'morder',
-  'muerde': 'morder',
-  'mordemos': 'morder',
-  'muerden': 'morder',
-  'mordí': 'morder',
-  'mordiste': 'morder',
-  'mordió': 'morder',
-  'mordieron': 'morder',
-  
-  // Nadar
-  'nado': 'nadar',
-  'nadas': 'nadar',
-  'nada': 'nadar',
-  'nadamos': 'nadar',
-  'nadan': 'nadar',
-  'nadé': 'nadar',
-  'nadaste': 'nadar',
-  'nadó': 'nadar',
-  'nadaron': 'nadar',
-  
-  // Necesitar
-  'necesito': 'necesitar',
-  'necesitas': 'necesitar',
-  'necesita': 'necesitar',
-  'necesitamos': 'necesitar',
-  'necesitan': 'necesitar',
-  'necesité': 'necesitar',
-  'necesitaste': 'necesitar',
-  'necesitó': 'necesitar',
-  'necesitaron': 'necesitar',
-  
-  // Oír
-  'oigo': 'oír',
-  'oyes': 'oír',
-  'oye': 'oír',
-  'oímos': 'oír',
-  'oyen': 'oír',
-  'oí': 'oír',
-  'oíste': 'oír',
-  'oyó': 'oír',
-  'oyeron': 'oír',
-  
-  // Oler
-  'huelo': 'oler',
-  'hueles': 'oler',
-  'huele': 'oler',
-  'olemos': 'oler',
-  'huelen': 'oler',
-  'olí': 'oler',
-  'oliste': 'oler',
-  'olió': 'oler',
-  'olieron': 'oler',
-  
-  // Patear
-  'pateo': 'patear',
-  'pateas': 'patear',
-  'patea': 'patear',
-  'pateamos': 'patear',
-  'patean': 'patear',
-  'pateé': 'patear',
-  'pateaste': 'patear',
-  'pateó': 'patear',
-  'patearon': 'patear',
-  
-  // Patinar
-  'patino': 'patinar',
-  'patinas': 'patinar',
-  'patina': 'patinar',
-  'patinamos': 'patinar',
-  'patinan': 'patinar',
-  'patiné': 'patinar',
-  'patinaste': 'patinar',
-  'patinó': 'patinar',
-  'patinaron': 'patinar',
-  
-  // Pegar
-  'pego': 'pegar',
-  'pegas': 'pegar',
-  'pega': 'pegar',
-  'pegamos': 'pegar',
-  'pegan': 'pegar',
-  'pegué': 'pegar',
-  'pegaste': 'pegar',
-  'pegó': 'pegar',
-  'pegaron': 'pegar',
-  
-  // Pintar
-  'pinto': 'pintar',
-  'pintas': 'pintar',
-  'pinta': 'pintar',
-  'pintamos': 'pintar',
-  'pintan': 'pintar',
-  'pinté': 'pintar',
-  'pintaste': 'pintar',
-  'pintó': 'pintar',
-  'pintaron': 'pintar',
-  
-  // Querer
-  'quiero': 'querer',
-  'quieres': 'querer',
-  'quiere': 'querer',
-  'queremos': 'querer',
-  'quieren': 'querer',
-  'quise': 'querer',
-  'quisiste': 'querer',
-  'quiso': 'querer',
-  'quisieron': 'querer',
-  
-  // Recibir
-  'recibo': 'recibir',
-  'recibes': 'recibir',
-  'recibe': 'recibir',
-  'recibimos': 'recibir',
-  'reciben': 'recibir',
-  'recibí': 'recibir',
-  'recibiste': 'recibir',
-  'recibió': 'recibir',
-  'recibieron': 'recibir',
-  
-  // Salir
-  'salgo': 'salir',
-  'sales': 'salir',
-  'sale': 'salir',
-  'salimos': 'salir',
-  'salen': 'salir',
-  'salí': 'salir',
-  'saliste': 'salir',
-  'salió': 'salir',
-  'salieron': 'salir',
-  
-  // Saltar
-  'salto': 'saltar',
-  'saltas': 'saltar',
-  'salta': 'saltar',
-  'saltamos': 'saltar',
-  'saltan': 'saltar',
-  'salté': 'saltar',
-  'saltaste': 'saltar',
-  'saltó': 'saltar',
-  'saltaron': 'saltar',
-  
-  // Sentar
-  'siento': 'sentar',
-  'sientas': 'sentar',
-  'sienta': 'sentar',
-  'sentamos': 'sentar',
-  'sientan': 'sentar',
-  'senté': 'sentar',
-  'sentaste': 'sentar',
-  'sentó': 'sentar',
-  'sentaron': 'sentar',
-  
-  // Ser
-  'soy': 'ser',
-  'eres': 'ser',
-  'es': 'ser',
-  'somos': 'ser',
-  'son': 'ser',
-  'fui': 'ser',
-  'fuiste': 'ser',
-  'fue': 'ser',
-  'fueron': 'ser',
-  
-  // Soñar
-  'sueño': 'soñar',
-  'sueñas': 'soñar',
-  'sueña': 'soñar',
-  'soñamos': 'soñar',
-  'sueñan': 'soñar',
-  'soñé': 'soñar',
-  'soñaste': 'soñar',
-  'soñó': 'soñar',
-  'soñaron': 'soñar',
-  
-  // Tener
-  'tengo': 'tener',
-  'tienes': 'tener',
-  'tiene': 'tener',
-  'tenemos': 'tener',
-  'tienen': 'tener',
-  'tuve': 'tener',
-  'tuviste': 'tener',
-  'tuvo': 'tener',
-  'tuvieron': 'tener',
-  
-  // Vender
-  'vendo': 'vender',
-  'vendes': 'vender',
-  'vende': 'vender',
-  'vendemos': 'vender',
-  'venden': 'vender',
-  'vendí': 'vender',
-  'vendiste': 'vender',
-  'vendió': 'vender',
-  'vendieron': 'vender',
+import { createClient } from '@supabase/supabase-js';
+import { getInfinitiveForm, normalizeWord } from '../utils/verbConjugations';
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const signLanguageAPI = {
+  // Get all letters
+  async getAllLetters() {
+    const { data, error } = await supabase
+      .from('letters')
+      .select('*')
+      .eq('type', 'letter')
+      .order('character');
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Get all numbers
+  async getAllNumbers() {
+    const { data, error } = await supabase
+      .from('letters')
+      .select('*')
+      .eq('type', 'number')
+      .order('character');
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Get special characters (RR, LL)
+  async getSpecialCharacters() {
+    const { data, error } = await supabase
+      .from('letters')
+      .select('*')
+      .eq('type', 'special')
+      .order('character');
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Get sign by character
+  async getSignByCharacter(character) {
+    const { data, error } = await supabase
+      .from('letters')
+      .select('*')
+      .eq('character', character.toUpperCase())
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Get multiple signs by characters (for translating words)
+  async getSignsByCharacters(characters) {
+    const upperCaseChars = characters.map(char => char.toUpperCase());
+    
+    const { data, error } = await supabase
+      .from('letters')
+      .select('*')
+      .in('character', upperCaseChars);
+    
+    if (error) throw error;
+    
+    // Return in the same order as requested
+    return upperCaseChars.map(char => 
+      data.find(item => item.character === char)
+    ).filter(Boolean);
+  },
+
+  // Get all signs (letters, numbers, and special)
+  async getAllSigns() {
+    const { data, error } = await supabase
+      .from('letters')
+      .select('*')
+      .order('type', { ascending: true })
+      .order('character', { ascending: true });
+    
+    if (error) throw error;
+    return data;
+  },
+
 };
 
-// Función para normalizar una palabra (quitar acentos y convertir a minúsculas)
-export const normalizeWord = (word) => {
-  return word
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, ''); // Quita acentos
-};
+// Words API for complete sign language words
+export const wordsAPI = {
+  // Check if a word exists in the database
+  async checkWordExists(word) {
+    // Primero intentar con la palabra original
+    const { data, error } = await supabase
+      .from('words')
+      .select('word')
+      .ilike('word', word.toLowerCase())
+      .single();
+    
+    if (!error && data) {
+      return true;
+    }
+    
+    // Si no se encuentra, intentar con la forma infinitiva
+    const infinitiveForm = getInfinitiveForm(word);
+    if (infinitiveForm !== word.toLowerCase()) {
+      const { data: infinitiveData, error: infinitiveError } = await supabase
+        .from('words')
+        .select('word')
+        .ilike('word', infinitiveForm)
+        .single();
+      
+      if (!infinitiveError && infinitiveData) {
+        return true;
+      }
+    }
+    
+    return false;
+  },
 
-// Función para obtener la forma infinitiva de un verbo
-export const getInfinitiveForm = (word) => {
-  const normalizedWord = normalizeWord(word);
-  console.log(`🔄 Buscando conjugación: "${word}" → normalizado: "${normalizedWord}"`);
-  const infinitive = verbConjugations[normalizedWord] || word.toLowerCase();
-  console.log(`🔄 Resultado: "${infinitive}"`);
-  return infinitive;
+  // Get word video by word
+  async getWordVideo(word) {
+    // Primero intentar con la palabra original
+    const { data, error } = await supabase
+      .from('words')
+      .select('*')
+      .ilike('word', word.toLowerCase())
+      .single();
+    
+    if (!error && data) {
+      return data;
+    }
+    
+    // Si no se encuentra, intentar con la forma infinitiva (para verbos conjugados)
+    const infinitiveForm = getInfinitiveForm(word);
+    if (infinitiveForm !== word.toLowerCase()) {
+      const { data: infinitiveData, error: infinitiveError } = await supabase
+        .from('words')
+        .select('*')
+        .ilike('word', infinitiveForm)
+        .single();
+      
+      if (!infinitiveError && infinitiveData) {
+        return infinitiveData;
+      }
+    }
+    
+    // Si no se encuentra de ninguna manera, lanzar el error original
+    throw error;
+  },
+
+  // Get words by category
+  async getWordsByCategory(category) {
+    const { data, error } = await supabase
+      .from('words')
+      .select('*')
+      .ilike('category', category)
+      .order('word');
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Get all words
+  async getAllWords() {
+    const { data, error } = await supabase
+      .from('words')
+      .select('*')
+      .order('category')
+      .order('word');
+    
+    if (error) throw error;
+    return data;
+  },
+
+  // Get all categories
+  async getAllCategories() {
+    const { data, error } = await supabase
+      .from('words')
+      .select('category')
+      .order('category');
+    
+    if (error) throw error;
+    return [...new Set(data.map(item => item.category))];
+  },
 };

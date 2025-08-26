@@ -36,7 +36,7 @@ const TranslateScreen = ({ navigation }) => {
           
           console.log(`🔍 Procesando palabra: "${word}"`);
           
-          // Primero verificar si existe la palabra original
+          // Primero verificar si existe la palabra original (manteniendo tildes)
           let wordExists = false;
           try {
             wordExists = await wordsAPI.checkWordExists(word);
@@ -46,7 +46,7 @@ const TranslateScreen = ({ navigation }) => {
           }
           
           if (wordExists) {
-            // Si existe, obtener el video
+            // Si existe, obtener el video (manteniendo tildes)
             try {
               const wordVideo = await wordsAPI.getWordVideo(word);
               console.log(`🎥 Video encontrado para "${word}":`, wordVideo.word);
@@ -64,7 +64,7 @@ const TranslateScreen = ({ navigation }) => {
               });
             } catch (error) {
               console.log(`❌ Error obteniendo video para "${word}":`, error.message);
-              // Si hay error, deletrear
+              // Si hay error, deletrear (aquí sí normalizamos para deletreo)
               const wordSigns = await getSpelledWord(word);
               translatedWords.push({
                 originalWord: word,
@@ -73,12 +73,12 @@ const TranslateScreen = ({ navigation }) => {
               });
             }
           } else {
-            // Si no existe, verificar si es una conjugación
+            // Si no existe, verificar si es una conjugación (normalizar solo para buscar)
             const infinitiveForm = getInfinitiveForm(word);
             console.log(`🔄 Forma infinitiva de "${word}": "${infinitiveForm}"`);
             
             if (infinitiveForm !== word.toLowerCase()) {
-              // Es una conjugación, verificar si existe el infinitivo
+              // Es una conjugación, verificar si existe el infinitivo (manteniendo tildes del infinitivo)
               let infinitiveExists = false;
               try {
                 infinitiveExists = await wordsAPI.checkWordExists(infinitiveForm);
@@ -105,7 +105,7 @@ const TranslateScreen = ({ navigation }) => {
                   });
                 } catch (error) {
                   console.log(`❌ Error obteniendo video para infinitivo "${infinitiveForm}":`, error.message);
-                  // Si hay error, deletrear
+                  // Si hay error, deletrear (aquí sí normalizamos)
                   const wordSigns = await getSpelledWord(word);
                   translatedWords.push({
                     originalWord: word,
@@ -114,7 +114,7 @@ const TranslateScreen = ({ navigation }) => {
                   });
                 }
               } else {
-                // No existe ni la palabra ni su infinitivo, deletrear
+                // No existe ni la palabra ni su infinitivo, deletrear (aquí sí normalizamos)
                 console.log(`📝 Deletreando "${word}" - no encontrado en DB`);
                 const wordSigns = await getSpelledWord(word);
                 translatedWords.push({
@@ -124,7 +124,7 @@ const TranslateScreen = ({ navigation }) => {
                 });
               }
             } else {
-              // No es una conjugación conocida, deletrear
+              // No es una conjugación conocida, deletrear (aquí sí normalizamos)
               console.log(`📝 Deletreando "${word}" - no es conjugación conocida`);
               const wordSigns = await getSpelledWord(word);
               translatedWords.push({
