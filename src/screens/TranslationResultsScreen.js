@@ -226,9 +226,6 @@ const TranslationResultsScreen = ({ route, navigation }) => {
                         isLooping={true}
                         shouldPlay={true}
                       />
-                      <View style={styles.videoOverlay}>
-                        <Icon name="play-circle" size={48} color="rgba(255,255,255,0.9)" />
-                      </View>
                     </View>
                     <View style={styles.videoInfo}>
                       <Text style={styles.videoTitle}>{wordData.signs[0].word}</Text>
