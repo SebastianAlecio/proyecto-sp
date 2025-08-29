@@ -1,24 +1,3 @@
-/*
-  # Add complete frases y emociones to words table
-
-  1. Data
-    - Insert all 28 frases y emociones with their video URLs
-    - Videos stored in Supabase Storage under 'word-videos' bucket
-    - All categorized as 'frases_emociones'
-    - Video files use underscores (_) for spaces in filenames
-    - Database entries use spaces for natural display
-
-  2. Categories
-    - All phrases added with category 'frases_emociones' for easy filtering
-
-  3. Complete list (28 phrases)
-    - Greetings: Hola, Buenos días, Buenas tardes, Buenas noches, etc.
-    - Courtesy: Gracias, De nada, Por favor, Permiso, etc.
-    - Emotions: Feliz cumpleaños, Me gusta, Me equivoqué, etc.
-    - Common expressions: No sé, Tal vez, Disculpa, Cómo estás, etc.
-    - Basic responses: Sí, No, Ok, Entendiste, etc.
-*/
-
 -- First, remove any existing frases_emociones to avoid duplicates
 DELETE FROM words WHERE category = 'frases_emociones';
 
