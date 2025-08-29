@@ -1,15 +1,3 @@
-/*
-  # Add verbos (verbs) to words table
-
-  1. Data
-    - Insert all 79 verbos with their video URLs
-    - Videos stored in Supabase Storage under 'word-videos' bucket
-    - All categorized as 'verbos'
-
-  2. Categories
-    - All words added with category 'verbos' for easy filtering
-*/
-
 -- Insert all verbos (79 words)
 INSERT INTO words (word, video_url, description, category) VALUES
 ('agarrar', 'https://aipphlqzhtkwmlnkkrgt.supabase.co/storage/v1/object/public/word-videos/Agarrar.mp4', 'Verbo: agarrar', 'verbos'),
