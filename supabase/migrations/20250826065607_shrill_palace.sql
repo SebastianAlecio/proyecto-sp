@@ -1,23 +1,3 @@
-/*
-  # Add frases y emociones to words table
-
-  1. Data
-    - Insert all 25 frases y emociones with their video URLs
-    - Videos stored in Supabase Storage under 'word-videos' bucket
-    - All categorized as 'frases_emociones'
-    - Video files use underscores (_) for spaces in filenames
-    - Database entries use spaces for natural display
-
-  2. Categories
-    - All phrases added with category 'frases_emociones' for easy filtering
-
-  3. Phrases included
-    - Greetings: Hola, Buenos días, Buenas tardes, etc.
-    - Courtesy: Gracias, De nada, Por favor, etc.
-    - Emotions: Feliz cumpleaños, Me gusta, etc.
-    - Common expressions: No sé, Tal vez, Disculpa, etc.
-*/
-
 -- Insert all 25 frases y emociones
 INSERT INTO words (word, video_url, description, category) VALUES
 ('adiós', 'https://aipphlqzhtkwmlnkkrgt.supabase.co/storage/v1/object/public/word-videos/Adios.mp4', 'Frase: adiós', 'frases_emociones'),
