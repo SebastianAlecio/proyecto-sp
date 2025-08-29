@@ -1,28 +1,3 @@
-/*
-  # Create words table for complete sign language words
-
-  1. New Tables
-    - `words`
-      - `id` (uuid, primary key)
-      - `word` (text, unique, the complete word)
-      - `video_url` (text, URL to the video file)
-      - `description` (text, optional description)
-      - `category` (text, for organizing words by categories)
-      - `created_at` (timestamp)
-
-  2. Security
-    - Enable RLS on `words` table
-    - Add policy for public read access
-
-  3. Data
-    - Insert all 53 adjetivos with their video URLs
-    - Videos will be stored in Supabase Storage under 'word-videos' bucket
-
-  4. Indexes
-    - Add index on word for faster searches
-    - Add index on category for filtering
-*/
-
 -- Create the words table
 CREATE TABLE IF NOT EXISTS words (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
