@@ -1,16 +1,3 @@
-/*
-  # Add complete list of verbos (verbs) to words table
-
-  1. Data
-    - Insert all 82 verbos with their video URLs
-    - Videos stored in Supabase Storage under 'word-videos' bucket
-    - All categorized as 'verbos'
-    - Note: This replaces any existing verbos with the complete list
-
-  2. Categories
-    - All words added with category 'verbos' for easy filtering
-*/
-
 -- First, remove any existing verbos to avoid duplicates
 DELETE FROM words WHERE category = 'verbos';
 
