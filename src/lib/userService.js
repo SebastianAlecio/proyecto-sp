@@ -294,21 +294,23 @@ export const userService = {
   async migrateGuestToAuth(guestProfile, authUser) {
     try {
       // Actualizar perfil guest para convertirlo en usuario real
-      const { error: updateError } = await supabase
+      const { data: updatedProfile, error: updateError } = await supabase
         .from('user_profiles')
         .update({
           auth_user_id: authUser.id,
           email: authUser.email,
           is_guest: false
         })
-        .eq('id', guestProfile.id);
+        .eq('id', guestProfile.id)
+        .select()
+        .single();
 
       if (updateError) throw updateError;
 
       // Limpiar guest_id del AsyncStorage
       await AsyncStorage.removeItem('guest_id');
 
-      return true;
+      return updatedProfile;
     } catch (error) {
       console.error('Error migrating guest to auth:', error);
       throw error;
