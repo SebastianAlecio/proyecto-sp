@@ -80,7 +80,13 @@ const ProfileEditModal = ({ visible, onClose }) => {
     setIsLoading(true);
     try {
       if (mode === 'register') {
-        const result = await registerUser(formData.email, formData.password);
+        // Actualizar el nombre en el perfil guest antes del registro
+        if (user && user.isGuest) {
+          const updatedUser = { ...user, display_name: formData.displayName };
+          const result = await registerUser(formData.email, formData.password, updatedUser);
+        } else {
+          const result = await registerUser(formData.email, formData.password);
+        }
         if (result.success) {
           Alert.alert(
             '¡Registro exitoso!',
@@ -119,6 +125,7 @@ const ProfileEditModal = ({ visible, onClose }) => {
         }
       }
     } catch (error) {
+      console.error('Submit error:', error);
       Alert.alert('Error', 'Algo salió mal. Intenta de nuevo.');
     } finally {
       setIsLoading(false);
@@ -135,15 +142,24 @@ const ProfileEditModal = ({ visible, onClose }) => {
           text: 'Cerrar Sesión', 
           style: 'destructive',
           onPress: async () => {
-            setIsLoading(true);
-            const result = await signOut();
-            setIsLoading(false);
-            if (result.success) {
-              Alert.alert('¡Hasta luego!', 'Has cerrado sesión correctamente', [
-                { text: 'OK', onPress: onClose }
-              ]);
-            } else {
-              Alert.alert('Error', 'No se pudo cerrar sesión');
+            try {
+              setIsLoading(true);
+              console.log('Starting logout process...');
+              const result = await signOut();
+              console.log('Logout result:', result);
+              
+              if (result.success) {
+                Alert.alert('¡Hasta luego!', 'Has cerrado sesión correctamente', [
+                  { text: 'OK', onPress: onClose }
+                ]);
+              } else {
+                Alert.alert('Error', 'No se pudo cerrar sesión');
+              }
+            } catch (error) {
+              console.error('Logout error:', error);
+              Alert.alert('Error', 'Hubo un problema al cerrar sesión');
+            } finally {
+              setIsLoading(false);
             }
           }
         }

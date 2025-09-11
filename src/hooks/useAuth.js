@@ -61,11 +61,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Registrar usuario (migrar de guest)
-  const registerUser = async (email, password) => {
+  const registerUser = async (email, password, updatedUser = null) => {
 
     try {
-      console.log('Register user called with current user:', user);
-      const result = await userService.registerWithEmail(email, password, user);
+      const userToRegister = updatedUser || user;
+      console.log('Register user called with user:', userToRegister);
+      const result = await userService.registerWithEmail(email, password, userToRegister);
       
       if (result.success) {
         console.log('Registration successful, reinitializing user...');
@@ -102,13 +103,16 @@ export const AuthProvider = ({ children }) => {
   // Cerrar sesión
   const signOut = async () => {
     try {
+      console.log('Starting signOut process...');
       const guestUser = await userService.signOut();
+      console.log('SignOut completed, new guest user:', guestUser);
       setUser(guestUser);
       setUserStats({
         consecutiveDays: 0,
         totalProgress: 0,
         completedItems: 0
       });
+      console.log('SignOut successful');
       return { success: true };
     } catch (error) {
       console.error('Error signing out:', error);

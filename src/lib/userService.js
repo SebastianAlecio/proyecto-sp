@@ -266,7 +266,7 @@ export const userService = {
         options: {
           emailRedirectTo: undefined, // Disable email confirmation for now
           data: {
-            display_name: currentProfile.display_name || 'Usuario'
+            display_name: currentProfile?.display_name || 'Usuario'
           }
         }
       });
@@ -279,7 +279,7 @@ export const userService = {
         // Solo migrar si tenemos un perfil guest válido
         if (currentProfile && currentProfile.is_guest) {
           console.log('Migrating guest profile to authenticated user...');
-          await this.migrateGuestToAuth(currentProfile, authData.user);
+          await this.migrateGuestToAuth(currentProfile, authData.user, currentProfile.display_name);
         } else {
           console.log('Creating new authenticated profile...');
           // Crear nuevo perfil autenticado directamente
@@ -309,11 +309,12 @@ export const userService = {
   },
 
   // Migrar datos de guest a usuario autenticado
-  async migrateGuestToAuth(guestProfile, authUser) {
+  async migrateGuestToAuth(guestProfile, authUser, displayName) {
     try {
       console.log('Starting migration for profile:', guestProfile.id);
       console.log('Auth user:', authUser.id);
       console.log('Current profile data:', guestProfile);
+      console.log('Display name to save:', displayName);
       
       // No verificar sesión activa, solo usar el authUser que recibimos
       console.log('Using auth user from registration:', authUser.id);
@@ -324,7 +325,8 @@ export const userService = {
         .update({
           auth_user_id: authUser.id,
           email: authUser.email,
-          is_guest: false
+          is_guest: false,
+          display_name: displayName || guestProfile.display_name || 'Usuario'
         })
         .eq('id', guestProfile.id)
         .select()
