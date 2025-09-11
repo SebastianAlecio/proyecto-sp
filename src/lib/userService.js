@@ -372,6 +372,31 @@ export const userService = {
     }
   },
 
+  // Actualizar perfil del usuario
+  async updateProfile(userProfileId, updates) {
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .update(updates)
+        .eq('id', userProfileId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        profile: data
+      };
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  },
+
   // Cerrar sesión
   async signOut() {
     try {
