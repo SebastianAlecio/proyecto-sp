@@ -256,11 +256,14 @@ export const userService = {
   // Registrar usuario con email (migrar de guest)
   async registerWithEmail(email, password, currentProfile) {
     try {
+      console.log('Starting registration process...');
+      
       // Crear cuenta en Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          emailRedirectTo: undefined, // Disable email confirmation for now
           data: {
             display_name: currentProfile.display_name || 'Usuario'
           }
@@ -268,15 +271,22 @@ export const userService = {
       });
 
       if (authError) throw authError;
+      
+      console.log('Auth signup result:', authData);
 
       if (authData.user) {
         // Migrar datos de guest a usuario autenticado
         await this.migrateGuestToAuth(currentProfile, authData.user);
         
+        // If we have a session, the user is automatically logged in
+        const isLoggedIn = !!authData.session;
+        console.log('User logged in after registration:', isLoggedIn);
+        
         return {
           success: true,
           user: authData.user,
-          needsEmailConfirmation: !authData.session
+          needsEmailConfirmation: !authData.session,
+          isLoggedIn
         };
       }
 

@@ -81,13 +81,21 @@ const ProfileEditModal = ({ visible, onClose }) => {
       if (mode === 'register') {
         const result = await registerUser(formData.email, formData.password);
         if (result.success) {
-          Alert.alert(
-            '¡Registro exitoso!',
-            result.needsEmailConfirmation 
-              ? 'Revisa tu email para confirmar tu cuenta'
-              : 'Tu cuenta ha sido creada exitosamente',
-            [{ text: 'OK', onPress: onClose }]
-          );
+          if (result.isLoggedIn) {
+            Alert.alert(
+              '¡Registro exitoso!',
+              'Tu cuenta ha sido creada y has iniciado sesión automáticamente',
+              [{ text: 'OK', onPress: onClose }]
+            );
+          } else {
+            Alert.alert(
+              '¡Registro exitoso!',
+              result.needsEmailConfirmation 
+                ? 'Revisa tu email para confirmar tu cuenta'
+                : 'Tu cuenta ha sido creada exitosamente',
+              [{ text: 'OK', onPress: onClose }]
+            );
+          }
         } else {
           Alert.alert('Error', result.error || 'No se pudo crear la cuenta');
         }
@@ -98,7 +106,8 @@ const ProfileEditModal = ({ visible, onClose }) => {
             { text: 'OK', onPress: onClose }
           ]);
         } else {
-          Alert.alert('Error', result.error || 'Credenciales incorrectas');
+          console.log('Login error details:', result.error);
+          Alert.alert('Error de inicio de sesión', result.error || 'Credenciales incorrectas');
         }
       } else {
         // Edit mode - solo actualizar nombre (implementar después)

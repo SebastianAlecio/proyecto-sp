@@ -82,9 +82,11 @@ export const AuthProvider = ({ children }) => {
   // Iniciar sesión
   const signIn = async (email, password) => {
     try {
+      console.log('Attempting sign in for:', email);
       const result = await userService.signIn(email, password);
       
       if (result.success) {
+        console.log('Sign in successful, reinitializing user...');
         // Reinicializar usuario después del login
         await initializeUser();
       }
