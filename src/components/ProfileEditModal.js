@@ -88,18 +88,30 @@ const ProfileEditModal = ({ visible, onClose }) => {
           result = await registerUser(formData.email, formData.password);
         }
         if (result.success) {
-          Alert.alert(
-            '¡Registro exitoso!',
-            'Tu cuenta ha sido creada exitosamente. Ahora puedes iniciar sesión.',
-            [{ 
-              text: 'OK', 
-              onPress: () => {
-                // Cambiar a modo login después del registro exitoso
-                setMode('login');
-                setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
-              }
-            }]
-          );
+          // Auto-login después del registro exitoso
+          console.log('Registration successful, attempting auto-login...');
+          const loginResult = await signIn(formData.email, formData.password);
+          
+          if (loginResult.success) {
+            Alert.alert(
+              '¡Bienvenido!',
+              'Tu cuenta ha sido creada e iniciaste sesión automáticamente.',
+              [{ text: 'OK', onPress: onClose }]
+            );
+          } else {
+            // Si el auto-login falla, mostrar mensaje para login manual
+            Alert.alert(
+              '¡Registro exitoso!',
+              'Tu cuenta ha sido creada. Por favor, inicia sesión manualmente.',
+              [{ 
+                text: 'OK', 
+                onPress: () => {
+                  setMode('login');
+                  setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
+                }
+              }]
+            );
+          }
         } else {
           Alert.alert('Error', result.error || 'No se pudo crear la cuenta');
         }
