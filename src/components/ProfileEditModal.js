@@ -18,7 +18,7 @@ import { useAuth } from '../hooks/useAuth';
 
 const ProfileEditModal = ({ visible, onClose }) => {
   const { theme } = useTheme();
-  const { user, isGuest, registerUser, signIn } = useAuth();
+  const { user, isGuest, registerUser, signIn, signOut, updateProfile } = useAuth();
   
   const [mode, setMode] = useState('edit'); // 'edit', 'register', 'login'
   const [formData, setFormData] = useState({
