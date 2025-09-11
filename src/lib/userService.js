@@ -330,20 +330,7 @@ export const userService = {
       console.log('Current profile data:', guestProfile);
       console.log('Display name to save:', displayName);
       
-      // Verificar que el usuario auth existe antes de intentar la migración
-      const { data: existingAuthUser, error: userCheckError } = await supabase
-        .from('auth.users')
-        .select('id')
-        .eq('id', authUser.id)
-        .single();
-      
-      if (userCheckError) {
-        console.log('Auth user not found in database, creating new profile instead');
-        // Si no existe el usuario auth, crear un nuevo perfil en lugar de migrar
-        throw new Error('Auth user not found, will create new profile');
-      }
-      
-      console.log('Auth user exists, proceeding with migration');
+      console.log('Proceeding with migration (foreign key constraint removed)');
       
       // Actualizar perfil guest para convertirlo en usuario real
       const { data: updatedProfile, error: updateError } = await supabase
