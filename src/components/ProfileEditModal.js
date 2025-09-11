@@ -96,8 +96,8 @@ const ProfileEditModal = ({ visible, onClose }) => {
             } else if (result.needsEmailConfirmation) {
               // Necesita confirmación de email
               Alert.alert(
-                '¡Cuenta creada!',
-                result.message || 'Revisa tu email para confirmar tu cuenta antes de iniciar sesión.',
+                '📧 ¡Revisa tu email!',
+                result.message || 'Te hemos enviado un email de confirmación. Haz clic en el enlace para activar tu cuenta y luego podrás iniciar sesión.',
                 [{ 
                   text: 'OK', 
                   onPress: () => {
@@ -122,8 +122,8 @@ const ProfileEditModal = ({ visible, onClose }) => {
               );
             } else if (result.needsEmailConfirmation) {
               Alert.alert(
-                '¡Cuenta creada!',
-                result.message || 'Revisa tu email para confirmar tu cuenta antes de iniciar sesión.',
+                '📧 ¡Revisa tu email!',
+                result.message || 'Te hemos enviado un email de confirmación. Haz clic en el enlace para activar tu cuenta y luego podrás iniciar sesión.',
                 [{ 
                   text: 'OK', 
                   onPress: () => {
@@ -138,18 +138,21 @@ const ProfileEditModal = ({ visible, onClose }) => {
           }
         }
       } else if (mode === 'login') {
-        result = await signIn(formData.email, formData.password);
+        const result = await signIn(formData.email, formData.password);
         if (result.success) {
           Alert.alert('¡Bienvenido!', 'Has iniciado sesión correctamente', [
             { text: 'OK', onPress: onClose }
           ]);
         } else {
           console.log('Login error details:', result.error);
-          Alert.alert('Error de inicio de sesión', result.error || 'Credenciales incorrectas');
+          Alert.alert(
+            'Error de inicio de sesión', 
+            result.error || 'Credenciales incorrectas. Si acabas de registrarte, asegúrate de haber confirmado tu email.'
+          );
         }
       } else {
         // Edit mode - actualizar nombre
-        result = await updateProfile(formData.displayName);
+        const result = await updateProfile(formData.displayName);
         if (result.success) {
           Alert.alert('¡Perfil actualizado!', 'Tu nombre ha sido actualizado correctamente', [
             { text: 'OK', onPress: onClose }
