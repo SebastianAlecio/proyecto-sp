@@ -326,62 +326,6 @@ export const userService = {
       };
     }
   },
-          data: {
-            display_name: currentProfile?.display_name || 'Usuario'
-          }
-        }
-      });
-
-      if (authError) throw authError;
-      
-      console.log('Auth signup result:', authData);
-
-      // Verificar que el usuario se creó correctamente
-      if (!authData.user || !authData.user.id) {
-        throw new Error('No se pudo crear el usuario en el sistema de autenticación');
-      }
-
-      // Esperar un momento para que Supabase procese el usuario
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Verificar que el usuario existe en auth.users antes de continuar
-      const { data: authUser, error: checkError } = await supabase.auth.getUser();
-      console.log('Auth user check:', authUser, checkError);
-
-      if (authData.user) {
-        try {
-          // Solo migrar si tenemos un perfil guest válido
-          if (currentProfile && currentProfile.is_guest) {
-            console.log('Migrating guest profile to authenticated user...');
-            await this.migrateGuestToAuth(currentProfile, authData.user, currentProfile.display_name);
-          } else {
-            console.log('Creating new authenticated profile...');
-            // Crear nuevo perfil autenticado directamente
-            await this.getOrCreateAuthenticatedProfile(authData.user);
-          }
-        } catch (migrationError) {
-          console.error('Migration failed, creating new profile instead:', migrationError);
-          // Si la migración falla, crear un nuevo perfil
-          await this.getOrCreateAuthenticatedProfile(authData.user);
-        }
-        
-        return {
-          success: true,
-          user: authData.user,
-          needsEmailConfirmation: !authData.session,
-          isLoggedIn: !!authData.session
-        };
-      }
-
-      throw new Error('No se pudo crear la cuenta');
-    } catch (error) {
-      console.error('Error registering user:', error);
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  },
 
   // Migrar datos de guest a usuario autenticado
   async migrateGuestToAuth(guestProfile, authUser, displayName) {
