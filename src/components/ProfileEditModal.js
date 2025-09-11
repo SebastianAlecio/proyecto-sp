@@ -83,37 +83,59 @@ const ProfileEditModal = ({ visible, onClose }) => {
         // Actualizar el nombre en el perfil guest antes del registro
         if (user && user.isGuest) {
           const updatedUser = { ...user, display_name: formData.displayName };
-          result = await registerUser(formData.email, formData.password, updatedUser);
-        } else {
-          result = await registerUser(formData.email, formData.password);
-        }
-        if (result.success) {
-          // Auto-login después del registro exitoso
-          console.log('Registration successful, attempting auto-login...');
-          const loginResult = await signIn(formData.email, formData.password);
+          const result = await registerUser(formData.email, formData.password, updatedUser);
           
-          if (loginResult.success) {
-            Alert.alert(
-              '¡Bienvenido!',
-              'Tu cuenta ha sido creada e iniciaste sesión automáticamente.',
-              [{ text: 'OK', onPress: onClose }]
-            );
+          if (result.success) {
+            if (result.isLoggedIn) {
+              // Usuario logueado automáticamente
+              Alert.alert(
+                '¡Bienvenido!',
+                'Tu cuenta ha sido creada e iniciaste sesión automáticamente.',
+                [{ text: 'OK', onPress: onClose }]
+              );
+            } else if (result.needsEmailConfirmation) {
+              // Necesita confirmación de email
+              Alert.alert(
+                '¡Cuenta creada!',
+                result.message || 'Revisa tu email para confirmar tu cuenta antes de iniciar sesión.',
+                [{ 
+                  text: 'OK', 
+                  onPress: () => {
+                    setMode('login');
+                    setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
+                  }
+                }]
+              );
+            }
           } else {
-            // Si el auto-login falla, mostrar mensaje para login manual
-            Alert.alert(
-              '¡Registro exitoso!',
-              'Tu cuenta ha sido creada. Por favor, inicia sesión manualmente.',
-              [{ 
-                text: 'OK', 
-                onPress: () => {
-                  setMode('login');
-                  setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
-                }
-              }]
-            );
+            Alert.alert('Error', result.error || 'No se pudo crear la cuenta');
           }
         } else {
-          Alert.alert('Error', result.error || 'No se pudo crear la cuenta');
+          const result = await registerUser(formData.email, formData.password);
+          
+          if (result.success) {
+            if (result.isLoggedIn) {
+              Alert.alert(
+                '¡Bienvenido!',
+                'Tu cuenta ha sido creada e iniciaste sesión automáticamente.',
+                [{ text: 'OK', onPress: onClose }]
+              );
+            } else if (result.needsEmailConfirmation) {
+              Alert.alert(
+                '¡Cuenta creada!',
+                result.message || 'Revisa tu email para confirmar tu cuenta antes de iniciar sesión.',
+                [{ 
+                  text: 'OK', 
+                  onPress: () => {
+                    setMode('login');
+                    setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
+                  }
+                }]
+              );
+            }
+          } else {
+            Alert.alert('Error', result.error || 'No se pudo crear la cuenta');
+          }
         }
       } else if (mode === 'login') {
         result = await signIn(formData.email, formData.password);
