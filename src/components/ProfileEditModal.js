@@ -65,7 +65,8 @@ const ProfileEditModal = ({ visible, onClose }) => {
       }
     }
 
-    if (!formData.displayName.trim()) {
+    // Solo validar displayName en modo edit o register
+    if ((mode === 'edit' || mode === 'register') && !formData.displayName.trim()) {
       newErrors.displayName = 'El nombre es requerido';
     }
 
@@ -173,20 +174,22 @@ const ProfileEditModal = ({ visible, onClose }) => {
 
           {/* Form */}
           <View style={styles.form}>
-            {/* Display Name */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Nombre</Text>
-              <TextInput
-                style={[styles.input, errors.displayName && styles.inputError]}
-                value={formData.displayName}
-                onChangeText={(text) => setFormData(prev => ({ ...prev, displayName: text }))}
-                placeholder="Tu nombre"
-                placeholderTextColor={theme.placeholder}
-              />
-              {errors.displayName && (
-                <Text style={styles.errorText}>{errors.displayName}</Text>
-              )}
-            </View>
+            {/* Display Name - Solo mostrar en modo edit o register */}
+            {(mode === 'edit' || mode === 'register') && (
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Nombre</Text>
+                <TextInput
+                  style={[styles.input, errors.displayName && styles.inputError]}
+                  value={formData.displayName}
+                  onChangeText={(text) => setFormData(prev => ({ ...prev, displayName: text }))}
+                  placeholder="Tu nombre"
+                  placeholderTextColor={theme.placeholder}
+                />
+                {errors.displayName && (
+                  <Text style={styles.errorText}>{errors.displayName}</Text>
+                )}
+              </View>
+            )}
 
             {/* Email (for register/login) */}
             {(mode === 'register' || mode === 'login') && (

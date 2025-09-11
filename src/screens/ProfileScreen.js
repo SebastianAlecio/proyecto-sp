@@ -70,7 +70,7 @@ const ProfileScreen = () => {
               {user?.display_name || 'Usuario'}
             </Text>
             <Text style={styles.userEmail}>
-              {isGuest ? 'Usuario Invitado' : user?.email || 'Aprendiz de Lenguaje de Señas'}
+              {isGuest ? 'Usuario Invitado' : 'Aprendiz de Lenguaje de Señas'}
             </Text>
           </View>
           <TouchableOpacity 
