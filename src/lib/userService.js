@@ -295,6 +295,7 @@ export const userService = {
     try {
       console.log('Starting migration for profile:', guestProfile.id);
       console.log('Auth user:', authUser.id);
+      console.log('Current profile data:', guestProfile);
       
       // Actualizar perfil guest para convertirlo en usuario real
       const { data: updatedProfile, error: updateError } = await supabase
@@ -310,6 +311,7 @@ export const userService = {
 
       if (updateError) {
         console.error('Migration update error:', updateError);
+        console.error('Update error details:', JSON.stringify(updateError, null, 2));
         throw updateError;
       }
       
