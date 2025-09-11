@@ -264,7 +264,7 @@ export const userService = {
         email,
         password,
         options: {
-          emailRedirectTo: undefined, // Disable email confirmation for now
+          emailRedirectTo: undefined,
           data: {
             display_name: currentProfile?.display_name || 'Usuario'
           }
@@ -275,26 +275,40 @@ export const userService = {
       
       console.log('Auth signup result:', authData);
 
+      // Verificar que el usuario se creó correctamente
+      if (!authData.user || !authData.user.id) {
+        throw new Error('No se pudo crear el usuario en el sistema de autenticación');
+      }
+
+      // Esperar un momento para que Supabase procese el usuario
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Verificar que el usuario existe en auth.users antes de continuar
+      const { data: authUser, error: checkError } = await supabase.auth.getUser();
+      console.log('Auth user check:', authUser, checkError);
+
       if (authData.user) {
-        // Solo migrar si tenemos un perfil guest válido
-        if (currentProfile && currentProfile.is_guest) {
-          console.log('Migrating guest profile to authenticated user...');
-          await this.migrateGuestToAuth(currentProfile, authData.user, currentProfile.display_name);
-        } else {
-          console.log('Creating new authenticated profile...');
-          // Crear nuevo perfil autenticado directamente
+        try {
+          // Solo migrar si tenemos un perfil guest válido
+          if (currentProfile && currentProfile.is_guest) {
+            console.log('Migrating guest profile to authenticated user...');
+            await this.migrateGuestToAuth(currentProfile, authData.user, currentProfile.display_name);
+          } else {
+            console.log('Creating new authenticated profile...');
+            // Crear nuevo perfil autenticado directamente
+            await this.getOrCreateAuthenticatedProfile(authData.user);
+          }
+        } catch (migrationError) {
+          console.error('Migration failed, creating new profile instead:', migrationError);
+          // Si la migración falla, crear un nuevo perfil
           await this.getOrCreateAuthenticatedProfile(authData.user);
         }
-        
-        // If we have a session, the user is automatically logged in
-        const isLoggedIn = !!authData.session;
-        console.log('User logged in after registration:', isLoggedIn);
         
         return {
           success: true,
           user: authData.user,
           needsEmailConfirmation: !authData.session,
-          isLoggedIn
+          isLoggedIn: !!authData.session
         };
       }
 
@@ -316,8 +330,20 @@ export const userService = {
       console.log('Current profile data:', guestProfile);
       console.log('Display name to save:', displayName);
       
-      // No verificar sesión activa, solo usar el authUser que recibimos
-      console.log('Using auth user from registration:', authUser.id);
+      // Verificar que el usuario auth existe antes de intentar la migración
+      const { data: existingAuthUser, error: userCheckError } = await supabase
+        .from('auth.users')
+        .select('id')
+        .eq('id', authUser.id)
+        .single();
+      
+      if (userCheckError) {
+        console.log('Auth user not found in database, creating new profile instead');
+        // Si no existe el usuario auth, crear un nuevo perfil en lugar de migrar
+        throw new Error('Auth user not found, will create new profile');
+      }
+      
+      console.log('Auth user exists, proceeding with migration');
       
       // Actualizar perfil guest para convertirlo en usuario real
       const { data: updatedProfile, error: updateError } = await supabase
@@ -334,7 +360,6 @@ export const userService = {
 
       if (updateError) {
         console.error('Migration update error:', updateError);
-        console.error('Update error details:', JSON.stringify(updateError, null, 2));
         throw updateError;
       }
       

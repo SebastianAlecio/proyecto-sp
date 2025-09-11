@@ -83,9 +83,9 @@ const ProfileEditModal = ({ visible, onClose }) => {
         // Actualizar el nombre en el perfil guest antes del registro
         if (user && user.isGuest) {
           const updatedUser = { ...user, display_name: formData.displayName };
-          const result = await registerUser(formData.email, formData.password, updatedUser);
+          result = await registerUser(formData.email, formData.password, updatedUser);
         } else {
-          const result = await registerUser(formData.email, formData.password);
+          result = await registerUser(formData.email, formData.password);
         }
         if (result.success) {
           Alert.alert(
@@ -104,7 +104,7 @@ const ProfileEditModal = ({ visible, onClose }) => {
           Alert.alert('Error', result.error || 'No se pudo crear la cuenta');
         }
       } else if (mode === 'login') {
-        const result = await signIn(formData.email, formData.password);
+        result = await signIn(formData.email, formData.password);
         if (result.success) {
           Alert.alert('¡Bienvenido!', 'Has iniciado sesión correctamente', [
             { text: 'OK', onPress: onClose }
@@ -115,7 +115,7 @@ const ProfileEditModal = ({ visible, onClose }) => {
         }
       } else {
         // Edit mode - actualizar nombre
-        const result = await updateProfile(formData.displayName);
+        result = await updateProfile(formData.displayName);
         if (result.success) {
           Alert.alert('¡Perfil actualizado!', 'Tu nombre ha sido actualizado correctamente', [
             { text: 'OK', onPress: onClose }
