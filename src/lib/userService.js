@@ -315,13 +315,8 @@ export const userService = {
       console.log('Auth user:', authUser.id);
       console.log('Current profile data:', guestProfile);
       
-      // Verificar que el usuario auth realmente existe
-      const { data: authCheck, error: authCheckError } = await supabase.auth.getUser();
-      if (authCheckError || !authCheck.user) {
-        throw new Error('Auth user not found or not logged in');
-      }
-      
-      console.log('Auth user verified:', authCheck.user.id);
+      // No verificar sesión activa, solo usar el authUser que recibimos
+      console.log('Using auth user from registration:', authUser.id);
       
       // Actualizar perfil guest para convertirlo en usuario real
       const { data: updatedProfile, error: updateError } = await supabase

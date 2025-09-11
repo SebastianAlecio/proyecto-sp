@@ -81,21 +81,18 @@ const ProfileEditModal = ({ visible, onClose }) => {
       if (mode === 'register') {
         const result = await registerUser(formData.email, formData.password);
         if (result.success) {
-          if (result.isLoggedIn) {
-            Alert.alert(
-              '¡Registro exitoso!',
-              'Tu cuenta ha sido creada y has iniciado sesión automáticamente',
-              [{ text: 'OK', onPress: onClose }]
-            );
-          } else {
-            Alert.alert(
-              '¡Registro exitoso!',
-              result.needsEmailConfirmation 
-                ? 'Revisa tu email para confirmar tu cuenta'
-                : 'Tu cuenta ha sido creada exitosamente',
-              [{ text: 'OK', onPress: onClose }]
-            );
-          }
+          Alert.alert(
+            '¡Registro exitoso!',
+            'Tu cuenta ha sido creada exitosamente. Ahora puedes iniciar sesión.',
+            [{ 
+              text: 'OK', 
+              onPress: () => {
+                // Cambiar a modo login después del registro exitoso
+                setMode('login');
+                setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
+              }
+            }]
+          );
         } else {
           Alert.alert('Error', result.error || 'No se pudo crear la cuenta');
         }
