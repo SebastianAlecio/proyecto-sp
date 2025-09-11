@@ -73,13 +73,11 @@ const ProfileScreen = () => {
               {isGuest ? 'Usuario Invitado' : user?.email || 'Aprendiz de Lenguaje de Señas'}
             </Text>
           </View>
-          <TouchableOpacity style={styles.editButton}>
-            <Icon name="pencil" size={16} color={theme.primary} />
-          </TouchableOpacity>
           <TouchableOpacity 
             style={styles.editButton}
             onPress={() => setShowEditModal(true)}
           >
+            <Icon name="pencil" size={16} color={theme.primary} />
           </TouchableOpacity>
         </View>
 
