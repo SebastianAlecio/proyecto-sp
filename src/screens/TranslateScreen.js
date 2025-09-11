@@ -14,11 +14,9 @@ import { useTheme } from '../context/ThemeContext';
 import { signLanguageAPI } from '../lib/supabase';
 import { wordsAPI } from '../lib/supabase';
 import { getInfinitiveForm } from '../utils/verbConjugations';
-import { useAuth } from '../hooks/useAuth';
 
 const TranslateScreen = ({ navigation }) => {
   const { theme } = useTheme();
-  const { markProgress } = useAuth();
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 

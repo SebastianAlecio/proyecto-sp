@@ -13,29 +13,14 @@ import {
 import { Video } from 'expo-av';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
-import { useAuth } from '../hooks/useAuth';
 
 const { width } = Dimensions.get('window');
 
 const TranslationResultsScreen = ({ route, navigation }) => {
   const { theme } = useTheme();
-  const { markProgress } = useAuth();
   const { translatedWords, originalText } = route.params;
   const [expandedCard, setExpandedCard] = useState(null);
 
-  // Marcar progreso cuando se abre una seña
-  const handleSignPress = async (sign, wordIndex, signIndex) => {
-    if (sign && ((sign.character && sign.image_url) || (sign.word && sign.video_url))) {
-      // Marcar progreso según el tipo
-      if (sign.type === 'word') {
-        await markProgress('words', sign.word, true);
-      } else if (sign.character) {
-        await markProgress('letters', sign.character, true);
-      }
-      
-      openExpandedCard(sign, wordIndex, signIndex);
-    }
-  };
   const openExpandedCard = (sign, wordIndex, signIndex) => {
     if (sign && ((sign.character && sign.image_url) || (sign.word && sign.video_url))) {
       setExpandedCard({ ...sign, wordIndex, signIndex });
@@ -230,7 +215,7 @@ const TranslationResultsScreen = ({ route, navigation }) => {
                 <View style={styles.videoSection}>
                   <TouchableOpacity 
                     style={styles.videoCard}
-                    onPress={() => handleSignPress(wordData.signs[0], wordIndex, 0)}
+                    onPress={() => openExpandedCard(wordData.signs[0], wordIndex, 0)}
                     activeOpacity={0.9}
                   >
                     <View style={styles.videoContainer}>
@@ -269,7 +254,7 @@ const TranslationResultsScreen = ({ route, navigation }) => {
                       <TouchableOpacity 
                         key={`${sign.character}-${wordIndex}-${signIndex}`} 
                         style={styles.letterCard}
-                        onPress={() => handleSignPress(sign, wordIndex, signIndex)}
+                        onPress={() => openExpandedCard(sign, wordIndex, signIndex)}
                         activeOpacity={0.7}
                       >
                         <View style={styles.letterImageContainer}>
