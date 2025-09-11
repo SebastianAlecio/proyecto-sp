@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeProvider } from './src/context/ThemeContext';
+import { AuthProvider } from './src/hooks/useAuth';
 import AppNavigator from './src/navigation/AppNavigator';
 
 const App = () => {
@@ -29,9 +30,11 @@ const App = () => {
 
   return (
     <ThemeProvider>
-      <NavigationContainer>
-        <AppNavigator initialRouteName={isOnboardingCompleted ? 'Home' : 'Onboarding'} />
-      </NavigationContainer>
+      <AuthProvider>
+        <NavigationContainer>
+          <AppNavigator initialRouteName={isOnboardingCompleted ? 'Home' : 'Onboarding'} />
+        </NavigationContainer>
+      </AuthProvider>
     </ThemeProvider>
   );
 };

@@ -10,10 +10,12 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../hooks/useAuth';
 
 const ProfileScreen = () => {
   const { theme } = useTheme();
   const navigation = useNavigation();
+  const { user, userStats, isGuest, isAuthenticated } = useAuth();
 
   const profileOptions = [
     {
@@ -62,8 +64,12 @@ const ProfileScreen = () => {
             <Icon name="person" size={40} color={theme.primary} />
           </View>
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>Usuario</Text>
-            <Text style={styles.userEmail}>Aprendiz de Lenguaje de Señas</Text>
+            <Text style={styles.userName}>
+              {user?.display_name || 'Usuario'}
+            </Text>
+            <Text style={styles.userEmail}>
+              {isGuest ? 'Usuario Invitado' : user?.email || 'Aprendiz de Lenguaje de Señas'}
+            </Text>
           </View>
           <TouchableOpacity style={styles.editButton}>
             <Icon name="pencil" size={16} color={theme.primary} />
@@ -73,11 +79,11 @@ const ProfileScreen = () => {
         {/* Stats Cards */}
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
-            <Text style={styles.statNumber}>0</Text>
+            <Text style={styles.statNumber}>{userStats.wordsLearned}</Text>
             <Text style={styles.statLabel}>Palabras Aprendidas</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statNumber}>0</Text>
+            <Text style={styles.statNumber}>{userStats.consecutiveDays}</Text>
             <Text style={styles.statLabel}>Días Consecutivos</Text>
           </View>
         </View>
