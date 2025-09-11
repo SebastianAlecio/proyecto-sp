@@ -108,9 +108,15 @@ const ProfileEditModal = ({ visible, onClose }) => {
           Alert.alert('Error de inicio de sesión', result.error || 'Credenciales incorrectas');
         }
       } else {
-        // Edit mode - solo actualizar nombre (implementar después)
-        Alert.alert('Información', 'Función de edición próximamente');
-        onClose();
+        // Edit mode - actualizar nombre
+        const result = await updateProfile(formData.displayName);
+        if (result.success) {
+          Alert.alert('¡Perfil actualizado!', 'Tu nombre ha sido actualizado correctamente', [
+            { text: 'OK', onPress: onClose }
+          ]);
+        } else {
+          Alert.alert('Error', result.error || 'No se pudo actualizar el perfil');
+        }
       }
     } catch (error) {
       Alert.alert('Error', 'Algo salió mal. Intenta de nuevo.');
@@ -119,6 +125,31 @@ const ProfileEditModal = ({ visible, onClose }) => {
     }
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      'Cerrar Sesión',
+      '¿Estás seguro de que quieres cerrar sesión?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Cerrar Sesión', 
+          style: 'destructive',
+          onPress: async () => {
+            setIsLoading(true);
+            const result = await signOut();
+            setIsLoading(false);
+            if (result.success) {
+              Alert.alert('¡Hasta luego!', 'Has cerrado sesión correctamente', [
+                { text: 'OK', onPress: onClose }
+              ]);
+            } else {
+              Alert.alert('Error', 'No se pudo cerrar sesión');
+            }
+          }
+        }
+      ]
+    );
+  };
   const switchMode = (newMode) => {
     setMode(newMode);
     setErrors({});
@@ -277,6 +308,18 @@ const ProfileEditModal = ({ visible, onClose }) => {
               </Text>
             )}
           </TouchableOpacity>
+
+          {/* Logout Button - Solo mostrar si está autenticado */}
+          {!isGuest && mode === 'edit' && (
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={handleLogout}
+              disabled={isLoading}
+            >
+              <Icon name="log-out-outline" size={20} color="#FF6B6B" />
+              <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </KeyboardAvoidingView>
     </Modal>
@@ -418,6 +461,23 @@ const createStyles = (theme) => StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: '#FF6B6B',
+    borderRadius: 16,
+    paddingVertical: 16,
+    marginTop: 12,
+  },
+  logoutButtonText: {
+    color: '#FF6B6B',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
   },
 });
 

@@ -123,6 +123,24 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Actualizar perfil del usuario
+  const updateProfile = async (displayName) => {
+    if (!user?.id) {
+      return { success: false, error: 'Usuario no encontrado' };
+    }
+
+    try {
+      const result = await userService.updateProfile(user.id, { display_name: displayName });
+      if (result.success) {
+        // Actualizar usuario local
+        setUser(prev => ({ ...prev, display_name: displayName }));
+      }
+      return result;
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return { success: false, error: error.message };
+    }
+  };
   const value = {
     // Estado
     user,
@@ -135,6 +153,7 @@ export const AuthProvider = ({ children }) => {
     signIn,
     signOut,
     refreshUser,
+    updateProfile,
     
     // Helpers
     isGuest: user?.isGuest || false,
