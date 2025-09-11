@@ -62,12 +62,13 @@ export const AuthProvider = ({ children }) => {
 
   // Registrar usuario (migrar de guest)
   const registerUser = async (email, password) => {
-    if (!user) return { success: false, error: 'No user to register' };
 
     try {
+      console.log('Register user called with current user:', user);
       const result = await userService.registerWithEmail(email, password, user);
       
       if (result.success) {
+        console.log('Registration successful, reinitializing user...');
         // Actualizar usuario local
         await initializeUser();
       }

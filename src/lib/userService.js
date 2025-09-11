@@ -257,6 +257,7 @@ export const userService = {
   async registerWithEmail(email, password, currentProfile) {
     try {
       console.log('Starting registration process...');
+      console.log('Current profile:', currentProfile);
       
       // Crear cuenta en Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -275,8 +276,15 @@ export const userService = {
       console.log('Auth signup result:', authData);
 
       if (authData.user) {
-        // Migrar datos de guest a usuario autenticado
-        await this.migrateGuestToAuth(currentProfile, authData.user);
+        // Solo migrar si tenemos un perfil guest válido
+        if (currentProfile && currentProfile.is_guest) {
+          console.log('Migrating guest profile to authenticated user...');
+          await this.migrateGuestToAuth(currentProfile, authData.user);
+        } else {
+          console.log('Creating new authenticated profile...');
+          // Crear nuevo perfil autenticado directamente
+          await this.getOrCreateAuthenticatedProfile(authData.user);
+        }
         
         // If we have a session, the user is automatically logged in
         const isLoggedIn = !!authData.session;
@@ -306,6 +314,14 @@ export const userService = {
       console.log('Starting migration for profile:', guestProfile.id);
       console.log('Auth user:', authUser.id);
       console.log('Current profile data:', guestProfile);
+      
+      // Verificar que el usuario auth realmente existe
+      const { data: authCheck, error: authCheckError } = await supabase.auth.getUser();
+      if (authCheckError || !authCheck.user) {
+        throw new Error('Auth user not found or not logged in');
+      }
+      
+      console.log('Auth user verified:', authCheck.user.id);
       
       // Actualizar perfil guest para convertirlo en usuario real
       const { data: updatedProfile, error: updateError } = await supabase
