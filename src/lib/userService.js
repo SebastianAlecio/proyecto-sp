@@ -264,10 +264,12 @@ export const userService = {
         email,
         password,
         options: {
-          emailRedirectTo: undefined,
+          emailRedirectTo: null,
           data: {
             display_name: currentProfile?.display_name || 'Usuario'
-          }
+          },
+          // Intentar deshabilitar confirmación de email
+          skipConfirmation: true
         }
       });
 
@@ -280,42 +282,45 @@ export const userService = {
         throw new Error('No se pudo crear el usuario en el sistema de autenticación');
       }
 
-      // Si hay sesión, el usuario está confirmado automáticamente
-      if (authData.session) {
+      // Intentar hacer login inmediatamente después del registro
+      console.log('Attempting immediate login after registration...');
+      const loginResult = await this.signIn(email, password);
+      
+      if (loginResult.success && loginResult.session) {
         console.log('User confirmed automatically, proceeding with migration...');
         
         try {
           // Solo migrar si tenemos un perfil guest válido
           if (currentProfile && currentProfile.is_guest) {
             console.log('Migrating guest profile to authenticated user...');
-            await this.migrateGuestToAuth(currentProfile, authData.user, currentProfile.display_name);
+            await this.migrateGuestToAuth(currentProfile, loginResult.user, currentProfile.display_name);
           } else {
             console.log('Creating new authenticated profile...');
             // Crear nuevo perfil autenticado directamente
-            await this.getOrCreateAuthenticatedProfile(authData.user);
+            await this.getOrCreateAuthenticatedProfile(loginResult.user);
           }
         } catch (migrationError) {
           console.error('Migration failed, creating new profile instead:', migrationError);
           // Si la migración falla, crear un nuevo perfil
-          await this.getOrCreateAuthenticatedProfile(authData.user);
+          await this.getOrCreateAuthenticatedProfile(loginResult.user);
         }
         
         return {
           success: true,
-          user: authData.user,
-          session: authData.session,
+          user: loginResult.user,
+          session: loginResult.session,
           needsEmailConfirmation: false,
           isLoggedIn: true
         };
       } else {
-        // Usuario creado pero necesita confirmación de email
-        console.log('User created but needs email confirmation');
+        // Si el login inmediato falla, probablemente necesita confirmación
+        console.log('User created but login failed - likely needs email confirmation');
         return {
           success: true,
           user: authData.user,
           needsEmailConfirmation: true,
           isLoggedIn: false,
-          message: 'Cuenta creada. Revisa tu email para confirmar tu cuenta antes de iniciar sesión.'
+          message: 'Cuenta creada exitosamente. Si no puedes iniciar sesión inmediatamente, revisa tu email para confirmar tu cuenta.'
         };
       }
     } catch (error) {
