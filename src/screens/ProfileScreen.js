@@ -80,7 +80,6 @@ const ProfileScreen = () => {
             style={styles.editButton}
             onPress={() => setShowEditModal(true)}
           >
-            <Icon name="pencil" size={16} color={theme.primary} />
           </TouchableOpacity>
         </View>
 
