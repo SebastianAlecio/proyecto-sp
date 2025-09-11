@@ -148,16 +148,10 @@ export const userService = {
     try {
       const progress = await this.getUserProgress(userProfileId);
       
-      // Palabras aprendidas (palabras completas marcadas como completadas)
-      const wordsLearned = progress.filter(p => 
-        p.category === 'words' && p.completed
-      ).length;
-
       // Días consecutivos (simplificado por ahora)
       const consecutiveDays = await this.calculateConsecutiveDays(userProfileId);
 
       return {
-        wordsLearned,
         consecutiveDays,
         totalProgress: progress.length,
         completedItems: progress.filter(p => p.completed).length
@@ -165,7 +159,6 @@ export const userService = {
     } catch (error) {
       console.error('Error calculating user stats:', error);
       return {
-        wordsLearned: 0,
         consecutiveDays: 0,
         totalProgress: 0,
         completedItems: 0

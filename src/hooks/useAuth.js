@@ -9,7 +9,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userStats, setUserStats] = useState({
-    wordsLearned: 0,
     consecutiveDays: 0,
     totalProgress: 0,
     completedItems: 0
@@ -103,7 +102,6 @@ export const AuthProvider = ({ children }) => {
       const guestUser = await userService.signOut();
       setUser(guestUser);
       setUserStats({
-        wordsLearned: 0,
         consecutiveDays: 0,
         totalProgress: 0,
         completedItems: 0

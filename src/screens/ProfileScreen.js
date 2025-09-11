@@ -79,10 +79,6 @@ const ProfileScreen = () => {
         {/* Stats Cards */}
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{userStats.wordsLearned}</Text>
-            <Text style={styles.statLabel}>Palabras Aprendidas</Text>
-          </View>
-          <View style={styles.statCard}>
             <Text style={styles.statNumber}>{userStats.consecutiveDays}</Text>
             <Text style={styles.statLabel}>Días Consecutivos</Text>
           </View>
