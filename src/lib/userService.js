@@ -293,6 +293,9 @@ export const userService = {
   // Migrar datos de guest a usuario autenticado
   async migrateGuestToAuth(guestProfile, authUser) {
     try {
+      console.log('Starting migration for profile:', guestProfile.id);
+      console.log('Auth user:', authUser.id);
+      
       // Actualizar perfil guest para convertirlo en usuario real
       const { data: updatedProfile, error: updateError } = await supabase
         .from('user_profiles')
@@ -305,7 +308,12 @@ export const userService = {
         .select()
         .single();
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Migration update error:', updateError);
+        throw updateError;
+      }
+      
+      console.log('Migration successful:', updatedProfile);
 
       // Limpiar guest_id del AsyncStorage
       await AsyncStorage.removeItem('guest_id');
