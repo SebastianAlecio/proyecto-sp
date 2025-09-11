@@ -11,11 +11,13 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../hooks/useAuth';
+import ProfileEditModal from '../components/ProfileEditModal';
 
 const ProfileScreen = () => {
   const { theme } = useTheme();
   const navigation = useNavigation();
   const { user, userStats, isGuest, isAuthenticated } = useAuth();
+  const [showEditModal, setShowEditModal] = React.useState(false);
 
   const profileOptions = [
     {
@@ -74,6 +76,12 @@ const ProfileScreen = () => {
           <TouchableOpacity style={styles.editButton}>
             <Icon name="pencil" size={16} color={theme.primary} />
           </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.editButton}
+            onPress={() => setShowEditModal(true)}
+          >
+            <Icon name="pencil" size={16} color={theme.primary} />
+          </TouchableOpacity>
         </View>
 
         {/* Stats Cards */}
@@ -103,6 +111,12 @@ const ProfileScreen = () => {
             </TouchableOpacity>
           ))}
         </View>
+
+        {/* Profile Edit Modal */}
+        <ProfileEditModal
+          visible={showEditModal}
+          onClose={() => setShowEditModal(false)}
+        />
       </ScrollView>
     </SafeAreaView>
   );
