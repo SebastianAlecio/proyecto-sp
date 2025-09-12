@@ -20,18 +20,31 @@ const TranslationResultsScreen = ({ route, navigation }) => {
   const { theme } = useTheme();
   const { translatedWords, originalText } = route.params;
   const [expandedCard, setExpandedCard] = useState(null);
-  const [videoPlayers, setVideoPlayers] = useState({});
   
-  // Create or get video player for a specific URL
-  const getVideoPlayer = (videoUrl) => {
-    if (!videoPlayers[videoUrl]) {
-      const player = useVideoPlayer(videoUrl, player => {
+  // Crear todos los video players al inicio
+  const allVideoUrls = React.useMemo(() => {
+    const urls = new Set();
+    translatedWords.forEach(wordData => {
+      if (wordData.hasVideo && wordData.signs[0]?.video_url) {
+        urls.add(wordData.signs[0].video_url);
+      }
+    });
+    return Array.from(urls);
+  }, [translatedWords]);
+  
+  // Crear players para todas las URLs de una vez
+  const videoPlayers = React.useMemo(() => {
+    const players = {};
+    allVideoUrls.forEach(url => {
+      players[url] = useVideoPlayer(url, player => {
         player.loop = true;
         player.play();
       });
-      setVideoPlayers(prev => ({ ...prev, [videoUrl]: player }));
-      return player;
-    }
+    });
+    return players;
+  }, [allVideoUrls]);
+  
+  const getVideoPlayer = (videoUrl) => {
     return videoPlayers[videoUrl];
   };
 
