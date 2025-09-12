@@ -10,7 +10,7 @@ import {
   Dimensions,
   Animated
 } from 'react-native';
-import { Video } from 'expo-av';
+import { VideoView, useVideoPlayer } from 'expo-video';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
 
@@ -20,6 +20,14 @@ const TranslationResultsScreen = ({ route, navigation }) => {
   const { theme } = useTheme();
   const { translatedWords, originalText } = route.params;
   const [expandedCard, setExpandedCard] = useState(null);
+  
+  // Create video players for each video
+  const createVideoPlayer = (videoUrl) => {
+    return useVideoPlayer(videoUrl, player => {
+      player.loop = true;
+      player.play();
+    });
+  };
 
   const openExpandedCard = (sign, wordIndex, signIndex) => {
     if (sign && ((sign.character && sign.image_url) || (sign.word && sign.video_url))) {
@@ -130,13 +138,11 @@ const TranslationResultsScreen = ({ route, navigation }) => {
           <View style={styles.expandedCard}>
             {expandedCard.type === 'word' ? (
               <View style={styles.expandedVideoContainer}>
-                <Video
-                  source={{ uri: expandedCard.video_url }}
+                <VideoView
                   style={styles.expandedVideo}
-                  useNativeControls
-                  resizeMode="contain"
-                  isLooping={true}
-                  shouldPlay={true}
+                  player={createVideoPlayer(expandedCard.video_url)}
+                  allowsFullscreen
+                  allowsPictureInPicture
                 />
               </View>
             ) : (
@@ -219,12 +225,11 @@ const TranslationResultsScreen = ({ route, navigation }) => {
                     activeOpacity={0.9}
                   >
                     <View style={styles.videoContainer}>
-                      <Video
-                        source={{ uri: wordData.signs[0].video_url }}
+                      <VideoView
                         style={styles.video}
-                        resizeMode="contain"
-                        isLooping={true}
-                        shouldPlay={true}
+                        player={createVideoPlayer(wordData.signs[0].video_url)}
+                        allowsFullscreen={false}
+                        allowsPictureInPicture={false}
                       />
                     </View>
                     <View style={styles.videoInfo}>
