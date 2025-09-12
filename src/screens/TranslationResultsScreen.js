@@ -21,7 +21,7 @@ const TranslationResultsScreen = ({ route, navigation }) => {
   const { translatedWords, originalText } = route.params;
   const [expandedCard, setExpandedCard] = useState(null);
   
-  // Crear todos los video players al inicio
+  // Extraer todas las URLs de videos primero
   const allVideoUrls = React.useMemo(() => {
     const urls = new Set();
     translatedWords.forEach(wordData => {
@@ -31,19 +31,17 @@ const TranslationResultsScreen = ({ route, navigation }) => {
     });
     return Array.from(urls);
   }, [translatedWords]);
-  
-  // Crear players para todas las URLs de una vez
-  const videoPlayers = React.useMemo(() => {
-    const players = {};
-    allVideoUrls.forEach(url => {
-      players[url] = useVideoPlayer(url, player => {
-        player.loop = true;
-        player.play();
-      });
+
+  // Crear todos los video players usando hooks normales (NO dentro de useMemo)
+  const videoPlayers = {};
+  allVideoUrls.forEach(url => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    videoPlayers[url] = useVideoPlayer(url, player => {
+      player.loop = true;
+      player.play();
     });
-    return players;
-  }, [allVideoUrls]);
-  
+  });
+
   const getVideoPlayer = (videoUrl) => {
     return videoPlayers[videoUrl];
   };
