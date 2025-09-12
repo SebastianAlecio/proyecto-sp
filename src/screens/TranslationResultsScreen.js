@@ -20,13 +20,19 @@ const TranslationResultsScreen = ({ route, navigation }) => {
   const { theme } = useTheme();
   const { translatedWords, originalText } = route.params;
   const [expandedCard, setExpandedCard] = useState(null);
+  const [videoPlayers, setVideoPlayers] = useState({});
   
-  // Create video players for each video
-  const createVideoPlayer = (videoUrl) => {
-    return useVideoPlayer(videoUrl, player => {
-      player.loop = true;
-      player.play();
-    });
+  // Create or get video player for a specific URL
+  const getVideoPlayer = (videoUrl) => {
+    if (!videoPlayers[videoUrl]) {
+      const player = useVideoPlayer(videoUrl, player => {
+        player.loop = true;
+        player.play();
+      });
+      setVideoPlayers(prev => ({ ...prev, [videoUrl]: player }));
+      return player;
+    }
+    return videoPlayers[videoUrl];
   };
 
   const openExpandedCard = (sign, wordIndex, signIndex) => {
@@ -140,7 +146,7 @@ const TranslationResultsScreen = ({ route, navigation }) => {
               <View style={styles.expandedVideoContainer}>
                 <VideoView
                   style={styles.expandedVideo}
-                  player={createVideoPlayer(expandedCard.video_url)}
+                  player={getVideoPlayer(expandedCard.video_url)}
                   allowsFullscreen
                   allowsPictureInPicture
                 />
@@ -227,7 +233,7 @@ const TranslationResultsScreen = ({ route, navigation }) => {
                     <View style={styles.videoContainer}>
                       <VideoView
                         style={styles.video}
-                        player={createVideoPlayer(wordData.signs[0].video_url)}
+                        player={getVideoPlayer(wordData.signs[0].video_url)}
                         allowsFullscreen={false}
                         allowsPictureInPicture={false}
                       />
