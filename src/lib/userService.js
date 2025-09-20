@@ -157,8 +157,8 @@ export const userService = {
   // Obtener progreso del usuario
   async getUserProgress(userProfileId) {
     try {
-      // Si no hay ID válido, retornar array vacío
-      if (!userProfileId) {
+      // Si no hay ID válido o es fallback, retornar array vacío
+      if (!userProfileId || typeof userProfileId !== 'string' || userProfileId.startsWith('fallback_')) {
         console.log('No valid user profile ID, returning empty progress');
         return [];
       }
@@ -179,8 +179,8 @@ export const userService = {
   // Calcular estadísticas del usuario
   async getUserStats(userProfileId) {
     try {
-      // Si no hay ID válido, retornar stats vacías
-      if (!userProfileId) {
+      // Si no hay ID válido o es fallback, retornar stats vacías
+      if (!userProfileId || typeof userProfileId !== 'string' || userProfileId.startsWith('fallback_')) {
         console.log('No valid user profile ID, returning empty stats');
         return {
           consecutiveDays: 0,

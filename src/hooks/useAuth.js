@@ -87,10 +87,11 @@ export const AuthProvider = ({ children }) => {
             // Fallback: crear usuario guest básico
             console.log('Creating fallback guest user...');
             setUser({
-              id: 'fallback_guest_' + Date.now(),
+              id: null, // No ID para evitar problemas UUID
               display_name: 'Usuario',
               isGuest: true,
-              isAuthenticated: false
+              isAuthenticated: false,
+              isFallback: true
             });
             setUserStats({
               consecutiveDays: 0,
