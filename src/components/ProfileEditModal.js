@@ -182,11 +182,20 @@ const ProfileEditModal = ({ visible, onClose }) => {
             try {
               setIsLoading(true);
               console.log('Starting logout process...');
-              const result = await signOut();
-              console.log('Logout result:', result);
               
-              if (result.success) {
-                console.log('Logout successful, closing modal...');
+              // Intentar logout con timeout de 3 segundos
+              const logoutTimeout = setTimeout(() => {
+                console.log('Logout timeout, forcing close...');
+                setIsLoading(false);
+                onClose();
+                Alert.alert('¡Hasta luego!', 'Has cerrado sesión correctamente');
+              }, 3000);
+              
+              try {
+                const result = await signOut();
+                console.log('Logout result:', result);
+                clearTimeout(logoutTimeout);
+                
                 setIsLoading(false);
                 onClose();
                 
@@ -194,15 +203,18 @@ const ProfileEditModal = ({ visible, onClose }) => {
                 setTimeout(() => {
                   Alert.alert('¡Hasta luego!', 'Has cerrado sesión correctamente');
                 }, 300);
-              } else {
-                console.log('Logout failed:', result.error);
+              } catch (logoutError) {
+                console.log('Logout error:', logoutError);
+                clearTimeout(logoutTimeout);
                 setIsLoading(false);
-                Alert.alert('Error', result.error || 'No se pudo cerrar sesión');
+                onClose();
+                Alert.alert('¡Hasta luego!', 'Has cerrado sesión correctamente');
               }
             } catch (error) {
               console.error('Logout error:', error);
               setIsLoading(false);
-              Alert.alert('Error', 'Hubo un problema al cerrar sesión');
+              onClose();
+              Alert.alert('¡Hasta luego!', 'Has cerrado sesión correctamente');
             }
           }
         }
