@@ -83,21 +83,31 @@ export const userService = {
   // Obtener o crear perfil guest
   async getOrCreateGuestProfile() {
     try {
-      console.log('Starting getOrCreateGuestProfile...');
+      // Verificar si ya existe un guest_id en AsyncStorage
+      const existingGuestId = await AsyncStorage.getItem('guest_id');
       
-      // DESPUÉS DEL LOGOUT, SIEMPRE CREAR NUEVO GUEST USER
-      // Para evitar problemas con RLS y políticas de acceso
-      console.log('Creating fresh guest user after logout...');
+      if (existingGuestId) {
+        // Buscar perfil guest existente
+        const { data: existingProfile, error } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('guest_id', existingGuestId)
+          .eq('is_guest', true)
+          .single();
+
+        if (!error && existingProfile) {
+          return {
+            ...existingProfile,
+            isGuest: true,
+            isAuthenticated: false
+          };
+        }
+      }
 
       // Crear nuevo usuario guest
       const guestId = generateGuestId();
-      console.log('Generated new guest_id:', guestId);
       
-      console.log('Inserting new guest profile...');
-      console.log('About to insert into Supabase...');
-      
-      // Agregar timeout para evitar que se cuelgue indefinidamente
-      const insertPromise = supabase
+      const { data: newProfile, error: createError } = await supabase
         .from('user_profiles')
         .insert({
           guest_id: guestId,
@@ -107,41 +117,11 @@ export const userService = {
         .select()
         .single();
 
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Insert timeout after 10 seconds')), 10000)
-      );
-
-      console.log('Executing insert with 10s timeout...');
-      const { data: newProfile, error: createError } = await Promise.race([
-        insertPromise,
-        timeoutPromise
-      ]);
-
-      console.log('Supabase insert completed');
-      console.log('Insert result:', { newProfile, createError });
-      
-      if (createError) {
-        console.error('Insert error details:', createError);
-        console.error('Error code:', createError.code);
-        console.error('Error message:', createError.message);
-        console.error('Error hint:', createError.hint);
-        throw createError;
-      }
-
-      if (!newProfile) {
-        console.error('No profile returned from insert');
-        throw new Error('No profile data returned');
-      }
+      if (createError) throw createError;
 
       // Guardar guest_id en AsyncStorage
-      console.log('Saving guest_id to AsyncStorage...');
       await AsyncStorage.setItem('guest_id', guestId);
-      console.log('Guest_id saved successfully');
       
-      // Limpiar cualquier guest_id anterior para evitar conflictos
-      console.log('Cleaning up old guest references...');
-
-      console.log('Returning new guest profile');
       return {
         ...newProfile,
         isGuest: true,
@@ -149,7 +129,6 @@ export const userService = {
       };
     } catch (error) {
       console.error('Error with guest profile:', error);
-      console.error('Full guest profile error:', JSON.stringify(error, null, 2));
       throw error;
     }
   },
@@ -157,12 +136,6 @@ export const userService = {
   // Obtener progreso del usuario
   async getUserProgress(userProfileId) {
     try {
-      // Si no hay ID válido o es fallback, retornar array vacío
-      if (!userProfileId || typeof userProfileId !== 'string' || userProfileId.startsWith('fallback_')) {
-        console.log('No valid user profile ID, returning empty progress');
-        return [];
-      }
-      
       const { data, error } = await supabase
         .from('user_progress')
         .select('*')
@@ -179,17 +152,6 @@ export const userService = {
   // Calcular estadísticas del usuario
   async getUserStats(userProfileId) {
     try {
-      // Si no hay ID válido o es fallback, retornar stats vacías
-      if (!userProfileId || typeof userProfileId !== 'string' || userProfileId.startsWith('fallback_')) {
-        console.log('No valid user profile ID, returning empty stats');
-        return {
-          consecutiveDays: 0,
-          maxStreak: 0,
-          totalProgress: 0,
-          completedItems: 0
-        };
-      }
-      
       const progress = await this.getUserProgress(userProfileId);
       
       // Días consecutivos (simplificado por ahora)
@@ -527,22 +489,16 @@ export const userService = {
   // Cerrar sesión
   async signOut() {
     try {
-      console.log('UserService signOut called');
+      // Limpiar guest_id del AsyncStorage para forzar nuevo guest user
+      await AsyncStorage.removeItem('guest_id');
       
-      // Logout directo sin timeout complicado
       const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.log('SignOut error:', error.message);
-      } else {
-        console.log('Supabase signOut successful');
-      }
+      if (error) throw error;
 
-      // El AuthProvider manejará la creación del guest user
-      // a través del onAuthStateChange listener
       return { success: true };
     } catch (error) {
       console.error('Error signing out:', error);
-      return { success: true };
+      return { success: false, error: error.message };
     }
   }
 };
