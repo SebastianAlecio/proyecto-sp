@@ -488,15 +488,17 @@ export const userService = {
   // Cerrar sesión
   async signOut() {
     try {
+      console.log('UserService signOut called');
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
+      console.log('Supabase signOut successful');
       // El AuthProvider manejará la creación del guest user
       // a través del onAuthStateChange listener
       return { success: true };
     } catch (error) {
       console.error('Error signing out:', error);
-      throw error;
+      return { success: false, error: error.message };
     }
   }
 };
