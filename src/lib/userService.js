@@ -196,7 +196,7 @@ export const userService = {
   },
 
   // Marcar progreso en un elemento
-  async markProgress(userProfileId, category, itemId, completed = true) {
+  async markProgress(userProfileId, category, itemId, completed = true, score = null) {
     try {
       // Actualizar racha antes de marcar progreso
       await this.updateUserStreak(userProfileId);
@@ -216,13 +216,20 @@ export const userService = {
 
       if (existing) {
         // Actualizar progreso existente
+        const updateData = {
+          completed,
+          attempts: existing.attempts + 1,
+          last_practiced: new Date().toISOString()
+        };
+        
+        // Solo actualizar score si se proporciona y es mejor que el anterior
+        if (score !== null && (existing.score === null || score > existing.score)) {
+          updateData.score = score;
+        }
+        
         const { data, error } = await supabase
           .from('user_progress')
-          .update({
-            completed,
-            attempts: existing.attempts + 1,
-            last_practiced: new Date().toISOString()
-          })
+          .update(updateData)
           .eq('id', existing.id)
           .select()
           .single();
@@ -231,16 +238,23 @@ export const userService = {
         return data;
       } else {
         // Crear nuevo progreso
+        const insertData = {
+          user_profile_id: userProfileId,
+          category,
+          item_id: itemId,
+          completed,
+          attempts: 1,
+          last_practiced: new Date().toISOString()
+        };
+        
+        // Agregar score si se proporciona
+        if (score !== null) {
+          insertData.score = score;
+        }
+        
         const { data, error } = await supabase
           .from('user_progress')
-          .insert({
-            user_profile_id: userProfileId,
-            category,
-            item_id: itemId,
-            completed,
-            attempts: 1,
-            last_practiced: new Date().toISOString()
-          })
+          .insert(insertData)
           .select()
           .single();
 

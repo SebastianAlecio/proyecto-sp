@@ -134,8 +134,8 @@ const LessonScreen = ({ route, navigation }) => {
       emoji = '💪';
     }
 
-    // Marcar progreso de la lección
-    markProgress('lessons', lessonId, true);
+    // Marcar progreso de la lección con el porcentaje obtenido
+    markProgress('lessons', lessonId, true, percentage);
 
     // Mostrar modal de resultados
     setLessonResults({

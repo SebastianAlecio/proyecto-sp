@@ -6,18 +6,21 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
-  Dimensions
+  Dimensions,
+  ActivityIndicator
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../hooks/useAuth';
+import { userService } from '../lib/userService';
 
 const { width } = Dimensions.get('window');
 
 const LearnScreen = ({ navigation }) => {
   const { theme } = useTheme();
-  const { user, userStats } = useAuth();
-  const [userProgress, setUserProgress] = useState([]);
+  const { user, userStats, refreshUser } = useAuth();
+  const [lessons, setLessons] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Definir las lecciones del abecedario
   const alphabetLessons = [
@@ -28,7 +31,8 @@ const LearnScreen = ({ navigation }) => {
       letters: ['A', 'B', 'C', 'D', 'E'],
       isUnlocked: true, // Primera lección siempre desbloqueada
       stars: 0,
-      completed: false
+      completed: false,
+      requiredScore: 0 // No requiere score previo
     },
     {
       id: 'lesson_2',
@@ -37,7 +41,8 @@ const LearnScreen = ({ navigation }) => {
       letters: ['F', 'G', 'H', 'I', 'J'],
       isUnlocked: false,
       stars: 0,
-      completed: false
+      completed: false,
+      requiredScore: 70 // Requiere 70% en lección anterior
     },
     {
       id: 'lesson_3',
@@ -46,7 +51,8 @@ const LearnScreen = ({ navigation }) => {
       letters: ['K', 'L', 'M', 'N', 'Ñ'],
       isUnlocked: false,
       stars: 0,
-      completed: false
+      completed: false,
+      requiredScore: 70
     },
     {
       id: 'lesson_4',
@@ -55,7 +61,8 @@ const LearnScreen = ({ navigation }) => {
       letters: ['O', 'P', 'Q', 'R', 'S'],
       isUnlocked: false,
       stars: 0,
-      completed: false
+      completed: false,
+      requiredScore: 70
     },
     {
       id: 'lesson_5',
@@ -64,7 +71,8 @@ const LearnScreen = ({ navigation }) => {
       letters: ['T', 'U', 'V', 'W', 'X'],
       isUnlocked: false,
       stars: 0,
-      completed: false
+      completed: false,
+      requiredScore: 70
     },
     {
       id: 'lesson_6',
@@ -73,25 +81,88 @@ const LearnScreen = ({ navigation }) => {
       letters: ['Y', 'Z', 'RR', 'LL'],
       isUnlocked: false,
       stars: 0,
-      completed: false
+      completed: false,
+      requiredScore: 70
     }
   ];
 
-  const [lessons, setLessons] = useState(alphabetLessons);
-
+  // Cargar progreso cuando cambie el usuario
   useEffect(() => {
-    // TODO: Cargar progreso del usuario desde la base de datos
-    // Por ahora simulamos que la primera lección está desbloqueada
-    updateLessonsProgress();
+    if (user?.id) {
+      loadLessonsProgress();
+    }
   }, [user]);
 
-  const updateLessonsProgress = () => {
-    // TODO: Implementar lógica real de progreso
-    // Por ahora solo desbloqueamos la primera lección
-    setLessons(prev => prev.map((lesson, index) => ({
-      ...lesson,
-      isUnlocked: index === 0 ? true : lesson.isUnlocked
-    })));
+  // Recargar cuando regresemos de una lección
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (user?.id) {
+        loadLessonsProgress();
+        refreshUser(); // Actualizar estadísticas
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, user]);
+
+  const loadLessonsProgress = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Obtener progreso del usuario
+      const progress = await userService.getUserProgress(user.id);
+      
+      // Procesar progreso de lecciones
+      const updatedLessons = alphabetLessons.map((lesson, index) => {
+        // Buscar progreso de esta lección
+        const lessonProgress = progress.find(p => 
+          p.category === 'lessons' && p.item_id === lesson.id
+        );
+        
+        // Calcular estrellas basado en el score guardado
+        let stars = 0;
+        let completed = false;
+        
+        if (lessonProgress && lessonProgress.score !== undefined) {
+          const percentage = lessonProgress.score;
+          completed = lessonProgress.completed;
+          
+          if (percentage >= 90) stars = 3;
+          else if (percentage >= 70) stars = 2;
+          else if (percentage >= 50) stars = 1;
+        }
+        
+        // Determinar si está desbloqueada
+        let isUnlocked = lesson.isUnlocked; // Primera lección siempre desbloqueada
+        
+        if (index > 0) {
+          // Para lecciones posteriores, verificar si la anterior está completada
+          const previousLessonId = alphabetLessons[index - 1].id;
+          const previousProgress = progress.find(p => 
+            p.category === 'lessons' && p.item_id === previousLessonId
+          );
+          
+          // Desbloquear si la lección anterior tiene al menos 70%
+          isUnlocked = previousProgress && 
+                      previousProgress.score >= lesson.requiredScore;
+        }
+        
+        return {
+          ...lesson,
+          isUnlocked,
+          stars,
+          completed
+        };
+      });
+      
+      setLessons(updatedLessons);
+    } catch (error) {
+      console.error('Error loading lessons progress:', error);
+      // En caso de error, usar lecciones por defecto
+      setLessons(alphabetLessons);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const startLesson = (lesson) => {
@@ -105,8 +176,33 @@ const LearnScreen = ({ navigation }) => {
     });
   };
 
+  const getLockMessage = (lesson, index) => {
+    if (index === 0) return ''; // Primera lección no tiene mensaje
+    
+    const previousLesson = lessons[index - 1];
+    if (!previousLesson.completed) {
+      return `Completa ${previousLesson.title} para desbloquear`;
+    } else if (previousLesson.stars < 2) {
+      return `Necesitas al menos 70% en ${previousLesson.title}`;
+    }
+    return '';
+  };
   const styles = createStyles(theme);
 
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Aprender</Text>
+          <Text style={styles.headerSubtitle}>Domina el lenguaje de señas</Text>
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.primary} />
+          <Text style={styles.loadingText}>Cargando tu progreso...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -127,7 +223,9 @@ const LearnScreen = ({ navigation }) => {
         </View>
         <View style={styles.statItem}>
           <Icon name="star" size={20} color={theme.primary} />
-          <Text style={styles.statText}>0</Text>
+          <Text style={styles.statText}>
+            {lessons.reduce((total, lesson) => total + lesson.stars, 0)}
+          </Text>
         </View>
       </View>
 
@@ -149,7 +247,8 @@ const LearnScreen = ({ navigation }) => {
               key={lesson.id}
               style={[
                 styles.lessonCard,
-                !lesson.isUnlocked && styles.lessonCardLocked
+                !lesson.isUnlocked && styles.lessonCardLocked,
+                lesson.completed && styles.lessonCardCompleted
               ]}
               onPress={() => startLesson(lesson)}
               disabled={!lesson.isUnlocked}
@@ -162,6 +261,12 @@ const LearnScreen = ({ navigation }) => {
                 </View>
               )}
 
+              {/* Completed Icon */}
+              {lesson.completed && (
+                <View style={styles.completedIcon}>
+                  <Icon name="checkmark-circle" size={24} color="#4CAF50" />
+                </View>
+              )}
               {/* Lesson Content */}
               <View style={styles.lessonContent}>
                 <Text style={[
@@ -176,6 +281,13 @@ const LearnScreen = ({ navigation }) => {
                 ]}>
                   {lesson.subtitle}
                 </Text>
+                
+                {/* Lock message */}
+                {!lesson.isUnlocked && (
+                  <Text style={styles.lockMessage}>
+                    {getLockMessage(lesson, index)}
+                  </Text>
+                )}
               </View>
 
               {/* Stars */}
@@ -264,6 +376,18 @@ const createStyles = (theme) => StyleSheet.create({
     color: theme.text,
     marginLeft: 8,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: theme.textSecondary,
+    marginTop: 16,
+    textAlign: 'center',
+  },
   content: {
     flex: 1,
   },
@@ -308,7 +432,17 @@ const createStyles = (theme) => StyleSheet.create({
     backgroundColor: theme.background,
     opacity: 0.6,
   },
+  lessonCardCompleted: {
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+  },
   lockIcon: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    zIndex: 1,
+  },
+  completedIcon: {
     position: 'absolute',
     top: 16,
     right: 16,
@@ -333,6 +467,12 @@ const createStyles = (theme) => StyleSheet.create({
   },
   lessonSubtitleLocked: {
     color: theme.placeholder,
+  },
+  lockMessage: {
+    fontSize: 12,
+    color: theme.placeholder,
+    fontStyle: 'italic',
+    marginTop: 4,
   },
   starsContainer: {
     flexDirection: 'row',

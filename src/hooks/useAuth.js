@@ -112,11 +112,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Marcar progreso en un elemento
-  const markProgress = async (category, itemId, completed = true) => {
+  const markProgress = async (category, itemId, completed = true, score = null) => {
     if (!user?.id) return;
 
     try {
-      await userService.markProgress(user.id, category, itemId, completed);
+      await userService.markProgress(user.id, category, itemId, completed, score);
       // Recargar estadísticas después de marcar progreso
       await loadUserStats(user.id);
     } catch (error) {
