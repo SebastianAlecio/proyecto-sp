@@ -1,0 +1,384 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../hooks/useAuth';
+
+const { width } = Dimensions.get('window');
+
+const LearnScreen = ({ navigation }) => {
+  const { theme } = useTheme();
+  const { user, userStats } = useAuth();
+  const [userProgress, setUserProgress] = useState([]);
+
+  // Definir las lecciones del abecedario
+  const alphabetLessons = [
+    {
+      id: 'lesson_1',
+      title: 'Lección 1',
+      subtitle: 'A - B - C - D - E',
+      letters: ['A', 'B', 'C', 'D', 'E'],
+      isUnlocked: true, // Primera lección siempre desbloqueada
+      stars: 0,
+      completed: false
+    },
+    {
+      id: 'lesson_2',
+      title: 'Lección 2',
+      subtitle: 'F - G - H - I - J',
+      letters: ['F', 'G', 'H', 'I', 'J'],
+      isUnlocked: false,
+      stars: 0,
+      completed: false
+    },
+    {
+      id: 'lesson_3',
+      title: 'Lección 3',
+      subtitle: 'K - L - M - N - Ñ',
+      letters: ['K', 'L', 'M', 'N', 'Ñ'],
+      isUnlocked: false,
+      stars: 0,
+      completed: false
+    },
+    {
+      id: 'lesson_4',
+      title: 'Lección 4',
+      subtitle: 'O - P - Q - R - S',
+      letters: ['O', 'P', 'Q', 'R', 'S'],
+      isUnlocked: false,
+      stars: 0,
+      completed: false
+    },
+    {
+      id: 'lesson_5',
+      title: 'Lección 5',
+      subtitle: 'T - U - V - W - X',
+      letters: ['T', 'U', 'V', 'W', 'X'],
+      isUnlocked: false,
+      stars: 0,
+      completed: false
+    },
+    {
+      id: 'lesson_6',
+      title: 'Lección 6',
+      subtitle: 'Y - Z - RR - LL',
+      letters: ['Y', 'Z', 'RR', 'LL'],
+      isUnlocked: false,
+      stars: 0,
+      completed: false
+    }
+  ];
+
+  const [lessons, setLessons] = useState(alphabetLessons);
+
+  useEffect(() => {
+    // TODO: Cargar progreso del usuario desde la base de datos
+    // Por ahora simulamos que la primera lección está desbloqueada
+    updateLessonsProgress();
+  }, [user]);
+
+  const updateLessonsProgress = () => {
+    // TODO: Implementar lógica real de progreso
+    // Por ahora solo desbloqueamos la primera lección
+    setLessons(prev => prev.map((lesson, index) => ({
+      ...lesson,
+      isUnlocked: index === 0 ? true : lesson.isUnlocked
+    })));
+  };
+
+  const startLesson = (lesson) => {
+    if (!lesson.isUnlocked) return;
+    
+    // Navegar a la pantalla de lección
+    navigation.navigate('Lesson', {
+      lessonId: lesson.id,
+      lessonTitle: lesson.title,
+      letters: lesson.letters
+    });
+  };
+
+  const styles = createStyles(theme);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Aprender</Text>
+        <Text style={styles.headerSubtitle}>Domina el lenguaje de señas</Text>
+      </View>
+
+      {/* Stats Bar */}
+      <View style={styles.statsBar}>
+        <View style={styles.statItem}>
+          <Icon name="flame" size={20} color="#FF6B35" />
+          <Text style={styles.statText}>{userStats.consecutiveDays}</Text>
+        </View>
+        <View style={styles.statItem}>
+          <Icon name="trophy" size={20} color="#FFD700" />
+          <Text style={styles.statText}>{userStats.maxStreak}</Text>
+        </View>
+        <View style={styles.statItem}>
+          <Icon name="star" size={20} color={theme.primary} />
+          <Text style={styles.statText}>0</Text>
+        </View>
+      </View>
+
+      <ScrollView 
+        style={styles.content} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.contentContainer}
+      >
+        {/* Section Header */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>🔤 Abecedario</Text>
+          <Text style={styles.sectionSubtitle}>Aprende las letras básicas del lenguaje de señas</Text>
+        </View>
+
+        {/* Lessons Grid */}
+        <View style={styles.lessonsContainer}>
+          {lessons.map((lesson, index) => (
+            <TouchableOpacity
+              key={lesson.id}
+              style={[
+                styles.lessonCard,
+                !lesson.isUnlocked && styles.lessonCardLocked
+              ]}
+              onPress={() => startLesson(lesson)}
+              disabled={!lesson.isUnlocked}
+              activeOpacity={lesson.isUnlocked ? 0.7 : 1}
+            >
+              {/* Lock Icon for locked lessons */}
+              {!lesson.isUnlocked && (
+                <View style={styles.lockIcon}>
+                  <Icon name="lock-closed" size={24} color={theme.placeholder} />
+                </View>
+              )}
+
+              {/* Lesson Content */}
+              <View style={styles.lessonContent}>
+                <Text style={[
+                  styles.lessonTitle,
+                  !lesson.isUnlocked && styles.lessonTitleLocked
+                ]}>
+                  {lesson.title}
+                </Text>
+                <Text style={[
+                  styles.lessonSubtitle,
+                  !lesson.isUnlocked && styles.lessonSubtitleLocked
+                ]}>
+                  {lesson.subtitle}
+                </Text>
+              </View>
+
+              {/* Stars */}
+              <View style={styles.starsContainer}>
+                {[1, 2, 3].map((star) => (
+                  <Icon
+                    key={star}
+                    name={lesson.stars >= star ? "star" : "star-outline"}
+                    size={16}
+                    color={lesson.stars >= star ? "#FFD700" : theme.placeholder}
+                  />
+                ))}
+              </View>
+
+              {/* Progress Indicator */}
+              {lesson.isUnlocked && (
+                <View style={styles.progressIndicator}>
+                  <View style={[
+                    styles.progressBar,
+                    { width: `${lesson.completed ? 100 : 0}%` }
+                  ]} />
+                </View>
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Coming Soon Section */}
+        <View style={styles.comingSoonSection}>
+          <Text style={styles.comingSoonTitle}>🔢 Próximamente</Text>
+          <View style={styles.comingSoonCard}>
+            <Icon name="time" size={32} color={theme.placeholder} />
+            <Text style={styles.comingSoonText}>Números</Text>
+            <Text style={styles.comingSoonSubtext}>Aprende los números del 1 al 10</Text>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+const createStyles = (theme) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.background,
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 50,
+    paddingBottom: 24,
+    backgroundColor: theme.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.border,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: theme.text,
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: theme.textSecondary,
+    fontWeight: '400',
+  },
+  statsBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    backgroundColor: theme.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.border,
+  },
+  statItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.background,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  statText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.text,
+    marginLeft: 8,
+  },
+  content: {
+    flex: 1,
+  },
+  contentContainer: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 100,
+  },
+  sectionHeader: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: theme.text,
+    marginBottom: 8,
+  },
+  sectionSubtitle: {
+    fontSize: 16,
+    color: theme.textSecondary,
+    lineHeight: 22,
+  },
+  lessonsContainer: {
+    marginBottom: 40,
+  },
+  lessonCard: {
+    backgroundColor: theme.surface,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    position: 'relative',
+  },
+  lessonCardLocked: {
+    backgroundColor: theme.background,
+    opacity: 0.6,
+  },
+  lockIcon: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    zIndex: 1,
+  },
+  lessonContent: {
+    marginBottom: 12,
+  },
+  lessonTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: theme.text,
+    marginBottom: 4,
+  },
+  lessonTitleLocked: {
+    color: theme.placeholder,
+  },
+  lessonSubtitle: {
+    fontSize: 16,
+    color: theme.textSecondary,
+    fontWeight: '400',
+  },
+  lessonSubtitleLocked: {
+    color: theme.placeholder,
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    marginBottom: 12,
+  },
+  progressIndicator: {
+    height: 4,
+    backgroundColor: theme.border,
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: theme.primary,
+    borderRadius: 2,
+  },
+  comingSoonSection: {
+    marginTop: 20,
+  },
+  comingSoonTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: theme.text,
+    marginBottom: 16,
+  },
+  comingSoonCard: {
+    backgroundColor: theme.surface,
+    borderRadius: 16,
+    padding: 32,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: theme.border,
+    borderStyle: 'dashed',
+  },
+  comingSoonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.placeholder,
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  comingSoonSubtext: {
+    fontSize: 14,
+    color: theme.placeholder,
+    textAlign: 'center',
+  },
+});
+
+export default LearnScreen;
