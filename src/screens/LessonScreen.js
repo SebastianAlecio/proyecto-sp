@@ -6,7 +6,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
-  Alert,
+  Modal,
   Dimensions
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -27,6 +27,8 @@ const LessonScreen = ({ route, navigation }) => {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [lessonResults, setLessonResults] = useState(null);
 
   useEffect(() => {
     generateQuestions();
@@ -111,24 +113,45 @@ const LessonScreen = ({ route, navigation }) => {
   const handleLessonComplete = (finalScore = score) => {
     const percentage = (finalScore / questions.length) * 100;
     let stars = 0;
+    let message = '';
+    let emoji = '';
     
-    if (percentage >= 90) stars = 3;
-    else if (percentage >= 70) stars = 2;
-    else if (percentage >= 50) stars = 1;
+    if (percentage >= 90) {
+      stars = 3;
+      message = '¡Increíble! ¡Eres un maestro!';
+      emoji = '🏆';
+    } else if (percentage >= 70) {
+      stars = 2;
+      message = '¡Muy bien! ¡Sigue así!';
+      emoji = '⭐';
+    } else if (percentage >= 50) {
+      stars = 1;
+      message = '¡Buen trabajo! ¡Puedes mejorar!';
+      emoji = '👍';
+    } else {
+      stars = 0;
+      message = '¡No te rindas! ¡Inténtalo de nuevo!';
+      emoji = '💪';
+    }
 
     // Marcar progreso de la lección
     markProgress('lessons', lessonId, true);
 
-    Alert.alert(
-      '🎉 ¡Lección Completada!',
-      `Obtuviste ${finalScore} de ${questions.length} respuestas correctas.\n⭐ ${stars} estrella${stars !== 1 ? 's' : ''}`,
-      [
-        {
-          text: 'Continuar',
-          onPress: () => navigation.goBack()
-        }
-      ]
-    );
+    // Mostrar modal de resultados
+    setLessonResults({
+      score: finalScore,
+      total: questions.length,
+      percentage,
+      stars,
+      message,
+      emoji
+    });
+    setShowCompletionModal(true);
+  };
+
+  const handleContinue = () => {
+    setShowCompletionModal(false);
+    navigation.goBack();
   };
 
   const currentQuestion = questions[currentQuestionIndex];
@@ -255,6 +278,61 @@ const LessonScreen = ({ route, navigation }) => {
           </View>
         )}
       </View>
+
+      {/* Lesson Completion Modal */}
+      <Modal
+        visible={showCompletionModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={handleContinue}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            {/* Header */}
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalEmoji}>{lessonResults?.emoji}</Text>
+              <Text style={styles.modalTitle}>¡Lección Completada!</Text>
+              <Text style={styles.modalMessage}>{lessonResults?.message}</Text>
+            </View>
+
+            {/* Score */}
+            <View style={styles.scoreSection}>
+              <Text style={styles.scoreTitle}>Tu Puntuación</Text>
+              <Text style={styles.scoreBig}>
+                {lessonResults?.score}/{lessonResults?.total}
+              </Text>
+              <Text style={styles.scorePercentage}>
+                {Math.round(lessonResults?.percentage || 0)}% Correcto
+              </Text>
+            </View>
+
+            {/* Stars */}
+            <View style={styles.starsSection}>
+              <Text style={styles.starsTitle}>Estrellas Obtenidas</Text>
+              <View style={styles.starsContainer}>
+                {[1, 2, 3].map((star) => (
+                  <Icon
+                    key={star}
+                    name={lessonResults?.stars >= star ? "star" : "star-outline"}
+                    size={32}
+                    color={lessonResults?.stars >= star ? "#FFD700" : theme.placeholder}
+                    style={styles.starIcon}
+                  />
+                ))}
+              </View>
+            </View>
+
+            {/* Continue Button */}
+            <TouchableOpacity
+              style={styles.continueButton}
+              onPress={handleContinue}
+            >
+              <Text style={styles.continueButtonText}>Continuar</Text>
+              <Icon name="chevron-forward" size={20} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -449,6 +527,115 @@ const createStyles = (theme) => StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  modalContainer: {
+    backgroundColor: theme.surface,
+    borderRadius: 24,
+    padding: 32,
+    width: '100%',
+    maxWidth: 400,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  modalHeader: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  modalEmoji: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: theme.text,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: theme.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  scoreSection: {
+    alignItems: 'center',
+    marginBottom: 32,
+    backgroundColor: theme.background,
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+  },
+  scoreTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.textSecondary,
+    marginBottom: 8,
+  },
+  scoreBig: {
+    fontSize: 48,
+    fontWeight: '700',
+    color: theme.primary,
+    marginBottom: 4,
+  },
+  scorePercentage: {
+    fontSize: 14,
+    color: theme.textSecondary,
+    fontWeight: '500',
+  },
+  starsSection: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  starsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.textSecondary,
+    marginBottom: 16,
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  starIcon: {
+    marginHorizontal: 4,
+  },
+  continueButton: {
+    backgroundColor: theme.primary,
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: theme.primary,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  continueButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+    marginRight: 8,
   },
 });
 
