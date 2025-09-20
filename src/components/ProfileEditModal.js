@@ -183,26 +183,26 @@ const ProfileEditModal = ({ visible, onClose }) => {
               setIsLoading(true);
               console.log('Starting logout process...');
               
-              // Logout y esperar resultado
+              // Logout directo - el AuthProvider manejará el resto
               const result = await signOut();
               console.log('Logout result:', result);
               
-              // Siempre cerrar modal y mostrar mensaje
+              // Cerrar modal inmediatamente
               setIsLoading(false);
               onClose();
               
-              // Mensaje después de cerrar modal
+              // Esperar un poco más para que el AuthProvider procese el cambio
               setTimeout(() => {
                 Alert.alert('¡Hasta luego!', 'Has cerrado sesión correctamente');
-              }, 300);
+              }, 1000); // Más tiempo para que se complete la transición
               
             } catch (error) {
               console.error('Logout error:', error);
               setIsLoading(false);
-              onClose(); // Cerrar modal incluso si hay error
+              onClose();
               setTimeout(() => {
                 Alert.alert('¡Hasta luego!', 'Has cerrado sesión correctamente');
-              }, 300);
+              }, 1000);
             }
           }
         }

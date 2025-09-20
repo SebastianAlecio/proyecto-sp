@@ -61,14 +61,41 @@ export const AuthProvider = ({ children }) => {
         } else if (event === 'SIGNED_OUT') {
           // Usuario cerró sesión
           console.log('User signed out, creating guest');
-          const guestUser = await userService.getOrCreateGuestProfile();
-          setUser(guestUser);
-          setUserStats({
-            consecutiveDays: 0,
-            maxStreak: 0,
-            totalProgress: 0,
-            completedItems: 0
-          });
+          try {
+            console.log('Creating new guest user after logout...');
+            const guestUser = await userService.getOrCreateGuestProfile();
+            console.log('New guest user created:', guestUser);
+            setUser(guestUser);
+            
+            // Cargar estadísticas del nuevo guest user
+            if (guestUser?.id) {
+              await loadUserStats(guestUser.id);
+            } else {
+              setUserStats({
+                consecutiveDays: 0,
+                maxStreak: 0,
+                totalProgress: 0,
+                completedItems: 0
+              });
+            }
+            
+            console.log('Guest user setup complete after logout');
+          } catch (error) {
+            console.error('Error creating guest user after logout:', error);
+            // Fallback: crear usuario guest básico
+            setUser({
+              id: null,
+              display_name: 'Usuario',
+              isGuest: true,
+              isAuthenticated: false
+            });
+            setUserStats({
+              consecutiveDays: 0,
+              maxStreak: 0,
+              totalProgress: 0,
+              completedItems: 0
+            });
+          }
         }
       }
     );
