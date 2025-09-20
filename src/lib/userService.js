@@ -490,19 +490,12 @@ export const userService = {
     try {
       console.log('UserService signOut called');
       
-      // Crear una promesa con timeout para evitar que se cuelgue
-      const signOutPromise = supabase.auth.signOut();
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout')), 5000)
-      );
-      
-      try {
-        const { error } = await Promise.race([signOutPromise, timeoutPromise]);
-        if (error) throw error;
+      // Logout directo sin timeout complicado
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.log('SignOut error:', error.message);
+      } else {
         console.log('Supabase signOut successful');
-      } catch (timeoutError) {
-        console.log('SignOut timeout or error, forcing logout:', timeoutError.message);
-        // Forzar el logout localmente aunque Supabase falle
       }
 
       // El AuthProvider manejará la creación del guest user
@@ -510,8 +503,6 @@ export const userService = {
       return { success: true };
     } catch (error) {
       console.error('Error signing out:', error);
-      // Incluso si hay error, consideramos el logout exitoso
-      // porque el AuthProvider se encargará del resto
       return { success: true };
     }
   }

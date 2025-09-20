@@ -168,8 +168,8 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     try {
       console.log('Starting signOut process...');
-      await userService.signOut();
-      console.log('SignOut successful');
+      const result = await userService.signOut();
+      console.log('SignOut result:', result);
       return { success: true };
     } catch (error) {
       console.error('Error signing out:', error);
