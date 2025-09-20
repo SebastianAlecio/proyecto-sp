@@ -96,7 +96,8 @@ export const userService = {
       console.log('Inserting new guest profile...');
       console.log('About to insert into Supabase...');
       
-      const { data: newProfile, error: createError } = await supabase
+      // Agregar timeout para evitar que se cuelgue indefinidamente
+      const insertPromise = supabase
         .from('user_profiles')
         .insert({
           guest_id: guestId,
@@ -106,9 +107,31 @@ export const userService = {
         .select()
         .single();
 
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Insert timeout after 10 seconds')), 10000)
+      );
+
+      console.log('Executing insert with 10s timeout...');
+      const { data: newProfile, error: createError } = await Promise.race([
+        insertPromise,
+        timeoutPromise
+      ]);
+
       console.log('Supabase insert completed');
       console.log('Insert result:', { newProfile, createError });
-      if (createError) throw createError;
+      
+      if (createError) {
+        console.error('Insert error details:', createError);
+        console.error('Error code:', createError.code);
+        console.error('Error message:', createError.message);
+        console.error('Error hint:', createError.hint);
+        throw createError;
+      }
+
+      if (!newProfile) {
+        console.error('No profile returned from insert');
+        throw new Error('No profile data returned');
+      }
 
       // Guardar guest_id en AsyncStorage
       console.log('Saving guest_id to AsyncStorage...');
