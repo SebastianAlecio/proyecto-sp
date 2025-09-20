@@ -11,14 +11,18 @@ export const userService = {
   // Inicializar usuario (guest o autenticado)
   async initializeUser() {
     try {
+      console.log('Initializing user...');
       // Verificar si hay usuario autenticado
       const { data: { user } } = await supabase.auth.getUser();
+      console.log('Current auth user:', user?.id);
       
       if (user) {
         // Usuario autenticado - buscar o crear perfil
+        console.log('User is authenticated, getting profile...');
         return await this.getOrCreateAuthenticatedProfile(user);
       } else {
         // Usuario guest - buscar o crear guest
+        console.log('No authenticated user, creating guest...');
         return await this.getOrCreateGuestProfile();
       }
     } catch (error) {

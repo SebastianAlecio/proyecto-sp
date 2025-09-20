@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext, createContext } from 'react';
+import { supabase } from '../lib/supabase';
 import { userService } from '../lib/userService';
 
 // Crear contexto de autenticación
@@ -16,7 +17,34 @@ export const AuthProvider = ({ children }) => {
 
   // Inicializar usuario al cargar la app
   useEffect(() => {
-    initializeUser();
+    // Escuchar cambios de autenticación
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.id);
+        
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          // Usuario autenticado o token refrescado
+          await initializeUser();
+        } else if (event === 'SIGNED_OUT') {
+          // Usuario cerró sesión
+          const guestUser = await userService.getOrCreateGuestProfile();
+          setUser(guestUser);
+          setUserStats({
+            consecutiveDays: 0,
+            totalProgress: 0,
+            completedItems: 0
+          });
+        } else {
+          // Inicializar normalmente (primera carga)
+          await initializeUser();
+        }
+      }
+    );
+
+    // Cleanup subscription
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
   // Función para inicializar usuario
