@@ -85,7 +85,11 @@ const ProfileScreen = () => {
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
             <Text style={styles.statNumber}>{userStats.consecutiveDays}</Text>
-            <Text style={styles.statLabel}>Días Consecutivos</Text>
+            <Text style={styles.statLabel}>Racha Actual</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statNumber}>{userStats.maxStreak}</Text>
+            <Text style={styles.statLabel}>Récord Personal</Text>
           </View>
         </View>
 

@@ -154,10 +154,11 @@ export const userService = {
       const progress = await this.getUserProgress(userProfileId);
       
       // Días consecutivos (simplificado por ahora)
-      const consecutiveDays = await this.calculateConsecutiveDays(userProfileId);
+      const streakData = await this.calculateConsecutiveDays(userProfileId);
 
       return {
-        consecutiveDays,
+        consecutiveDays: streakData.current,
+        maxStreak: streakData.max,
         totalProgress: progress.length,
         completedItems: progress.filter(p => p.completed).length
       };
@@ -165,6 +166,7 @@ export const userService = {
       console.error('Error calculating user stats:', error);
       return {
         consecutiveDays: 0,
+        maxStreak: 0,
         totalProgress: 0,
         completedItems: 0
       };
@@ -174,38 +176,31 @@ export const userService = {
   // Calcular días consecutivos (versión simple)
   async calculateConsecutiveDays(userProfileId) {
     try {
-      const { data, error } = await supabase
-        .from('user_progress')
-        .select('last_practiced')
-        .eq('user_profile_id', userProfileId)
-        .order('last_practiced', { ascending: false })
-        .limit(30); // Últimos 30 días
+      // Obtener datos de racha del perfil del usuario
+      const { data: profile, error } = await supabase
+        .from('user_profiles')
+        .select('current_streak, max_streak, last_activity_date')
+        .eq('id', userProfileId)
+        .single();
 
-      if (error || !data || data.length === 0) return 0;
+      if (error || !profile) return { current: 0, max: 0 };
 
-      // Lógica simple: contar días únicos en los últimos 7 días
-      const now = new Date();
-      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      
-      const recentDays = new Set();
-      data.forEach(item => {
-        const practiceDate = new Date(item.last_practiced);
-        if (practiceDate >= sevenDaysAgo) {
-          const dayKey = practiceDate.toDateString();
-          recentDays.add(dayKey);
-        }
-      });
-
-      return recentDays.size;
+      return {
+        current: profile.current_streak || 0,
+        max: profile.max_streak || 0
+      };
     } catch (error) {
       console.error('Error calculating consecutive days:', error);
-      return 0;
+      return { current: 0, max: 0 };
     }
   },
 
   // Marcar progreso en un elemento
   async markProgress(userProfileId, category, itemId, completed = true) {
     try {
+      // Actualizar racha antes de marcar progreso
+      await this.updateUserStreak(userProfileId);
+
       // Verificar si ya existe progreso para este elemento
       const { data: existing, error: selectError } = await supabase
         .from('user_progress')
@@ -255,6 +250,68 @@ export const userService = {
     } catch (error) {
       console.error('Error marking progress:', error);
       throw error;
+    }
+  },
+
+  // Actualizar racha del usuario
+  async updateUserStreak(userProfileId) {
+    try {
+      // Obtener perfil actual
+      const { data: profile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('current_streak, max_streak, last_activity_date')
+        .eq('id', userProfileId)
+        .single();
+
+      if (profileError) throw profileError;
+
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      const lastActivityDate = profile.last_activity_date;
+      
+      let newCurrentStreak = profile.current_streak || 0;
+      let newMaxStreak = profile.max_streak || 0;
+
+      if (!lastActivityDate) {
+        // Primera vez - iniciar racha
+        newCurrentStreak = 1;
+      } else {
+        const lastDate = new Date(lastActivityDate);
+        const todayDate = new Date(today);
+        const diffTime = todayDate.getTime() - lastDate.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) {
+          // Mismo día - no cambiar racha
+          return;
+        } else if (diffDays === 1) {
+          // Día consecutivo - aumentar racha
+          newCurrentStreak = newCurrentStreak + 1;
+        } else {
+          // Perdió la racha - reiniciar
+          newCurrentStreak = 1;
+        }
+      }
+
+      // Actualizar récord si es necesario
+      if (newCurrentStreak > newMaxStreak) {
+        newMaxStreak = newCurrentStreak;
+      }
+
+      // Actualizar en la base de datos
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update({
+          current_streak: newCurrentStreak,
+          max_streak: newMaxStreak,
+          last_activity_date: today
+        })
+        .eq('id', userProfileId);
+
+      if (updateError) throw updateError;
+
+      console.log(`🔥 Streak updated: ${newCurrentStreak} days (max: ${newMaxStreak})`);
+    } catch (error) {
+      console.error('Error updating user streak:', error);
     }
   },
 

@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [userStats, setUserStats] = useState({
     consecutiveDays: 0,
+    maxStreak: 0,
     totalProgress: 0,
     completedItems: 0
   });
@@ -64,6 +65,7 @@ export const AuthProvider = ({ children }) => {
           setUser(guestUser);
           setUserStats({
             consecutiveDays: 0,
+            maxStreak: 0,
             totalProgress: 0,
             completedItems: 0
           });
@@ -171,6 +173,8 @@ export const AuthProvider = ({ children }) => {
       setUser(guestUser);
       setUserStats({
         consecutiveDays: 0,
+        maxStreak: 0,
+        maxStreak: 0,
         totalProgress: 0,
         completedItems: 0
       });
