@@ -85,8 +85,8 @@ const LessonScreen = ({ route, navigation }) => {
 
     if (option.isCorrect) {
       setScore(prev => prev + 1);
-      // Marcar progreso para esta letra
-      markProgress('letters', option.text, true);
+      // Marcar progreso para la letra correcta de esta pregunta
+      markProgress('letters', currentQuestion.correctAnswer, true);
     }
 
     // Avanzar automáticamente después de 1.5 segundos
