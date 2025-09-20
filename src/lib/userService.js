@@ -83,29 +83,37 @@ export const userService = {
   // Obtener o crear perfil guest
   async getOrCreateGuestProfile() {
     try {
+      console.log('Starting getOrCreateGuestProfile...');
       // Verificar si ya hay un guest_id guardado
       let guestId = await AsyncStorage.getItem('guest_id');
+      console.log('Existing guest_id from storage:', guestId);
       
       if (guestId) {
         // Buscar perfil guest existente
+        console.log('Looking for existing guest profile...');
         const { data: profile, error } = await supabase
           .from('user_profiles')
           .select('*')
           .eq('guest_id', guestId)
           .single();
 
+        console.log('Existing profile query result:', { profile, error });
         if (!error && profile) {
+          console.log('Found existing guest profile, returning it');
           return {
             ...profile,
             isGuest: true,
             isAuthenticated: false
           };
         }
+        console.log('No existing profile found, creating new one');
       }
 
       // Crear nuevo usuario guest
       guestId = generateGuestId();
+      console.log('Generated new guest_id:', guestId);
       
+      console.log('Inserting new guest profile...');
       const { data: newProfile, error: createError } = await supabase
         .from('user_profiles')
         .insert({
@@ -116,11 +124,15 @@ export const userService = {
         .select()
         .single();
 
+      console.log('Insert result:', { newProfile, createError });
       if (createError) throw createError;
 
       // Guardar guest_id en AsyncStorage
+      console.log('Saving guest_id to AsyncStorage...');
       await AsyncStorage.setItem('guest_id', guestId);
+      console.log('Guest_id saved successfully');
 
+      console.log('Returning new guest profile');
       return {
         ...newProfile,
         isGuest: true,
@@ -128,6 +140,7 @@ export const userService = {
       };
     } catch (error) {
       console.error('Error with guest profile:', error);
+      console.error('Full guest profile error:', JSON.stringify(error, null, 2));
       throw error;
     }
   },

@@ -82,9 +82,11 @@ export const AuthProvider = ({ children }) => {
             console.log('Guest user setup complete after logout');
           } catch (error) {
             console.error('Error creating guest user after logout:', error);
+            console.error('Full error details:', JSON.stringify(error, null, 2));
             // Fallback: crear usuario guest básico
+            console.log('Creating fallback guest user...');
             setUser({
-              id: null,
+              id: 'fallback_guest_' + Date.now(),
               display_name: 'Usuario',
               isGuest: true,
               isAuthenticated: false
@@ -95,6 +97,7 @@ export const AuthProvider = ({ children }) => {
               totalProgress: 0,
               completedItems: 0
             });
+            console.log('Fallback guest user created');
           }
         }
       }
