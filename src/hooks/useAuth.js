@@ -21,7 +21,10 @@ export const AuthProvider = ({ children }) => {
     
     const initializeAuth = async () => {
       try {
-        // Primero verificar si hay sesión activa
+        // Esperar un poco para que Supabase termine de cargar la sesión
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Verificar si hay sesión activa
         const { data: { session } } = await supabase.auth.getSession();
         console.log('Initial session check:', session?.user?.id || 'no session');
         
@@ -44,9 +47,12 @@ export const AuthProvider = ({ children }) => {
         if (!mounted) return;
         
         if (event === 'INITIAL_SESSION') {
-          // Sesión inicial - no hacer nada, ya manejamos esto arriba
-          console.log('Initial session detected, skipping...');
-          return;
+          // Manejar sesión inicial aquí también por si acaso
+          console.log('Initial session detected, initializing...');
+          if (session?.user) {
+            console.log('Found existing session, initializing user...');
+            await initializeUser();
+          }
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           // Usuario autenticado o token refrescado
           console.log('User signed in or token refreshed');
