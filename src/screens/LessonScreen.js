@@ -83,31 +83,33 @@ const LessonScreen = ({ route, navigation }) => {
     setSelectedAnswer(option);
     setShowResult(true);
 
+    let newScore = score;
     if (option.isCorrect) {
-      setScore(prev => prev + 1);
+      newScore = score + 1;
+      setScore(newScore);
       // Marcar progreso para la letra correcta de esta pregunta
       markProgress('letters', currentQuestion.correctAnswer, true);
     }
 
     // Avanzar automáticamente después de 1.5 segundos
     setTimeout(() => {
-      handleNextQuestion();
+      handleNextQuestion(newScore);
     }, 1500);
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = (currentScore = score) => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
       setSelectedAnswer(null);
       setShowResult(false);
     } else {
       // Lección completada
-      handleLessonComplete();
+      handleLessonComplete(currentScore);
     }
   };
 
-  const handleLessonComplete = () => {
-    const percentage = (score / questions.length) * 100;
+  const handleLessonComplete = (finalScore = score) => {
+    const percentage = (finalScore / questions.length) * 100;
     let stars = 0;
     
     if (percentage >= 90) stars = 3;
@@ -119,7 +121,7 @@ const LessonScreen = ({ route, navigation }) => {
 
     Alert.alert(
       '🎉 ¡Lección Completada!',
-      `Obtuviste ${score} de ${questions.length} respuestas correctas.\n⭐ ${stars} estrella${stars !== 1 ? 's' : ''}`,
+      `Obtuviste ${finalScore} de ${questions.length} respuestas correctas.\n⭐ ${stars} estrella${stars !== 1 ? 's' : ''}`,
       [
         {
           text: 'Continuar',
