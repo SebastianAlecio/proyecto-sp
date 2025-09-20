@@ -168,16 +168,7 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     try {
       console.log('Starting signOut process...');
-      const guestUser = await userService.signOut();
-      console.log('SignOut completed, new guest user:', guestUser);
-      setUser(guestUser);
-      setUserStats({
-        consecutiveDays: 0,
-        maxStreak: 0,
-        maxStreak: 0,
-        totalProgress: 0,
-        completedItems: 0
-      });
+      await userService.signOut();
       console.log('SignOut successful');
       return { success: true };
     } catch (error) {

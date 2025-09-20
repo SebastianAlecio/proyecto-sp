@@ -185,22 +185,22 @@ const ProfileEditModal = ({ visible, onClose }) => {
               const result = await signOut();
               console.log('Logout result:', result);
               
+              // Siempre cerrar el modal después de intentar logout
+              setIsLoading(false);
+              onClose();
+              
               if (result.success) {
-                // Cerrar modal inmediatamente después del logout exitoso
-                setIsLoading(false);
-                onClose();
-                
-                // Mostrar mensaje de confirmación después de cerrar el modal
+                // Mostrar mensaje de confirmación
                 setTimeout(() => {
                   Alert.alert('¡Hasta luego!', 'Has cerrado sesión correctamente');
-                }, 100);
+                }, 300);
               } else {
-                setIsLoading(false);
-                Alert.alert('Error', 'No se pudo cerrar sesión');
+                Alert.alert('Error', result.error || 'No se pudo cerrar sesión');
               }
             } catch (error) {
               console.error('Logout error:', error);
               setIsLoading(false);
+              onClose();
               Alert.alert('Error', 'Hubo un problema al cerrar sesión');
             }
           }

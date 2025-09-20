@@ -491,8 +491,9 @@ export const userService = {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
-      // Crear nuevo usuario guest
-      return await this.getOrCreateGuestProfile();
+      // El AuthProvider manejará la creación del guest user
+      // a través del onAuthStateChange listener
+      return { success: true };
     } catch (error) {
       console.error('Error signing out:', error);
       throw error;
