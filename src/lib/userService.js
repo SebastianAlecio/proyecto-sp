@@ -13,7 +13,8 @@ export const userService = {
     try {
       console.log('Initializing user...');
       // Verificar si hay usuario autenticado
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       console.log('Current auth user:', user?.id);
       
       if (user) {

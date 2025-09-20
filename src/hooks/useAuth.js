@@ -17,16 +17,43 @@ export const AuthProvider = ({ children }) => {
 
   // Inicializar usuario al cargar la app
   useEffect(() => {
+    let mounted = true;
+    
+    const initializeAuth = async () => {
+      try {
+        // Primero verificar si hay sesión activa
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Initial session check:', session?.user?.id || 'no session');
+        
+        if (mounted) {
+          await initializeUser();
+        }
+      } catch (error) {
+        console.error('Error checking initial session:', error);
+        if (mounted) {
+          await initializeUser();
+        }
+      }
+    };
+
     // Escuchar cambios de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
         
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (!mounted) return;
+        
+        if (event === 'INITIAL_SESSION') {
+          // Sesión inicial - no hacer nada, ya manejamos esto arriba
+          console.log('Initial session detected, skipping...');
+          return;
+        } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           // Usuario autenticado o token refrescado
+          console.log('User signed in or token refreshed');
           await initializeUser();
         } else if (event === 'SIGNED_OUT') {
           // Usuario cerró sesión
+          console.log('User signed out, creating guest');
           const guestUser = await userService.getOrCreateGuestProfile();
           setUser(guestUser);
           setUserStats({
@@ -34,15 +61,16 @@ export const AuthProvider = ({ children }) => {
             totalProgress: 0,
             completedItems: 0
           });
-        } else {
-          // Inicializar normalmente (primera carga)
-          await initializeUser();
         }
       }
     );
 
+    // Inicializar autenticación
+    initializeAuth();
+
     // Cleanup subscription
     return () => {
+      mounted = false;
       subscription?.unsubscribe();
     };
   }, []);
