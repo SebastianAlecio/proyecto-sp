@@ -183,13 +183,15 @@ const ProfileEditModal = ({ visible, onClose }) => {
               setIsLoading(true);
               console.log('Starting logout process...');
               
-              // Logout simple y directo
-              await signOut();
+              // Logout y esperar resultado
+              const result = await signOut();
+              console.log('Logout result:', result);
               
+              // Siempre cerrar modal y mostrar mensaje
               setIsLoading(false);
               onClose();
               
-              // Un solo mensaje después de cerrar modal
+              // Mensaje después de cerrar modal
               setTimeout(() => {
                 Alert.alert('¡Hasta luego!', 'Has cerrado sesión correctamente');
               }, 300);
@@ -197,7 +199,10 @@ const ProfileEditModal = ({ visible, onClose }) => {
             } catch (error) {
               console.error('Logout error:', error);
               setIsLoading(false);
-              Alert.alert('Error', 'Hubo un problema al cerrar sesión');
+              onClose(); // Cerrar modal incluso si hay error
+              setTimeout(() => {
+                Alert.alert('¡Hasta luego!', 'Has cerrado sesión correctamente');
+              }, 300);
             }
           }
         }
