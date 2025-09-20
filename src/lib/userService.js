@@ -91,13 +91,17 @@ export const userService = {
       if (guestId) {
         // Buscar perfil guest existente
         console.log('Looking for existing guest profile...');
+        console.log('About to query Supabase for guest_id:', guestId);
+        
         const { data: profile, error } = await supabase
           .from('user_profiles')
           .select('*')
           .eq('guest_id', guestId)
           .single();
 
+        console.log('Supabase query completed');
         console.log('Existing profile query result:', { profile, error });
+        
         if (!error && profile) {
           console.log('Found existing guest profile, returning it');
           return {
@@ -106,6 +110,7 @@ export const userService = {
             isAuthenticated: false
           };
         }
+        console.log('No existing profile found or error occurred, creating new one');
         console.log('No existing profile found, creating new one');
       }
 
@@ -114,6 +119,8 @@ export const userService = {
       console.log('Generated new guest_id:', guestId);
       
       console.log('Inserting new guest profile...');
+      console.log('About to insert into Supabase...');
+      
       const { data: newProfile, error: createError } = await supabase
         .from('user_profiles')
         .insert({
@@ -124,6 +131,7 @@ export const userService = {
         .select()
         .single();
 
+      console.log('Supabase insert completed');
       console.log('Insert result:', { newProfile, createError });
       if (createError) throw createError;
 
