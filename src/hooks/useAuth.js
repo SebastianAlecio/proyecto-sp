@@ -72,10 +72,11 @@ export const AuthProvider = ({ children }) => {
               await loadUserStats(guestUser.id);
             } else {
               setUserStats({
-                consecutiveDays: 0,
+                id: null, // No ID para evitar problemas con UUID
                 maxStreak: 0,
                 totalProgress: 0,
-                completedItems: 0
+                isAuthenticated: false,
+                isFallback: true // Marcar como fallback
               });
             }
             
@@ -143,7 +144,10 @@ export const AuthProvider = ({ children }) => {
 
   // Marcar progreso en un elemento
   const markProgress = async (category, itemId, completed = true, score = null) => {
-    if (!user?.id) return;
+    if (!user?.id || user?.isFallback) {
+      console.log('Cannot mark progress: no valid user ID or fallback user');
+      return;
+    }
 
     try {
       await userService.markProgress(user.id, category, itemId, completed, score);

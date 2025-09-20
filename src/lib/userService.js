@@ -157,6 +157,12 @@ export const userService = {
   // Obtener progreso del usuario
   async getUserProgress(userProfileId) {
     try {
+      // Si no hay ID válido, retornar array vacío
+      if (!userProfileId) {
+        console.log('No valid user profile ID, returning empty progress');
+        return [];
+      }
+      
       const { data, error } = await supabase
         .from('user_progress')
         .select('*')
@@ -173,6 +179,17 @@ export const userService = {
   // Calcular estadísticas del usuario
   async getUserStats(userProfileId) {
     try {
+      // Si no hay ID válido, retornar stats vacías
+      if (!userProfileId) {
+        console.log('No valid user profile ID, returning empty stats');
+        return {
+          consecutiveDays: 0,
+          maxStreak: 0,
+          totalProgress: 0,
+          completedItems: 0
+        };
+      }
+      
       const progress = await this.getUserProgress(userProfileId);
       
       // Días consecutivos (simplificado por ahora)
