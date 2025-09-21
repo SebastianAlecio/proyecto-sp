@@ -123,36 +123,36 @@ const CameraScreen = ({ navigation }) => {
           ref={cameraRef}
           style={styles.camera} 
           facing={facing}
-        >
-          {/* Overlay para guiar al usuario */}
-          <View style={styles.overlay}>
-            {/* Marco de detección */}
-            <View style={styles.detectionFrame}>
-              <View style={styles.frameCorner} />
-              <View style={[styles.frameCorner, styles.frameCornerTopRight]} />
-              <View style={[styles.frameCorner, styles.frameCornerBottomLeft]} />
-              <View style={[styles.frameCorner, styles.frameCornerBottomRight]} />
-            </View>
-
-            {/* Instrucciones */}
-            <View style={styles.instructionsContainer}>
-              <Text style={styles.instructionsText}>
-                {isRecording 
-                  ? '🎯 Detectando seña...' 
-                  : '✋ Coloca tu mano dentro del marco'
-                }
-              </Text>
-            </View>
-
-            {/* Resultado de detección */}
-            {detectedSign && (
-              <View style={styles.resultContainer}>
-                <Text style={styles.resultText}>Seña detectada:</Text>
-                <Text style={styles.detectedSignText}>{detectedSign}</Text>
-              </View>
-            )}
+        />
+        
+        {/* Overlay con posicionamiento absoluto */}
+        <View style={styles.overlay}>
+          {/* Marco de detección */}
+          <View style={styles.detectionFrame}>
+            <View style={styles.frameCorner} />
+            <View style={[styles.frameCorner, styles.frameCornerTopRight]} />
+            <View style={[styles.frameCorner, styles.frameCornerBottomLeft]} />
+            <View style={[styles.frameCorner, styles.frameCornerBottomRight]} />
           </View>
-        </CameraView>
+
+          {/* Instrucciones */}
+          <View style={styles.instructionsContainer}>
+            <Text style={styles.instructionsText}>
+              {isRecording 
+                ? '🎯 Detectando seña...' 
+                : '✋ Coloca tu mano dentro del marco'
+              }
+            </Text>
+          </View>
+
+          {/* Resultado de detección */}
+          {detectedSign && (
+            <View style={styles.resultContainer}>
+              <Text style={styles.resultText}>Seña detectada:</Text>
+              <Text style={styles.detectedSignText}>{detectedSign}</Text>
+            </View>
+          )}
+        </View>
       </View>
 
       {/* Controls */}
@@ -300,7 +300,11 @@ const createStyles = (theme) => StyleSheet.create({
     flex: 1,
   },
   overlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'transparent',
   },
   detectionFrame: {
