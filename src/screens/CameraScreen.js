@@ -350,7 +350,7 @@ const createStyles = (theme) => StyleSheet.create({
   },
   instructionsContainer: {
     position: 'absolute',
-    top: '15%',
+    top: '20%',
     left: 0,
     right: 0,
     alignItems: 'center',
