@@ -16,13 +16,12 @@ const { width, height } = Dimensions.get('window');
 
 const CameraScreen = ({ navigation }) => {
   const { theme } = useTheme();
-  const [facing, setFacing] = useState('front'); // Front camera para selfie de señas
+  const [facing, setFacing] = useState('front'); // Cámara frontal
   const [permission, requestPermission] = useCameraPermissions();
   const [isRecording, setIsRecording] = useState(false);
   const [detectedSign, setDetectedSign] = useState(null);
   const cameraRef = useRef(null);
 
-  // Verificar permisos al cargar la pantalla
   useEffect(() => {
     if (permission && !permission.granted && !permission.canAskAgain) {
       Alert.alert(
@@ -40,27 +39,59 @@ const CameraScreen = ({ navigation }) => {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
   };
 
-  const startDetection = () => {
-    setIsRecording(true);
-    // TODO: Aquí integraremos el API de detección de señas
-    console.log('🎯 Iniciando detección de señas...');
-    
-    // Simulación temporal - remover cuando tengamos el API real
-    setTimeout(() => {
-      setDetectedSign('Hola');
+  const startDetection = async () => {
+    if (!cameraRef.current) return;
+
+    try {
+      setIsRecording(true);
+      setDetectedSign(null);
+
+      console.log("📸 Capturando imagen...");
+      const photo = await cameraRef.current.takePictureAsync({
+        base64: true,
+      });
+
+      const formData = new FormData();
+      formData.append("file", {
+        uri: photo.uri,
+        name: "hand.jpg",
+        type: "image/jpeg",
+      });
+
+      console.log("📤 Enviando al servidor...");
+      //Aqui remplazar IPV4
+      const response = await fetch("http://192.168.50.143:8000/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+      console.log("✅ Respuesta:", result);
+
+      if (result.error) {
+        setDetectedSign("✋ Mano no detectada");
+      } else {
+        setDetectedSign(`${result.prediction} (${(result.confidence * 100).toFixed(1)}%)`);
+      }
+    } catch (error) {
+      console.error("❌ Error:", error);
+      setDetectedSign("Error en detección");
+    } finally {
       setIsRecording(false);
-    }, 3000);
+    }
   };
 
   const stopDetection = () => {
     setIsRecording(false);
     setDetectedSign(null);
-    console.log('🛑 Deteniendo detección de señas...');
+    console.log('🛑 Detección detenida');
   };
 
   const styles = createStyles(theme);
 
-  // Pantalla de carga de permisos
   if (!permission) {
     return (
       <SafeAreaView style={styles.container}>
@@ -71,7 +102,6 @@ const CameraScreen = ({ navigation }) => {
     );
   }
 
-  // Pantalla de solicitud de permisos
   if (!permission.granted) {
     return (
       <SafeAreaView style={styles.container}>
@@ -125,9 +155,7 @@ const CameraScreen = ({ navigation }) => {
           facing={facing}
         />
         
-        {/* Overlay con posicionamiento absoluto */}
         <View style={styles.overlay}>
-          {/* Marco de detección */}
           <View style={styles.detectionFrame}>
             <View style={styles.frameCorner} />
             <View style={[styles.frameCorner, styles.frameCornerTopRight]} />
@@ -135,7 +163,6 @@ const CameraScreen = ({ navigation }) => {
             <View style={[styles.frameCorner, styles.frameCornerBottomRight]} />
           </View>
 
-          {/* Instrucciones */}
           <View style={styles.instructionsContainer}>
             <Text style={styles.instructionsText}>
               {isRecording 
@@ -145,7 +172,6 @@ const CameraScreen = ({ navigation }) => {
             </Text>
           </View>
 
-          {/* Resultado de detección */}
           {detectedSign && (
             <View style={styles.resultContainer}>
               <Text style={styles.resultText}>Seña detectada:</Text>
@@ -155,10 +181,8 @@ const CameraScreen = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Controls */}
       <View style={styles.controlsContainer}>
         <View style={styles.controls}>
-          {/* Botón de detección */}
           <TouchableOpacity
             style={[
               styles.detectButton,
@@ -174,7 +198,6 @@ const CameraScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Información */}
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>
             {isRecording 
@@ -189,255 +212,40 @@ const CameraScreen = ({ navigation }) => {
 };
 
 const createStyles = (theme) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000000',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.background,
-  },
-  loadingText: {
-    fontSize: 18,
-    color: theme.textSecondary,
-  },
-  permissionContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-    backgroundColor: theme.background,
-  },
-  permissionIcon: {
-    marginBottom: 32,
-  },
-  permissionTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: theme.text,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  permissionText: {
-    fontSize: 16,
-    color: theme.textSecondary,
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 32,
-  },
-  permissionButton: {
-    backgroundColor: theme.primary,
-    borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    marginBottom: 16,
-    shadowColor: theme.primary,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  permissionButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  cancelButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-  },
-  cancelButtonText: {
-    color: theme.textSecondary,
-    fontSize: 16,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingTop: 50,
-    paddingBottom: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-  },
-  backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  flipButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cameraContainer: {
-    flex: 1,
-  },
-  camera: {
-    flex: 1,
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'transparent',
-  },
-  detectionFrame: {
-    position: 'absolute',
-    top: '25%',
-    left: '15%',
-    right: '15%',
-    bottom: '35%',
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  frameCorner: {
-    position: 'absolute',
-    width: 30,
-    height: 30,
-    borderColor: '#FFFFFF',
-    top: -2,
-    left: -2,
-    borderTopWidth: 4,
-    borderLeftWidth: 4,
-  },
-  frameCornerTopRight: {
-    left: undefined,
-    right: -2,
-    borderLeftWidth: 0,
-    borderRightWidth: 4,
-  },
-  frameCornerBottomLeft: {
-    top: undefined,
-    bottom: -2,
-    borderTopWidth: 0,
-    borderBottomWidth: 4,
-  },
-  frameCornerBottomRight: {
-    top: undefined,
-    left: undefined,
-    right: -2,
-    bottom: -2,
-    borderTopWidth: 0,
-    borderLeftWidth: 0,
-    borderRightWidth: 4,
-    borderBottomWidth: 4,
-  },
-  instructionsContainer: {
-    position: 'absolute',
-    top: '18%',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  instructionsText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  resultContainer: {
-    position: 'absolute',
-    bottom: '35%',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  resultText: {
-    fontSize: 14,
-    color: '#FFFFFF',
-    marginBottom: 4,
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
-  },
-  detectedSignText: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#4CAF50',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 16,
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
-  },
-  controlsContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingBottom: 40,
-    paddingTop: 16,
-  },
-  controls: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 16,
-  },
-  detectButton: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: theme.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  detectButtonActive: {
-    backgroundColor: '#FF6B6B',
-  },
-  infoContainer: {
-    paddingHorizontal: 24,
-    paddingBottom: 8,
-    paddingTop: 8,
-  },
-  infoText: {
-    fontSize: 13,
-    color: '#FFFFFF',
-    textAlign: 'center',
-    opacity: 0.8,
-    lineHeight: 18,
-  },
+  container: { flex: 1, backgroundColor: '#000' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.background },
+  loadingText: { fontSize: 18, color: theme.textSecondary },
+  permissionContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32, backgroundColor: theme.background },
+  permissionIcon: { marginBottom: 32 },
+  permissionTitle: { fontSize: 24, fontWeight: '700', color: theme.text, marginBottom: 16, textAlign: 'center' },
+  permissionText: { fontSize: 16, color: theme.textSecondary, textAlign: 'center', lineHeight: 24, marginBottom: 32 },
+  permissionButton: { backgroundColor: theme.primary, borderRadius: 16, paddingVertical: 16, paddingHorizontal: 32, marginBottom: 16 },
+  permissionButtonText: { color: '#FFF', fontSize: 16, fontWeight: '600', textAlign: 'center' },
+  cancelButton: { paddingVertical: 12, paddingHorizontal: 24 },
+  cancelButtonText: { color: theme.textSecondary, fontSize: 16, fontWeight: '500', textAlign: 'center' },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingTop: 50, paddingBottom: 20, backgroundColor: 'rgba(0,0,0,0.8)', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 },
+  backButton: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
+  headerTitle: { fontSize: 20, fontWeight: '600', color: '#FFF' },
+  flipButton: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
+  cameraContainer: { flex: 1 },
+  camera: { flex: 1 },
+  overlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'transparent' },
+  detectionFrame: { position: 'absolute', top: '25%', left: '15%', right: '15%', bottom: '35%', borderWidth: 2, borderColor: 'transparent' },
+  frameCorner: { position: 'absolute', width: 30, height: 30, borderColor: '#FFF', top: -2, left: -2, borderTopWidth: 4, borderLeftWidth: 4 },
+  frameCornerTopRight: { left: undefined, right: -2, borderLeftWidth: 0, borderRightWidth: 4 },
+  frameCornerBottomLeft: { top: undefined, bottom: -2, borderTopWidth: 0, borderBottomWidth: 4 },
+  frameCornerBottomRight: { top: undefined, left: undefined, right: -2, bottom: -2, borderTopWidth: 0, borderLeftWidth: 0, borderRightWidth: 4, borderBottomWidth: 4 },
+  instructionsContainer: { position: 'absolute', top: '18%', left: 0, right: 0, alignItems: 'center' },
+  instructionsText: { fontSize: 16, fontWeight: '600', color: '#FFF', textAlign: 'center', backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
+  resultContainer: { position: 'absolute', bottom: '35%', left: 0, right: 0, alignItems: 'center' },
+  resultText: { fontSize: 14, color: '#FFF', marginBottom: 4, textShadowColor: 'rgba(0,0,0,0.8)', textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 3 },
+  detectedSignText: { fontSize: 24, fontWeight: '700', color: '#4CAF50', backgroundColor: 'rgba(0,0,0,0.8)', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 16, textShadowColor: 'rgba(0,0,0,0.8)', textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 3 },
+  controlsContainer: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.7)', paddingBottom: 40, paddingTop: 16 },
+  controls: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: 16 },
+  detectButton: { width: 70, height: 70, borderRadius: 35, backgroundColor: theme.primary, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 },
+  detectButtonActive: { backgroundColor: '#FF6B6B' },
+  infoContainer: { paddingHorizontal: 24, paddingBottom: 8, paddingTop: 8 },
+  infoText: { fontSize: 13, color: '#FFF', textAlign: 'center', opacity: 0.8, lineHeight: 18 },
 });
 
 export default CameraScreen;
