@@ -6,6 +6,7 @@ import TranslateScreen from '../screens/TranslateScreen';
 import TranslationResultsScreen from '../screens/TranslationResultsScreen';
 import LearnScreen from '../screens/LearnScreen';
 import LessonScreen from '../screens/LessonScreen';
+import CameraScreen from '../screens/CameraScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -28,6 +29,8 @@ const MainTabNavigator = () => {
             iconName = focused ? 'language' : 'language-outline';
           } else if (route.name === 'Learn') {
             iconName = focused ? 'school' : 'school-outline';
+          } else if (route.name === 'Camera') {
+            iconName = focused ? 'camera' : 'camera-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           }
@@ -73,6 +76,13 @@ const MainTabNavigator = () => {
         }}
       />
       <Tab.Screen 
+        name="Camera" 
+        component={CameraScreen}
+        options={{
+          tabBarLabel: 'Cámara',
+        }}
+      />
+      <Tab.Screen 
         name="Profile" 
         component={ProfileScreen}
         options={{
@@ -90,6 +100,7 @@ const AppNavigator = ({ initialRouteName }) => {
       <Stack.Screen name="Home" component={MainTabNavigator} />
       <Stack.Screen name="TranslationResults" component={TranslationResultsScreen} />
       <Stack.Screen name="Lesson" component={LessonScreen} />
+      <Stack.Screen name="CameraScreen" component={CameraScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
     </Stack.Navigator>
   );
