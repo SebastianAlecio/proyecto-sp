@@ -12,11 +12,20 @@ export const userService = {
   async initializeUser() {
     try {
       console.log("Initializing user...");
-      // Verificar si hay usuario autenticado
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      const user = session?.user;
+
+      // Verificar si hay usuario autenticado con timeout
+      const sessionPromise = supabase.auth.getSession();
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Session timeout")), 3000),
+      );
+
+      let sessionData;
+      try {
+        sessionData = await Promise.race([sessionPromise, timeoutPromise]);
+      } catch (timeoutError) {
+        sessionData = { data: { session: null } };
+      }
+      const user = sessionData.data.session?.user;
       console.log("Current auth user:", user?.id);
 
       if (user) {
@@ -89,7 +98,7 @@ export const userService = {
       const existingGuestId = await AsyncStorage.getItem("guest_id");
 
       if (existingGuestId) {
-        // Buscar perfil guest existente
+        // Buscar perfil guest existente en DB
         const { data: existingProfile, error } = await supabase
           .from("user_profiles")
           .select("*")
@@ -105,32 +114,23 @@ export const userService = {
           };
         }
       }
-
-      // Crear nuevo usuario guest
+      // Crear usuario fallback sin DB después del signOut
       const guestId = generateGuestId();
-
-      const { data: newProfile, error: createError } = await supabase
-        .from("user_profiles")
-        .insert({
-          guest_id: guestId,
-          display_name: "Usuario",
-          is_guest: true,
-        })
-        .select()
-        .single();
-
-      if (createError) throw createError;
-
-      // Guardar guest_id en AsyncStorage
       await AsyncStorage.setItem("guest_id", guestId);
 
-      return {
-        ...newProfile,
+      const fallbackUser = {
+        id: null,
+        guest_id: guestId,
+        display_name: "Usuario",
+        is_guest: true,
         isGuest: true,
         isAuthenticated: false,
+        isFallback: true,
       };
+
+      return fallbackUser;
     } catch (error) {
-      console.error("Error with guest profile:", error);
+      console.error("❌ [DEBUG] Error with guest profile:", error);
       throw error;
     }
   },
