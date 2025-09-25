@@ -93,10 +93,10 @@ const LearnScreen = ({ navigation }) => {
       title: 'Números 1',
       subtitle: '1 - 2 - 3 - 4 - 5',
       letters: ['1', '2', '3', '4', '5'],
-      isUnlocked: false, // Se desbloquea al completar todas las lecciones del abecedario
+      isUnlocked: true, // Primera lección de números siempre desbloqueada
       stars: 0,
       completed: false,
-      requiredScore: 70
+      requiredScore: 0 // No requiere score previo
     },
     {
       id: 'number_lesson_2',
@@ -202,14 +202,8 @@ const LearnScreen = ({ navigation }) => {
         let isUnlocked = false;
         
         if (index === 0) {
-          // Primera lección de números: se desbloquea al completar todas las lecciones del abecedario
-          const allAlphabetCompleted = updatedAlphabetLessons.every(alphabetLesson => {
-            const alphabetProgress = progress.find(p => 
-              p.category === 'lessons' && p.item_id === alphabetLesson.id
-            );
-            return alphabetProgress && alphabetProgress.score >= 70;
-          });
-          isUnlocked = allAlphabetCompleted;
+          // Primera lección de números: siempre desbloqueada
+          isUnlocked = lesson.isUnlocked; // true por defecto
         } else {
           // Lecciones posteriores de números: verificar si la anterior está completada
           const previousLessonId = numberLessons[index - 1].id;
@@ -257,8 +251,8 @@ const LearnScreen = ({ navigation }) => {
     if (index === 0) return ''; // Primera lección del abecedario no tiene mensaje
     
     if (index === alphabetLessonsCount) {
-      // Primera lección de números
-      return 'Completa todas las lecciones del abecedario para desbloquear';
+      // Primera lección de números - no debería mostrar mensaje ya que está desbloqueada
+      return '';
     }
     
     const previousLesson = lessons[index - 1];
