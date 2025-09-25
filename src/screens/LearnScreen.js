@@ -86,6 +86,29 @@ const LearnScreen = ({ navigation }) => {
     }
   ];
 
+  // Definir las lecciones de números
+  const numberLessons = [
+    {
+      id: 'number_lesson_1',
+      title: 'Números 1',
+      subtitle: '1 - 2 - 3 - 4 - 5',
+      letters: ['1', '2', '3', '4', '5'],
+      isUnlocked: false, // Se desbloquea al completar todas las lecciones del abecedario
+      stars: 0,
+      completed: false,
+      requiredScore: 70
+    },
+    {
+      id: 'number_lesson_2',
+      title: 'Números 2',
+      subtitle: '6 - 7 - 8 - 9 - 10',
+      letters: ['6', '7', '8', '9', '10'],
+      isUnlocked: false,
+      stars: 0,
+      completed: false,
+      requiredScore: 70
+    }
+  ];
   // Cargar progreso cuando cambie el usuario
   useEffect(() => {
     if (user?.id) {
@@ -155,11 +178,62 @@ const LearnScreen = ({ navigation }) => {
         };
       });
       
-      setLessons(updatedLessons);
+      // Procesar progreso de lecciones de números
+      const updatedNumberLessons = numberLessons.map((lesson, index) => {
+        // Buscar progreso de esta lección
+        const lessonProgress = progress.find(p => 
+          p.category === 'lessons' && p.item_id === lesson.id
+        );
+        
+        // Calcular estrellas basado en el score guardado
+        let stars = 0;
+        let completed = false;
+        
+        if (lessonProgress && lessonProgress.score !== undefined) {
+          const percentage = lessonProgress.score;
+          completed = lessonProgress.completed;
+          
+          if (percentage >= 90) stars = 3;
+          else if (percentage >= 70) stars = 2;
+          else if (percentage >= 50) stars = 1;
+        }
+        
+        // Determinar si está desbloqueada
+        let isUnlocked = false;
+        
+        if (index === 0) {
+          // Primera lección de números: se desbloquea al completar todas las lecciones del abecedario
+          const allAlphabetCompleted = updatedAlphabetLessons.every(alphabetLesson => {
+            const alphabetProgress = progress.find(p => 
+              p.category === 'lessons' && p.item_id === alphabetLesson.id
+            );
+            return alphabetProgress && alphabetProgress.score >= 70;
+          });
+          isUnlocked = allAlphabetCompleted;
+        } else {
+          // Lecciones posteriores de números: verificar si la anterior está completada
+          const previousLessonId = numberLessons[index - 1].id;
+          const previousProgress = progress.find(p => 
+            p.category === 'lessons' && p.item_id === previousLessonId
+          );
+          
+          // Desbloquear si la lección anterior tiene al menos 70%
+          isUnlocked = previousProgress && 
+                      previousProgress.score >= lesson.requiredScore;
+        }
+        
+        return {
+          ...lesson,
+          isUnlocked,
+          stars,
+          completed
+        };
+      });
+      setLessons([...updatedAlphabetLessons, ...updatedNumberLessons]);
     } catch (error) {
       console.error('Error loading lessons progress:', error);
       // En caso de error, usar lecciones por defecto
-      setLessons(alphabetLessons);
+      setLessons([...alphabetLessons, ...numberLessons]);
     } finally {
       setIsLoading(false);
     }
@@ -177,7 +251,15 @@ const LearnScreen = ({ navigation }) => {
   };
 
   const getLockMessage = (lesson, index) => {
-    if (index === 0) return ''; // Primera lección no tiene mensaje
+    // Encontrar si es una lección del abecedario o de números
+    const alphabetLessonsCount = alphabetLessons.length;
+    
+    if (index === 0) return ''; // Primera lección del abecedario no tiene mensaje
+    
+    if (index === alphabetLessonsCount) {
+      // Primera lección de números
+      return 'Completa todas las lecciones del abecedario para desbloquear';
+    }
     
     const previousLesson = lessons[index - 1];
     if (!previousLesson.completed) {
@@ -242,7 +324,7 @@ const LearnScreen = ({ navigation }) => {
 
         {/* Lessons Grid */}
         <View style={styles.lessonsContainer}>
-          {lessons.map((lesson, index) => (
+          {lessons.slice(0, alphabetLessons.length).map((lesson, index) => (
             <TouchableOpacity
               key={lesson.id}
               style={[
@@ -315,14 +397,89 @@ const LearnScreen = ({ navigation }) => {
           ))}
         </View>
 
-        {/* Coming Soon Section */}
-        <View style={styles.comingSoonSection}>
-          <Text style={styles.comingSoonTitle}>🔢 Próximamente</Text>
-          <View style={styles.comingSoonCard}>
-            <Icon name="time" size={32} color={theme.placeholder} />
-            <Text style={styles.comingSoonText}>Números</Text>
-            <Text style={styles.comingSoonSubtext}>Aprende los números del 1 al 10</Text>
-          </View>
+        {/* Numbers Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>🔢 Números</Text>
+          <Text style={styles.sectionSubtitle}>Aprende los números del 1 al 10 en lenguaje de señas</Text>
+        </View>
+
+        {/* Numbers Lessons Grid */}
+        <View style={styles.lessonsContainer}>
+          {lessons.slice(alphabetLessons.length).map((lesson, index) => {
+            const actualIndex = alphabetLessons.length + index;
+            return (
+              <TouchableOpacity
+                key={lesson.id}
+                style={[
+                  styles.lessonCard,
+                  !lesson.isUnlocked && styles.lessonCardLocked,
+                  lesson.completed && styles.lessonCardCompleted
+                ]}
+                onPress={() => startLesson(lesson)}
+                disabled={!lesson.isUnlocked}
+                activeOpacity={lesson.isUnlocked ? 0.7 : 1}
+              >
+                {/* Lock Icon for locked lessons */}
+                {!lesson.isUnlocked && (
+                  <View style={styles.lockIcon}>
+                    <Icon name="lock-closed" size={24} color={theme.placeholder} />
+                  </View>
+                )}
+
+                {/* Completed Icon */}
+                {lesson.completed && (
+                  <View style={styles.completedIcon}>
+                    <Icon name="checkmark-circle" size={24} color="#4CAF50" />
+                  </View>
+                )}
+                
+                {/* Lesson Content */}
+                <View style={styles.lessonContent}>
+                  <Text style={[
+                    styles.lessonTitle,
+                    !lesson.isUnlocked && styles.lessonTitleLocked
+                  ]}>
+                    {lesson.title}
+                  </Text>
+                  <Text style={[
+                    styles.lessonSubtitle,
+                    !lesson.isUnlocked && styles.lessonSubtitleLocked
+                  ]}>
+                    {lesson.subtitle}
+                  </Text>
+                  
+                  {/* Lock message */}
+                  {!lesson.isUnlocked && (
+                    <Text style={styles.lockMessage}>
+                      {getLockMessage(lesson, actualIndex)}
+                    </Text>
+                  )}
+                </View>
+
+                {/* Stars */}
+                <View style={styles.starsContainer}>
+                  {[1, 2, 3].map((star) => (
+                    <Icon
+                      key={star}
+                      name={lesson.stars >= star ? "star" : "star-outline"}
+                      size={16}
+                      color={lesson.stars >= star ? "#FFD700" : theme.placeholder}
+                    />
+                  ))}
+                </View>
+
+                {/* Progress Indicator */}
+                {lesson.isUnlocked && (
+                  <View style={styles.progressIndicator}>
+                    <View style={[
+                      styles.progressBar,
+                      { width: `${lesson.completed ? 100 : 0}%` }
+                    ]} />
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </ScrollView>
     </SafeAreaView>
