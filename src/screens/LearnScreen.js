@@ -136,7 +136,7 @@ const LearnScreen = ({ navigation }) => {
       const progress = await userService.getUserProgress(user.id);
       
       // Procesar progreso de lecciones
-      const updatedLessons = alphabetLessons.map((lesson, index) => {
+      const updatedAlphabetLessons = alphabetLessons.map((lesson, index) => {
         // Buscar progreso de esta lección
         const lessonProgress = progress.find(p => 
           p.category === 'lessons' && p.item_id === lesson.id
