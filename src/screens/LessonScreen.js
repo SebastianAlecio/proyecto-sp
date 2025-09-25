@@ -69,7 +69,10 @@ const LessonScreen = ({ route, navigation }) => {
         };
       });
 
-      setQuestions(generatedQuestions);
+      // Randomizar el orden de las preguntas
+      const randomizedQuestions = generatedQuestions.sort(() => Math.random() - 0.5);
+
+      setQuestions(randomizedQuestions);
     } catch (error) {
       console.error('Error generating questions:', error);
       Alert.alert('Error', 'No se pudieron cargar las preguntas');
