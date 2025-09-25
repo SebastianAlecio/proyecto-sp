@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { useAuth } from '../hooks/useAuth';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import TranslateScreen from '../screens/TranslateScreen';
 import TranslationResultsScreen from '../screens/TranslationResultsScreen';
@@ -17,6 +18,7 @@ const Tab = createBottomTabNavigator();
 
 const MainTabNavigator = () => {
   const { theme } = useTheme();
+  const { isAuthenticated } = useAuth();
 
   return (
     <Tab.Navigator
@@ -68,13 +70,15 @@ const MainTabNavigator = () => {
           tabBarLabel: 'Traducir',
         }}
       />
-      <Tab.Screen 
-        name="Learn" 
-        component={LearnScreen}
-        options={{
-          tabBarLabel: 'Aprender',
-        }}
-      />
+      {isAuthenticated && (
+        <Tab.Screen 
+          name="Learn" 
+          component={LearnScreen}
+          options={{
+            tabBarLabel: 'Aprender',
+          }}
+        />
+      )}
       <Tab.Screen 
         name="Camera" 
         component={CameraScreen}
