@@ -239,8 +239,8 @@ const LearnScreen = ({ navigation }) => {
   const startLesson = (lesson) => {
     if (!lesson.isUnlocked) return;
     
-    // Navegar a la pantalla de lección
-    navigation.navigate('Lesson', {
+    // Navegar a la pantalla de estudio
+    navigation.navigate('StudyLesson', {
       lessonId: lesson.id,
       lessonTitle: lesson.title,
       letters: lesson.letters
