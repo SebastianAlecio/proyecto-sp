@@ -185,9 +185,6 @@ const DatasetCategoryScreen = ({ route, navigation }) => {
                 <View style={styles.wordHeader}>
                   <View style={styles.wordInfo}>
                     <Text style={styles.wordTitle}>{word.word}</Text>
-                    <Text style={styles.wordDescription}>
-                      {getCategoryDisplayName(category)}
-                    </Text>
                   </View>
                   <Icon 
                     name={expandedWord === word.id ? "chevron-up" : "chevron-down"} 
