@@ -7,6 +7,7 @@ import TranslateScreen from '../screens/TranslateScreen';
 import TranslationResultsScreen from '../screens/TranslationResultsScreen';
 import LearnScreen from '../screens/LearnScreen';
 import LessonScreen from '../screens/LessonScreen';
+import StudyLessonScreen from '../screens/StudyLessonScreen';
 import CameraScreen from '../screens/CameraScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
@@ -101,6 +102,7 @@ const AppNavigator = ({ initialRouteName }) => {
       <Stack.Screen name="Home" component={MainTabNavigator} />
       <Stack.Screen name="TranslationResults" component={TranslationResultsScreen} />
       <Stack.Screen name="Lesson" component={LessonScreen} />
+      <Stack.Screen name="StudyLesson" component={StudyLessonScreen} />
       <Stack.Screen name="CameraScreen" component={CameraScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
     </Stack.Navigator>

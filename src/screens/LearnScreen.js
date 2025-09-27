@@ -452,6 +452,30 @@ const LearnScreen = ({ navigation }) => {
                 )}
               </View>
 
+              {/* Action Buttons - Solo mostrar si está desbloqueada */}
+              {lesson.isUnlocked && (
+                <View style={styles.actionButtons}>
+                  <TouchableOpacity
+                    style={styles.studyButton}
+                    onPress={() => navigation.navigate('StudyLesson', {
+                      lessonId: lesson.id,
+                      lessonTitle: lesson.title,
+                      letters: lesson.letters
+                    })}
+                  >
+                    <Icon name="eye" size={16} color={theme.primary} />
+                    <Text style={styles.studyButtonText}>Ver Lección</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity
+                    style={styles.quizButton}
+                    onPress={() => startLesson(lesson)}
+                  >
+                    <Icon name="school" size={16} color="#FFFFFF" />
+                    <Text style={styles.quizButtonText}>Hacer Examen</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
               {/* Stars */}
               <View style={styles.starsContainer}>
                 {[1, 2, 3].map((star) => (
@@ -536,6 +560,30 @@ const LearnScreen = ({ navigation }) => {
                   )}
                 </View>
 
+                {/* Action Buttons - Solo mostrar si está desbloqueada */}
+                {lesson.isUnlocked && (
+                  <View style={styles.actionButtons}>
+                    <TouchableOpacity
+                      style={styles.studyButton}
+                      onPress={() => navigation.navigate('StudyLesson', {
+                        lessonId: lesson.id,
+                        lessonTitle: lesson.title,
+                        letters: lesson.letters
+                      })}
+                    >
+                      <Icon name="eye" size={16} color={theme.primary} />
+                      <Text style={styles.studyButtonText}>Ver Lección</Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity
+                      style={styles.quizButton}
+                      onPress={() => startLesson(lesson)}
+                    >
+                      <Icon name="school" size={16} color="#FFFFFF" />
+                      <Text style={styles.quizButtonText}>Hacer Examen</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
                 {/* Stars */}
                 <View style={styles.starsContainer}>
                   {[1, 2, 3].map((star) => (
@@ -725,6 +773,54 @@ const createStyles = (theme) => StyleSheet.create({
     height: '100%',
     backgroundColor: theme.primary,
     borderRadius: 2,
+  },
+  // Action Buttons Styles
+  actionButtons: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    gap: 8,
+  },
+  studyButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: theme.primary,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  studyButtonText: {
+    color: theme.primary,
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 6,
+  },
+  quizButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.primary,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    shadowColor: theme.primary,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  quizButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 6,
   },
   // Auth Gate Styles
   authGateContainer: {
