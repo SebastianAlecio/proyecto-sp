@@ -23,6 +23,7 @@ const LearnScreen = ({ navigation }) => {
   const [lessons, setLessons] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState('register');
 
   // Definir las lecciones del abecedario
   const alphabetLessons = [
@@ -320,14 +321,20 @@ const LearnScreen = ({ navigation }) => {
             <View style={styles.authButtons}>
               <TouchableOpacity 
                 style={styles.primaryAuthButton}
-                onPress={() => setShowAuthModal(true)}
+                onPress={() => {
+                  setAuthModalMode('register');
+                  setShowAuthModal(true);
+                }}
               >
                 <Text style={styles.primaryAuthButtonText}>Crear Cuenta</Text>
               </TouchableOpacity>
               
               <TouchableOpacity 
                 style={styles.secondaryAuthButton}
-                onPress={() => setShowAuthModal(true)}
+                onPress={() => {
+                  setAuthModalMode('login');
+                  setShowAuthModal(true);
+                }}
               >
                 <Text style={styles.secondaryAuthButtonText}>Iniciar Sesión</Text>
               </TouchableOpacity>
@@ -339,6 +346,7 @@ const LearnScreen = ({ navigation }) => {
         <ProfileEditModal
           visible={showAuthModal}
           onClose={() => setShowAuthModal(false)}
+          initialMode={authModalMode}
         />
       </SafeAreaView>
     );

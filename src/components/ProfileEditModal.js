@@ -16,7 +16,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../hooks/useAuth';
 
-const ProfileEditModal = ({ visible, onClose }) => {
+const ProfileEditModal = ({ visible, onClose, initialMode = null }) => {
   const { theme } = useTheme();
   const { user, isGuest, registerUser, signIn, signOut, updateProfile } = useAuth();
   
@@ -40,7 +40,12 @@ const ProfileEditModal = ({ visible, onClose }) => {
         confirmPassword: ''
       });
       setErrors({});
-      setMode(isGuest ? 'register' : 'edit');
+      // Use initialMode if provided, otherwise default behavior
+      if (initialMode) {
+        setMode(initialMode);
+      } else {
+        setMode(isGuest ? 'register' : 'edit');
+      }
     }
   }, [visible, user, isGuest]);
 
