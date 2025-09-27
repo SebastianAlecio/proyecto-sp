@@ -78,6 +78,17 @@ const DatasetCategoryScreen = ({ route, navigation }) => {
     setExpandedWord(expandedWord === wordId ? null : wordId);
   };
 
+  const getCategoryDisplayName = (categoryId) => {
+    const categoryMap = {
+      'adjetivos': 'Palabra descriptiva',
+      'verbos': 'Acción o estado',
+      'frases_emociones': 'Expresión común',
+      'preguntas': 'Palabra interrogativa'
+    };
+    
+    return categoryMap[categoryId] || 'Palabra en señas';
+  };
+
   const styles = createStyles(theme, categoryColor);
 
   if (isLoading) {
@@ -174,7 +185,9 @@ const DatasetCategoryScreen = ({ route, navigation }) => {
                 <View style={styles.wordHeader}>
                   <View style={styles.wordInfo}>
                     <Text style={styles.wordTitle}>{word.word}</Text>
-                    <Text style={styles.wordDescription}>{word.description}</Text>
+                    <Text style={styles.wordDescription}>
+                      {getCategoryDisplayName(category)}
+                    </Text>
                   </View>
                   <Icon 
                     name={expandedWord === word.id ? "chevron-up" : "chevron-down"} 
@@ -190,7 +203,7 @@ const DatasetCategoryScreen = ({ route, navigation }) => {
                       <VideoView
                         style={styles.video}
                         player={videoPlayer}
-                        allowsFullscreen
+                        fullscreenOptions={{ enabled: true }}
                         allowsPictureInPicture
                       />
                     </View>

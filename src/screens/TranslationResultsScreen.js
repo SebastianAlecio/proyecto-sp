@@ -158,7 +158,7 @@ const TranslationResultsScreen = ({ route, navigation }) => {
                 <VideoView
                   style={styles.expandedVideo}
                   player={getVideoPlayer(expandedCard.video_url)}
-                  allowsFullscreen
+                  fullscreenOptions={{ enabled: true }}
                   allowsPictureInPicture
                 />
               </View>
@@ -245,7 +245,7 @@ const TranslationResultsScreen = ({ route, navigation }) => {
                       <VideoView
                         style={styles.video}
                         player={getVideoPlayer(wordData.signs[0].video_url)}
-                        allowsFullscreen={false}
+                        fullscreenOptions={{ enabled: false }}
                         allowsPictureInPicture={false}
                       />
                     </View>
