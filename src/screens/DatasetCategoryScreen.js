@@ -193,6 +193,7 @@ const DatasetCategoryScreen = ({ route, navigation }) => {
                     name={expandedWord === word.id ? "chevron-up" : "chevron-down"} 
                    size={20} 
                    color={theme.textSecondary} 
+                  />
                 </View>
 
                 {/* Expanded Content */}
