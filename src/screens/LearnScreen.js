@@ -281,10 +281,12 @@ const LearnScreen = ({ navigation }) => {
         };
       });
       
-      setLessons([...updatedAlphabetLessons, ...updatedNumberLessons]);
+      const allLessons = [...updatedAlphabetLessons, ...updatedNumberLessons];
+      setLessons(allLessons);
     } catch (error) {
       console.error('Error loading lessons progress:', error);
-      setLessons([...alphabetLessons, ...numberLessons]);
+      const allLessons = [...alphabetLessons, ...numberLessons];
+      setLessons(allLessons);
     } finally {
       setIsLoading(false);
     }
@@ -497,7 +499,7 @@ const LearnScreen = ({ navigation }) => {
                 <View style={styles.categoryContent}>
                   <Text style={styles.categoryTitle}>Abecedario</Text>
                   <Text style={styles.categorySubtitle}>
-                    {alphabetLessons.filter(l => l.completed).length}/{alphabetLessons.length} lecciones completadas
+                    {lessons.slice(0, alphabetLessons.length).filter(l => l.completed).length}/{alphabetLessons.length} lecciones completadas
                   </Text>
                 </View>
                 <View style={styles.categoryArrow}>
@@ -515,7 +517,7 @@ const LearnScreen = ({ navigation }) => {
                 <View style={styles.categoryContent}>
                   <Text style={styles.categoryTitle}>Números</Text>
                   <Text style={styles.categorySubtitle}>
-                    {numberLessons.filter(l => l.completed).length}/{numberLessons.length} lecciones completadas
+                    {lessons.slice(alphabetLessons.length).filter(l => l.completed).length}/{numberLessons.length} lecciones completadas
                   </Text>
                 </View>
                 <View style={styles.categoryArrow}>

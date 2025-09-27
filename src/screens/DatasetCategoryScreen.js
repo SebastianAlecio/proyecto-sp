@@ -26,17 +26,17 @@ const DatasetCategoryScreen = ({ route, navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedWord, setExpandedWord] = useState(null);
 
-  // Crear video players para todas las palabras
-  const videoPlayers = {};
-  words.forEach(word => {
-    if (word.video_url) {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      videoPlayers[word.id] = useVideoPlayer(word.video_url, player => {
+  // Crear video player solo para la palabra expandida
+  const expandedWordData = words.find(word => word.id === expandedWord);
+  const videoPlayer = useVideoPlayer(
+    expandedWordData?.video_url || '', 
+    player => {
+      if (expandedWordData?.video_url) {
         player.loop = true;
         player.play();
-      });
+      }
     }
-  });
+  );
 
   useEffect(() => {
     loadCategoryWords();
@@ -189,7 +189,7 @@ const DatasetCategoryScreen = ({ route, navigation }) => {
                     <View style={styles.videoContainer}>
                       <VideoView
                         style={styles.video}
-                        player={videoPlayers[word.id]}
+                        player={videoPlayer}
                         allowsFullscreen
                         allowsPictureInPicture
                       />
