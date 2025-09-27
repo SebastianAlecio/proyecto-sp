@@ -157,7 +157,7 @@ const createStyles = (theme) => StyleSheet.create({
     paddingTop: 24,
   },
   contentContainer: {
-    paddingBottom: 120, // Espacio extra para el tab bar
+    paddingBottom: 100, // Espacio extra para el tab bar
   },
   userCard: {
     backgroundColor: theme.surface,
