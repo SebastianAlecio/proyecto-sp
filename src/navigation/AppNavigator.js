@@ -18,7 +18,6 @@ const Tab = createBottomTabNavigator();
 
 const MainTabNavigator = () => {
   const { theme } = useTheme();
-  const { isAuthenticated } = useAuth();
 
   return (
     <Tab.Navigator
@@ -70,15 +69,13 @@ const MainTabNavigator = () => {
           tabBarLabel: 'Traducir',
         }}
       />
-      {isAuthenticated && (
-        <Tab.Screen 
-          name="Learn" 
-          component={LearnScreen}
-          options={{
-            tabBarLabel: 'Aprender',
-          }}
-        />
-      )}
+      <Tab.Screen 
+        name="Learn" 
+        component={LearnScreen}
+        options={{
+          tabBarLabel: 'Aprender',
+        }}
+      />
       <Tab.Screen 
         name="Camera" 
         component={CameraScreen}

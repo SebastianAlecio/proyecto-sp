@@ -13,14 +13,16 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../hooks/useAuth';
 import { userService } from '../lib/userService';
+import ProfileEditModal from '../components/ProfileEditModal';
 
 const { width } = Dimensions.get('window');
 
 const LearnScreen = ({ navigation }) => {
   const { theme } = useTheme();
-  const { user, userStats, refreshUser } = useAuth();
+  const { user, userStats, refreshUser, isGuest, isAuthenticated } = useAuth();
   const [lessons, setLessons] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Definir las lecciones del abecedario
   const alphabetLessons = [
@@ -265,6 +267,78 @@ const LearnScreen = ({ navigation }) => {
   };
   const styles = createStyles(theme);
 
+  // Si es usuario guest, mostrar pantalla de autenticación
+  if (isGuest || !isAuthenticated) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Aprender</Text>
+          <Text style={styles.headerSubtitle}>Domina el lenguaje de señas</Text>
+        </View>
+
+        <View style={styles.authGateContainer}>
+          <View style={styles.authGateContent}>
+            {/* Icon */}
+            <View style={styles.authGateIcon}>
+              <Icon name="school" size={80} color={theme.primary} />
+            </View>
+
+            {/* Title and Message */}
+            <Text style={styles.authGateTitle}>
+              ¡Desbloquea tu Aprendizaje! 🎓
+            </Text>
+            <Text style={styles.authGateMessage}>
+              Crea una cuenta o inicia sesión para acceder a nuestras lecciones interactivas, 
+              seguir tu progreso y ganar logros mientras dominas el lenguaje de señas.
+            </Text>
+
+            {/* Benefits */}
+            <View style={styles.benefitsList}>
+              <View style={styles.benefitItem}>
+                <Icon name="checkmark-circle" size={20} color="#4CAF50" />
+                <Text style={styles.benefitText}>Lecciones paso a paso</Text>
+              </View>
+              <View style={styles.benefitItem}>
+                <Icon name="checkmark-circle" size={20} color="#4CAF50" />
+                <Text style={styles.benefitText}>Seguimiento de progreso</Text>
+              </View>
+              <View style={styles.benefitItem}>
+                <Icon name="checkmark-circle" size={20} color="#4CAF50" />
+                <Text style={styles.benefitText}>Sistema de logros</Text>
+              </View>
+              <View style={styles.benefitItem}>
+                <Icon name="checkmark-circle" size={20} color="#4CAF50" />
+                <Text style={styles.benefitText}>Rachas diarias</Text>
+              </View>
+            </View>
+
+            {/* Action Buttons */}
+            <View style={styles.authButtons}>
+              <TouchableOpacity 
+                style={styles.primaryAuthButton}
+                onPress={() => setShowAuthModal(true)}
+              >
+                <Text style={styles.primaryAuthButtonText}>Crear Cuenta</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.secondaryAuthButton}
+                onPress={() => setShowAuthModal(true)}
+              >
+                <Text style={styles.secondaryAuthButtonText}>Iniciar Sesión</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        {/* Auth Modal */}
+        <ProfileEditModal
+          visible={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+        />
+      </SafeAreaView>
+    );
+  }
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -639,6 +713,93 @@ const createStyles = (theme) => StyleSheet.create({
     height: '100%',
     backgroundColor: theme.primary,
     borderRadius: 2,
+  },
+  // Auth Gate Styles
+  authGateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  authGateContent: {
+    alignItems: 'center',
+    maxWidth: 400,
+    width: '100%',
+  },
+  authGateIcon: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: theme.primary + '20',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 32,
+  },
+  authGateTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: theme.text,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  authGateMessage: {
+    fontSize: 16,
+    color: theme.textSecondary,
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 32,
+  },
+  benefitsList: {
+    alignSelf: 'stretch',
+    marginBottom: 40,
+  },
+  benefitItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingHorizontal: 16,
+  },
+  benefitText: {
+    fontSize: 16,
+    color: theme.text,
+    marginLeft: 12,
+    fontWeight: '500',
+  },
+  authButtons: {
+    alignSelf: 'stretch',
+    gap: 12,
+  },
+  primaryAuthButton: {
+    backgroundColor: theme.primary,
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: 'center',
+    shadowColor: theme.primary,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  primaryAuthButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  secondaryAuthButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: theme.primary,
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  secondaryAuthButtonText: {
+    color: theme.primary,
+    fontSize: 16,
+    fontWeight: '600',
   },
   comingSoonSection: {
     marginTop: 20,
