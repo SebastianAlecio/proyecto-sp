@@ -19,6 +19,14 @@ const ProfileScreen = () => {
   const { user, userStats, isGuest, isAuthenticated } = useAuth();
   const [showEditModal, setShowEditModal] = React.useState(false);
 
+  // Reset stats visually for guest users
+  const displayStats = isGuest ? {
+    consecutiveDays: 0,
+    maxStreak: 0,
+    totalProgress: 0,
+    completedItems: 0,
+  } : userStats;
+
   const profileOptions = [
     {
       id: 1,
@@ -88,11 +96,11 @@ const ProfileScreen = () => {
         {/* Stats Cards */}
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{userStats.consecutiveDays}</Text>
+            <Text style={styles.statNumber}>{displayStats.consecutiveDays}</Text>
             <Text style={styles.statLabel}>Racha Actual</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{userStats.maxStreak}</Text>
+            <Text style={styles.statNumber}>{displayStats.maxStreak}</Text>
             <Text style={styles.statLabel}>Récord Personal</Text>
           </View>
         </View>
