@@ -59,7 +59,11 @@ const ProfileScreen = () => {
         <Text style={styles.headerSubtitle}>Gestiona tu cuenta y preferencias</Text>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.content} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.contentContainer}
+      >
         {/* User Info Card */}
         <View style={styles.userCard}>
           <View style={styles.avatarContainer}>
