@@ -276,7 +276,11 @@ const LearnScreen = ({ navigation }) => {
           <Text style={styles.headerSubtitle}>Domina el lenguaje de señas</Text>
         </View>
 
-        <View style={styles.authGateContainer}>
+        <ScrollView 
+          style={styles.authGateContainer}
+          contentContainerStyle={styles.authGateScrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.authGateContent}>
             {/* Icon */}
             <View style={styles.authGateIcon}>
@@ -329,7 +333,7 @@ const LearnScreen = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </ScrollView>
 
         {/* Auth Modal */}
         <ProfileEditModal
@@ -717,9 +721,12 @@ const createStyles = (theme) => StyleSheet.create({
   // Auth Gate Styles
   authGateContainer: {
     flex: 1,
+  },
+  authGateScrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     paddingHorizontal: 24,
+    paddingVertical: 40,
   },
   authGateContent: {
     alignItems: 'center',
@@ -733,7 +740,7 @@ const createStyles = (theme) => StyleSheet.create({
     backgroundColor: theme.primary + '20',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   authGateTitle: {
     fontSize: 28,
@@ -751,7 +758,7 @@ const createStyles = (theme) => StyleSheet.create({
   },
   benefitsList: {
     alignSelf: 'stretch',
-    marginBottom: 40,
+    marginBottom: 32,
   },
   benefitItem: {
     flexDirection: 'row',
