@@ -78,16 +78,6 @@ const DatasetCategoryScreen = ({ route, navigation }) => {
     setExpandedWord(expandedWord === wordId ? null : wordId);
   };
 
-  const getCategoryDisplayName = (categoryId) => {
-    const categoryMap = {
-      'adjetivos': 'Palabra descriptiva',
-      'verbos': 'Acción o estado',
-      'frases_emociones': 'Expresión común',
-      'preguntas': 'Palabra interrogativa'
-    };
-    
-    return categoryMap[categoryId] || 'Palabra en señas';
-  };
 
   const styles = createStyles(theme, categoryColor);
 
