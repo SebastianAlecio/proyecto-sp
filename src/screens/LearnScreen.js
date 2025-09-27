@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../hooks/useAuth';
 import { userService } from '../lib/userService';
+import { wordsAPI } from '../lib/supabase';
 import ProfileEditModal from '../components/ProfileEditModal';
 
 const { width } = Dimensions.get('window');
@@ -20,7 +21,9 @@ const { width } = Dimensions.get('window');
 const LearnScreen = ({ navigation }) => {
   const { theme } = useTheme();
   const { user, userStats, refreshUser, isGuest, isAuthenticated } = useAuth();
+  const [activeTab, setActiveTab] = useState('lessons'); // 'lessons' or 'dataset'
   const [lessons, setLessons] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('register');
@@ -32,10 +35,10 @@ const LearnScreen = ({ navigation }) => {
       title: 'Lección 1',
       subtitle: 'A - B - C - D - E',
       letters: ['A', 'B', 'C', 'D', 'E'],
-      isUnlocked: true, // Primera lección siempre desbloqueada
+      isUnlocked: true,
       stars: 0,
       completed: false,
-      requiredScore: 0 // No requiere score previo
+      requiredScore: 0
     },
     {
       id: 'lesson_2',
@@ -45,7 +48,7 @@ const LearnScreen = ({ navigation }) => {
       isUnlocked: false,
       stars: 0,
       completed: false,
-      requiredScore: 70 // Requiere 70% en lección anterior
+      requiredScore: 70
     },
     {
       id: 'lesson_3',
@@ -96,10 +99,10 @@ const LearnScreen = ({ navigation }) => {
       title: 'Números 1',
       subtitle: '1 - 2 - 3 - 4 - 5',
       letters: ['1', '2', '3', '4', '5'],
-      isUnlocked: true, // Primera lección de números siempre desbloqueada
+      isUnlocked: true,
       stars: 0,
       completed: false,
-      requiredScore: 0 // No requiere score previo
+      requiredScore: 0
     },
     {
       id: 'number_lesson_2',
@@ -112,40 +115,101 @@ const LearnScreen = ({ navigation }) => {
       requiredScore: 70
     }
   ];
-  // Cargar progreso cuando cambie el usuario
+
+  // Cargar datos cuando cambie el usuario o la pestaña
   useEffect(() => {
-    if (user?.id) {
+    if (activeTab === 'dataset') {
+      loadDatasetCategories();
+    } else if (user?.id) {
       loadLessonsProgress();
     }
-  }, [user]);
+  }, [user, activeTab]);
 
   // Recargar cuando regresemos de una lección
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      if (user?.id) {
+      if (user?.id && activeTab === 'lessons') {
         loadLessonsProgress();
-        refreshUser(); // Actualizar estadísticas
+        refreshUser();
       }
     });
 
     return unsubscribe;
-  }, [navigation, user]);
+  }, [navigation, user, activeTab]);
+
+  const loadDatasetCategories = async () => {
+    try {
+      setIsLoading(true);
+      const allCategories = await wordsAPI.getAllCategories();
+      
+      // Mapear categorías con información adicional
+      const categoriesWithInfo = allCategories.map(category => {
+        const categoryInfo = getCategoryInfo(category);
+        return {
+          id: category,
+          name: categoryInfo.name,
+          icon: categoryInfo.icon,
+          color: categoryInfo.color,
+          description: categoryInfo.description
+        };
+      });
+
+      setCategories(categoriesWithInfo);
+    } catch (error) {
+      console.error('Error loading categories:', error);
+      setCategories([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getCategoryInfo = (category) => {
+    const categoryMap = {
+      'adjetivos': {
+        name: 'Adjetivos',
+        icon: 'color-palette',
+        color: '#FF6B6B',
+        description: 'Palabras que describen características'
+      },
+      'verbos': {
+        name: 'Verbos',
+        icon: 'flash',
+        color: '#4ECDC4',
+        description: 'Palabras que expresan acciones'
+      },
+      'frases_emociones': {
+        name: 'Frases y Emociones',
+        icon: 'happy',
+        color: '#45B7D1',
+        description: 'Expresiones comunes y sentimientos'
+      },
+      'preguntas': {
+        name: 'Preguntas',
+        icon: 'help-circle',
+        color: '#96CEB4',
+        description: 'Palabras interrogativas'
+      }
+    };
+
+    return categoryMap[category] || {
+      name: category.charAt(0).toUpperCase() + category.slice(1),
+      icon: 'library',
+      color: '#A8A8A8',
+      description: 'Categoría de palabras'
+    };
+  };
 
   const loadLessonsProgress = async () => {
     try {
       setIsLoading(true);
       
-      // Obtener progreso del usuario
       const progress = await userService.getUserProgress(user.id);
       
-      // Procesar progreso de lecciones
       const updatedAlphabetLessons = alphabetLessons.map((lesson, index) => {
-        // Buscar progreso de esta lección
         const lessonProgress = progress.find(p => 
           p.category === 'lessons' && p.item_id === lesson.id
         );
         
-        // Calcular estrellas basado en el score guardado
         let stars = 0;
         let completed = false;
         
@@ -158,17 +222,14 @@ const LearnScreen = ({ navigation }) => {
           else if (percentage >= 50) stars = 1;
         }
         
-        // Determinar si está desbloqueada
-        let isUnlocked = lesson.isUnlocked; // Primera lección siempre desbloqueada
+        let isUnlocked = lesson.isUnlocked;
         
         if (index > 0) {
-          // Para lecciones posteriores, verificar si la anterior está completada
           const previousLessonId = alphabetLessons[index - 1].id;
           const previousProgress = progress.find(p => 
             p.category === 'lessons' && p.item_id === previousLessonId
           );
           
-          // Desbloquear si la lección anterior tiene al menos 70%
           isUnlocked = previousProgress && 
                       previousProgress.score >= lesson.requiredScore;
         }
@@ -181,14 +242,11 @@ const LearnScreen = ({ navigation }) => {
         };
       });
       
-      // Procesar progreso de lecciones de números
       const updatedNumberLessons = numberLessons.map((lesson, index) => {
-        // Buscar progreso de esta lección
         const lessonProgress = progress.find(p => 
           p.category === 'lessons' && p.item_id === lesson.id
         );
         
-        // Calcular estrellas basado en el score guardado
         let stars = 0;
         let completed = false;
         
@@ -201,20 +259,16 @@ const LearnScreen = ({ navigation }) => {
           else if (percentage >= 50) stars = 1;
         }
         
-        // Determinar si está desbloqueada
         let isUnlocked = false;
         
         if (index === 0) {
-          // Primera lección de números: siempre desbloqueada
-          isUnlocked = lesson.isUnlocked; // true por defecto
+          isUnlocked = lesson.isUnlocked;
         } else {
-          // Lecciones posteriores de números: verificar si la anterior está completada
           const previousLessonId = numberLessons[index - 1].id;
           const previousProgress = progress.find(p => 
             p.category === 'lessons' && p.item_id === previousLessonId
           );
           
-          // Desbloquear si la lección anterior tiene al menos 70%
           isUnlocked = previousProgress && 
                       previousProgress.score >= lesson.requiredScore;
         }
@@ -226,10 +280,10 @@ const LearnScreen = ({ navigation }) => {
           completed
         };
       });
+      
       setLessons([...updatedAlphabetLessons, ...updatedNumberLessons]);
     } catch (error) {
       console.error('Error loading lessons progress:', error);
-      // En caso de error, usar lecciones por defecto
       setLessons([...alphabetLessons, ...numberLessons]);
     } finally {
       setIsLoading(false);
@@ -239,7 +293,6 @@ const LearnScreen = ({ navigation }) => {
   const startLesson = (lesson) => {
     if (!lesson.isUnlocked) return;
     
-    // Navegar a la pantalla de estudio
     navigation.navigate('StudyLesson', {
       lessonId: lesson.id,
       lessonTitle: lesson.title,
@@ -248,13 +301,11 @@ const LearnScreen = ({ navigation }) => {
   };
 
   const getLockMessage = (lesson, index) => {
-    // Encontrar si es una lección del abecedario o de números
     const alphabetLessonsCount = alphabetLessons.length;
     
-    if (index === 0) return ''; // Primera lección del abecedario no tiene mensaje
+    if (index === 0) return '';
     
     if (index === alphabetLessonsCount) {
-      // Primera lección de números - no debería mostrar mensaje ya que está desbloqueada
       return '';
     }
     
@@ -266,6 +317,22 @@ const LearnScreen = ({ navigation }) => {
     }
     return '';
   };
+
+  const navigateToCategory = (categoryType) => {
+    navigation.navigate('CategoryLessons', {
+      categoryType,
+      categoryName: categoryType === 'alphabet' ? 'Abecedario' : 'Números'
+    });
+  };
+
+  const navigateToDatasetCategory = (category) => {
+    navigation.navigate('DatasetCategory', {
+      category: category.id,
+      categoryName: category.name,
+      categoryColor: category.color
+    });
+  };
+
   const styles = createStyles(theme);
 
   // Si es usuario guest, mostrar pantalla de autenticación
@@ -283,12 +350,10 @@ const LearnScreen = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.authGateContent}>
-            {/* Icon */}
             <View style={styles.authGateIcon}>
               <Icon name="school" size={80} color={theme.primary} />
             </View>
 
-            {/* Title and Message */}
             <Text style={styles.authGateTitle}>
               ¡Desbloquea tu Aprendizaje! 🎓
             </Text>
@@ -297,7 +362,6 @@ const LearnScreen = ({ navigation }) => {
               seguir tu progreso y ganar logros mientras dominas el lenguaje de señas.
             </Text>
 
-            {/* Benefits */}
             <View style={styles.benefitsList}>
               <View style={styles.benefitItem}>
                 <Icon name="checkmark-circle" size={20} color="#4CAF50" />
@@ -317,7 +381,6 @@ const LearnScreen = ({ navigation }) => {
               </View>
             </View>
 
-            {/* Action Buttons */}
             <View style={styles.authButtons}>
               <TouchableOpacity 
                 style={styles.primaryAuthButton}
@@ -342,7 +405,6 @@ const LearnScreen = ({ navigation }) => {
           </View>
         </ScrollView>
 
-        {/* Auth Modal */}
         <ProfileEditModal
           visible={showAuthModal}
           onClose={() => setShowAuthModal(false)}
@@ -351,20 +413,7 @@ const LearnScreen = ({ navigation }) => {
       </SafeAreaView>
     );
   }
-  if (isLoading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Aprender</Text>
-          <Text style={styles.headerSubtitle}>Domina el lenguaje de señas</Text>
-        </View>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.primary} />
-          <Text style={styles.loadingText}>Cargando tu progreso...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -373,243 +422,146 @@ const LearnScreen = ({ navigation }) => {
         <Text style={styles.headerSubtitle}>Domina el lenguaje de señas</Text>
       </View>
 
-      {/* Stats Bar */}
-      <View style={styles.statsBar}>
-        <View style={styles.statItem}>
-          <Icon name="flame" size={20} color="#FF6B35" />
-          <Text style={styles.statText}>{userStats.consecutiveDays}</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Icon name="trophy" size={20} color="#FFD700" />
-          <Text style={styles.statText}>{userStats.maxStreak}</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Icon name="star" size={20} color={theme.primary} />
-          <Text style={styles.statText}>
-            {lessons.reduce((total, lesson) => total + lesson.stars, 0)}
+      {/* Tab Switcher */}
+      <View style={styles.tabSwitcher}>
+        <TouchableOpacity
+          style={[styles.tabButton, activeTab === 'lessons' && styles.tabButtonActive]}
+          onPress={() => setActiveTab('lessons')}
+        >
+          <Icon 
+            name="school" 
+            size={20} 
+            color={activeTab === 'lessons' ? '#FFFFFF' : theme.textSecondary} 
+          />
+          <Text style={[
+            styles.tabButtonText, 
+            activeTab === 'lessons' && styles.tabButtonTextActive
+          ]}>
+            Lecciones
           </Text>
-        </View>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.tabButton, activeTab === 'dataset' && styles.tabButtonActive]}
+          onPress={() => setActiveTab('dataset')}
+        >
+          <Icon 
+            name="library" 
+            size={20} 
+            color={activeTab === 'dataset' ? '#FFFFFF' : theme.textSecondary} 
+          />
+          <Text style={[
+            styles.tabButtonText, 
+            activeTab === 'dataset' && styles.tabButtonTextActive
+          ]}>
+            Ver Dataset
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      <ScrollView 
-        style={styles.content} 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.contentContainer}
-      >
-        {/* Section Header */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>🔤 Abecedario</Text>
-          <Text style={styles.sectionSubtitle}>Aprende las letras básicas del lenguaje de señas</Text>
-        </View>
+      {/* Content based on active tab */}
+      {activeTab === 'lessons' ? (
+        <>
+          {/* Stats Bar */}
+          <View style={styles.statsBar}>
+            <View style={styles.statItem}>
+              <Icon name="flame" size={20} color="#FF6B35" />
+              <Text style={styles.statText}>{userStats.consecutiveDays}</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Icon name="trophy" size={20} color="#FFD700" />
+              <Text style={styles.statText}>{userStats.maxStreak}</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Icon name="star" size={20} color={theme.primary} />
+              <Text style={styles.statText}>
+                {lessons.reduce((total, lesson) => total + lesson.stars, 0)}
+              </Text>
+            </View>
+          </View>
 
-        {/* Lessons Grid */}
-        <View style={styles.lessonsContainer}>
-          {lessons.slice(0, alphabetLessons.length).map((lesson, index) => (
-            <TouchableOpacity
-              key={lesson.id}
-              style={[
-                styles.lessonCard,
-                !lesson.isUnlocked && styles.lessonCardLocked,
-                lesson.completed && styles.lessonCardCompleted
-              ]}
-              onPress={() => startLesson(lesson)}
-              disabled={!lesson.isUnlocked}
-              activeOpacity={lesson.isUnlocked ? 0.7 : 1}
-            >
-              {/* Lock Icon for locked lessons */}
-              {!lesson.isUnlocked && (
-                <View style={styles.lockIcon}>
-                  <Icon name="lock-closed" size={24} color={theme.placeholder} />
+          <ScrollView 
+            style={styles.content} 
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.contentContainer}
+          >
+            {/* Learning Categories */}
+            <View style={styles.categoriesContainer}>
+              <TouchableOpacity
+                style={styles.categoryCard}
+                onPress={() => navigateToCategory('alphabet')}
+              >
+                <View style={[styles.categoryIcon, { backgroundColor: '#007AFF20' }]}>
+                  <Text style={styles.categoryEmoji}>🔤</Text>
                 </View>
-              )}
-
-              {/* Completed Icon */}
-              {lesson.completed && (
-                <View style={styles.completedIcon}>
-                  <Icon name="checkmark-circle" size={24} color="#4CAF50" />
-                </View>
-              )}
-              {/* Lesson Content */}
-              <View style={styles.lessonContent}>
-                <Text style={[
-                  styles.lessonTitle,
-                  !lesson.isUnlocked && styles.lessonTitleLocked
-                ]}>
-                  {lesson.title}
-                </Text>
-                <Text style={[
-                  styles.lessonSubtitle,
-                  !lesson.isUnlocked && styles.lessonSubtitleLocked
-                ]}>
-                  {lesson.subtitle}
-                </Text>
-                
-                {/* Lock message */}
-                {!lesson.isUnlocked && (
-                  <Text style={styles.lockMessage}>
-                    {getLockMessage(lesson, index)}
+                <View style={styles.categoryContent}>
+                  <Text style={styles.categoryTitle}>Abecedario</Text>
+                  <Text style={styles.categorySubtitle}>
+                    {alphabetLessons.filter(l => l.completed).length}/{alphabetLessons.length} lecciones completadas
                   </Text>
-                )}
-              </View>
-
-              {/* Action Buttons - Solo mostrar si está desbloqueada */}
-              {lesson.isUnlocked && (
-                <View style={styles.actionButtons}>
-                  <TouchableOpacity
-                    style={styles.studyButton}
-                    onPress={() => navigation.navigate('StudyLesson', {
-                      lessonId: lesson.id,
-                      lessonTitle: lesson.title,
-                      letters: lesson.letters
-                    })}
-                  >
-                    <Icon name="eye" size={16} color={theme.primary} />
-                    <Text style={styles.studyButtonText}>Ver Lección</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={styles.quizButton}
-                    onPress={() => startLesson(lesson)}
-                  >
-                    <Icon name="school" size={16} color="#FFFFFF" />
-                    <Text style={styles.quizButtonText}>Hacer Examen</Text>
-                  </TouchableOpacity>
                 </View>
-              )}
-              {/* Stars */}
-              <View style={styles.starsContainer}>
-                {[1, 2, 3].map((star) => (
-                  <Icon
-                    key={star}
-                    name={lesson.stars >= star ? "star" : "star-outline"}
-                    size={16}
-                    color={lesson.stars >= star ? "#FFD700" : theme.placeholder}
-                  />
+                <View style={styles.categoryArrow}>
+                  <Icon name="chevron-forward" size={24} color={theme.textSecondary} />
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.categoryCard}
+                onPress={() => navigateToCategory('numbers')}
+              >
+                <View style={[styles.categoryIcon, { backgroundColor: '#FF6B6B20' }]}>
+                  <Text style={styles.categoryEmoji}>🔢</Text>
+                </View>
+                <View style={styles.categoryContent}>
+                  <Text style={styles.categoryTitle}>Números</Text>
+                  <Text style={styles.categorySubtitle}>
+                    {numberLessons.filter(l => l.completed).length}/{numberLessons.length} lecciones completadas
+                  </Text>
+                </View>
+                <View style={styles.categoryArrow}>
+                  <Icon name="chevron-forward" size={24} color={theme.textSecondary} />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </>
+      ) : (
+        <ScrollView 
+          style={styles.content} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.contentContainer}
+        >
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={theme.primary} />
+              <Text style={styles.loadingText}>Cargando categorías...</Text>
+            </View>
+          ) : (
+            <View style={styles.datasetContainer}>
+              <Text style={styles.sectionTitle}>📚 Explora el Dataset</Text>
+              <Text style={styles.sectionSubtitle}>
+                Descubre todas las palabras y señas disponibles organizadas por categorías
+              </Text>
+
+              <View style={styles.datasetGrid}>
+                {categories.map((category) => (
+                  <TouchableOpacity
+                    key={category.id}
+                    style={styles.datasetCard}
+                    onPress={() => navigateToDatasetCategory(category)}
+                  >
+                    <View style={[styles.datasetIcon, { backgroundColor: category.color + '20' }]}>
+                      <Icon name={category.icon} size={32} color={category.color} />
+                    </View>
+                    <Text style={styles.datasetTitle}>{category.name}</Text>
+                    <Text style={styles.datasetDescription}>{category.description}</Text>
+                  </TouchableOpacity>
                 ))}
               </View>
-
-              {/* Progress Indicator */}
-              {lesson.isUnlocked && (
-                <View style={styles.progressIndicator}>
-                  <View style={[
-                    styles.progressBar,
-                    { width: `${lesson.completed ? 100 : 0}%` }
-                  ]} />
-                </View>
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Numbers Section */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>🔢 Números</Text>
-          <Text style={styles.sectionSubtitle}>Aprende los números del 1 al 10 en lenguaje de señas</Text>
-        </View>
-
-        {/* Numbers Lessons Grid */}
-        <View style={styles.lessonsContainer}>
-          {lessons.slice(alphabetLessons.length).map((lesson, index) => {
-            const actualIndex = alphabetLessons.length + index;
-            return (
-              <TouchableOpacity
-                key={lesson.id}
-                style={[
-                  styles.lessonCard,
-                  !lesson.isUnlocked && styles.lessonCardLocked,
-                  lesson.completed && styles.lessonCardCompleted
-                ]}
-                onPress={() => startLesson(lesson)}
-                disabled={!lesson.isUnlocked}
-                activeOpacity={lesson.isUnlocked ? 0.7 : 1}
-              >
-                {/* Lock Icon for locked lessons */}
-                {!lesson.isUnlocked && (
-                  <View style={styles.lockIcon}>
-                    <Icon name="lock-closed" size={24} color={theme.placeholder} />
-                  </View>
-                )}
-
-                {/* Completed Icon */}
-                {lesson.completed && (
-                  <View style={styles.completedIcon}>
-                    <Icon name="checkmark-circle" size={24} color="#4CAF50" />
-                  </View>
-                )}
-                
-                {/* Lesson Content */}
-                <View style={styles.lessonContent}>
-                  <Text style={[
-                    styles.lessonTitle,
-                    !lesson.isUnlocked && styles.lessonTitleLocked
-                  ]}>
-                    {lesson.title}
-                  </Text>
-                  <Text style={[
-                    styles.lessonSubtitle,
-                    !lesson.isUnlocked && styles.lessonSubtitleLocked
-                  ]}>
-                    {lesson.subtitle}
-                  </Text>
-                  
-                  {/* Lock message */}
-                  {!lesson.isUnlocked && (
-                    <Text style={styles.lockMessage}>
-                      {getLockMessage(lesson, actualIndex)}
-                    </Text>
-                  )}
-                </View>
-
-                {/* Action Buttons - Solo mostrar si está desbloqueada */}
-                {lesson.isUnlocked && (
-                  <View style={styles.actionButtons}>
-                    <TouchableOpacity
-                      style={styles.studyButton}
-                      onPress={() => navigation.navigate('StudyLesson', {
-                        lessonId: lesson.id,
-                        lessonTitle: lesson.title,
-                        letters: lesson.letters
-                      })}
-                    >
-                      <Icon name="eye" size={16} color={theme.primary} />
-                      <Text style={styles.studyButtonText}>Ver Lección</Text>
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity
-                      style={styles.quizButton}
-                      onPress={() => startLesson(lesson)}
-                    >
-                      <Icon name="school" size={16} color="#FFFFFF" />
-                      <Text style={styles.quizButtonText}>Hacer Examen</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-                {/* Stars */}
-                <View style={styles.starsContainer}>
-                  {[1, 2, 3].map((star) => (
-                    <Icon
-                      key={star}
-                      name={lesson.stars >= star ? "star" : "star-outline"}
-                      size={16}
-                      color={lesson.stars >= star ? "#FFD700" : theme.placeholder}
-                    />
-                  ))}
-                </View>
-
-                {/* Progress Indicator */}
-                {lesson.isUnlocked && (
-                  <View style={styles.progressIndicator}>
-                    <View style={[
-                      styles.progressBar,
-                      { width: `${lesson.completed ? 100 : 0}%` }
-                    ]} />
-                  </View>
-                )}
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </ScrollView>
+            </View>
+          )}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };
@@ -638,6 +590,37 @@ const createStyles = (theme) => StyleSheet.create({
     color: theme.textSecondary,
     fontWeight: '400',
   },
+  tabSwitcher: {
+    flexDirection: 'row',
+    backgroundColor: theme.surface,
+    marginHorizontal: 24,
+    marginTop: 16,
+    borderRadius: 12,
+    padding: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.border,
+  },
+  tabButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  tabButtonActive: {
+    backgroundColor: theme.primary,
+  },
+  tabButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.textSecondary,
+    marginLeft: 8,
+  },
+  tabButtonTextActive: {
+    color: '#FFFFFF',
+  },
   statsBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -661,18 +644,6 @@ const createStyles = (theme) => StyleSheet.create({
     color: theme.text,
     marginLeft: 8,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: theme.textSecondary,
-    marginTop: 16,
-    textAlign: 'center',
-  },
   content: {
     flex: 1,
   },
@@ -681,8 +652,53 @@ const createStyles = (theme) => StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 100,
   },
-  sectionHeader: {
-    marginBottom: 24,
+  categoriesContainer: {
+    gap: 16,
+  },
+  categoryCard: {
+    backgroundColor: theme.surface,
+    borderRadius: 16,
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  categoryIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  categoryEmoji: {
+    fontSize: 28,
+  },
+  categoryContent: {
+    flex: 1,
+  },
+  categoryTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: theme.text,
+    marginBottom: 4,
+  },
+  categorySubtitle: {
+    fontSize: 14,
+    color: theme.textSecondary,
+  },
+  categoryArrow: {
+    marginLeft: 12,
+  },
+  datasetContainer: {
+    flex: 1,
   },
   sectionTitle: {
     fontSize: 24,
@@ -694,15 +710,19 @@ const createStyles = (theme) => StyleSheet.create({
     fontSize: 16,
     color: theme.textSecondary,
     lineHeight: 22,
+    marginBottom: 32,
   },
-  lessonsContainer: {
-    marginBottom: 40,
+  datasetGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
   },
-  lessonCard: {
+  datasetCard: {
     backgroundColor: theme.surface,
     borderRadius: 16,
     padding: 20,
-    marginBottom: 16,
+    width: (width - 64) / 2,
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -711,118 +731,41 @@ const createStyles = (theme) => StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
-    position: 'relative',
   },
-  lessonCardLocked: {
-    backgroundColor: theme.background,
-    opacity: 0.6,
-  },
-  lessonCardCompleted: {
-    borderWidth: 2,
-    borderColor: '#4CAF50',
-  },
-  lockIcon: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    zIndex: 1,
-  },
-  completedIcon: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    zIndex: 1,
-  },
-  lessonContent: {
+  datasetIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 12,
   },
-  lessonTitle: {
-    fontSize: 20,
+  datasetTitle: {
+    fontSize: 16,
     fontWeight: '600',
     color: theme.text,
     marginBottom: 4,
+    textAlign: 'center',
   },
-  lessonTitleLocked: {
-    color: theme.placeholder,
+  datasetDescription: {
+    fontSize: 12,
+    color: theme.textSecondary,
+    textAlign: 'center',
+    lineHeight: 16,
   },
-  lessonSubtitle: {
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  loadingText: {
     fontSize: 16,
     color: theme.textSecondary,
-    fontWeight: '400',
+    marginTop: 16,
+    textAlign: 'center',
   },
-  lessonSubtitleLocked: {
-    color: theme.placeholder,
-  },
-  lockMessage: {
-    fontSize: 12,
-    color: theme.placeholder,
-    fontStyle: 'italic',
-    marginTop: 4,
-  },
-  starsContainer: {
-    flexDirection: 'row',
-    marginBottom: 12,
-  },
-  progressIndicator: {
-    height: 4,
-    backgroundColor: theme.border,
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  progressBar: {
-    height: '100%',
-    backgroundColor: theme.primary,
-    borderRadius: 2,
-  },
-  // Action Buttons Styles
-  actionButtons: {
-    flexDirection: 'row',
-    marginBottom: 16,
-    gap: 8,
-  },
-  studyButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: theme.primary,
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  studyButtonText: {
-    color: theme.primary,
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 6,
-  },
-  quizButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.primary,
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    shadowColor: theme.primary,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  quizButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 6,
-  },
-  // Auth Gate Styles
+  // Auth Gate Styles (unchanged)
   authGateContainer: {
     flex: 1,
   },
@@ -911,36 +854,6 @@ const createStyles = (theme) => StyleSheet.create({
     color: theme.primary,
     fontSize: 16,
     fontWeight: '600',
-  },
-  comingSoonSection: {
-    marginTop: 20,
-  },
-  comingSoonTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: theme.text,
-    marginBottom: 16,
-  },
-  comingSoonCard: {
-    backgroundColor: theme.surface,
-    borderRadius: 16,
-    padding: 32,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: theme.border,
-    borderStyle: 'dashed',
-  },
-  comingSoonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: theme.placeholder,
-    marginTop: 12,
-    marginBottom: 4,
-  },
-  comingSoonSubtext: {
-    fontSize: 14,
-    color: theme.placeholder,
-    textAlign: 'center',
   },
 });
 
