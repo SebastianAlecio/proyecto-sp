@@ -10,6 +10,7 @@ import LessonScreen from '../screens/LessonScreen';
 import StudyLessonScreen from '../screens/StudyLessonScreen';
 import CategoryLessonsScreen from '../screens/CategoryLessonsScreen';
 import DatasetCategoryScreen from '../screens/DatasetCategoryScreen';
+import WordCategoryLessonsScreen from '../screens/WordCategoryLessonsScreen';
 import CameraScreen from '../screens/CameraScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
@@ -107,6 +108,7 @@ const AppNavigator = ({ initialRouteName }) => {
       <Stack.Screen name="StudyLesson" component={StudyLessonScreen} />
       <Stack.Screen name="CategoryLessons" component={CategoryLessonsScreen} />
       <Stack.Screen name="DatasetCategory" component={DatasetCategoryScreen} />
+      <Stack.Screen name="WordCategoryLessons" component={WordCategoryLessonsScreen} />
       <Stack.Screen name="CameraScreen" component={CameraScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
     </Stack.Navigator>

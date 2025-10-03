@@ -335,6 +335,13 @@ const LearnScreen = ({ navigation }) => {
     });
   };
 
+  const navigateToWordCategory = (categoryType) => {
+    navigation.navigate('WordCategoryLessons', {
+      categoryType,
+      categoryName: categoryType === 'adjetivos' ? 'Adjetivos' : categoryType
+    });
+  };
+
   const styles = createStyles(theme);
 
   // Si es usuario guest, mostrar pantalla de autenticación
@@ -518,6 +525,32 @@ const LearnScreen = ({ navigation }) => {
                   <Text style={styles.categoryTitle}>Números</Text>
                   <Text style={styles.categorySubtitle}>
                     {lessons.slice(alphabetLessons.length).filter(l => l.completed).length}/{numberLessons.length} lecciones completadas
+                  </Text>
+                </View>
+                <View style={styles.categoryArrow}>
+                  <Icon name="chevron-forward" size={24} color={theme.textSecondary} />
+                </View>
+              </TouchableOpacity>
+            </View>
+
+            {/* Word Categories Section */}
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>📚 Categorías de Palabras</Text>
+              <Text style={styles.sectionSubtitle}>Aprende palabras completas con video</Text>
+            </View>
+
+            <View style={styles.categoriesContainer}>
+              <TouchableOpacity
+                style={styles.categoryCard}
+                onPress={() => navigateToWordCategory('adjetivos')}
+              >
+                <View style={[styles.categoryIcon, { backgroundColor: '#FF6B6B20' }]}>
+                  <Text style={styles.categoryEmoji}>🎨</Text>
+                </View>
+                <View style={styles.categoryContent}>
+                  <Text style={styles.categoryTitle}>Adjetivos</Text>
+                  <Text style={styles.categorySubtitle}>
+                    6 lecciones • 53 palabras descriptivas
                   </Text>
                 </View>
                 <View style={styles.categoryArrow}>
@@ -713,6 +746,10 @@ const createStyles = (theme) => StyleSheet.create({
     color: theme.textSecondary,
     lineHeight: 22,
     marginBottom: 32,
+  },
+  sectionHeader: {
+    marginBottom: 24,
+    marginTop: 32,
   },
   datasetGrid: {
     flexDirection: 'row',
