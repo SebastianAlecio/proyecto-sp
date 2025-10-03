@@ -18,10 +18,15 @@ const { width } = Dimensions.get('window');
 
 const WordStudyLessonScreen = ({ route, navigation }) => {
   const { theme } = useTheme();
-  const { lessonId, lessonTitle, words, categoryType } = route.params;
+  const { lessonId, lessonTitle, words, categoryType } = route.params || {};
   const [lessonWords, setLessonWords] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Debug: verificar parámetros
+  console.log('WordStudyLesson params:', route.params);
+  console.log('Words received:', words);
+  console.log('CategoryType:', categoryType);
 
   // Crear video player para la palabra actual
   const currentWord = lessonWords[currentIndex];
@@ -42,6 +47,12 @@ const WordStudyLessonScreen = ({ route, navigation }) => {
   const loadLessonWords = async () => {
     try {
       setIsLoading(true);
+      
+      // Verificar que tenemos palabras
+      if (!words || words.length === 0) {
+        console.error('No words provided to lesson');
+        return;
+      }
       
       // Obtener las palabras de la base de datos
       const wordPromises = words.map(word => wordsAPI.getWordVideo(word));

@@ -20,7 +20,7 @@ const { width } = Dimensions.get('window');
 const WordLessonScreen = ({ route, navigation }) => {
   const { theme } = useTheme();
   const { markProgress } = useAuth();
-  const { lessonId, lessonTitle, words, categoryType } = route.params;
+  const { lessonId, lessonTitle, words, categoryType } = route.params || {};
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [questions, setQuestions] = useState([]);
@@ -31,6 +31,10 @@ const WordLessonScreen = ({ route, navigation }) => {
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [lessonResults, setLessonResults] = useState(null);
 
+  // Debug: verificar parámetros
+  console.log('WordLesson params:', route.params);
+  console.log('Words received:', words);
+  console.log('CategoryType:', categoryType);
   // Video player para la pregunta actual
   const currentQuestion = questions[currentQuestionIndex];
   const videoPlayer = useVideoPlayer(
