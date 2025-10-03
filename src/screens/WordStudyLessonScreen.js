@@ -18,19 +18,25 @@ const { width } = Dimensions.get('window');
 
 const WordStudyLessonScreen = ({ route, navigation }) => {
   const { theme } = useTheme();
-  const { lessonId, lessonTitle, words, categoryType = 'adjetivos' } = route.params || {};
+  
+  // Validar que route.params existe
+  if (!route.params) {
+    console.error('No route params provided to WordStudyLessonScreen');
+    navigation.goBack();
+    return null;
+  }
+  
+  const { lessonId, lessonTitle, words, categoryType = 'adjetivos' } = route.params;
   const [lessonWords, setLessonWords] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Validar parámetros
-  useEffect(() => {
-    if (!route.params || !words || !lessonId) {
-      console.error('Missing required params:', route.params);
-      navigation.goBack();
-      return;
-    }
-  }, []);
+  // Validar parámetros requeridos
+  if (!words || !lessonId || !lessonTitle) {
+    console.error('Missing required params:', { lessonId, lessonTitle, words, categoryType });
+    navigation.goBack();
+    return null;
+  }
 
   useEffect(() => {
     loadLessonWords();
@@ -233,7 +239,7 @@ const WordStudyLessonScreen = ({ route, navigation }) => {
               lessonId,
               lessonTitle,
               words,
-              categoryType
+              categoryType: categoryType
             })}
           >
             <Icon name="school" size={20} color="#FFFFFF" />
