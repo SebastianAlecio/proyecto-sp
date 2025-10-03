@@ -194,9 +194,6 @@ const WordStudyLessonScreen = ({ route, navigation }) => {
           <View style={styles.wordInfo}>
             <Text style={styles.wordTitle}>{currentWord.word}</Text>
             <Text style={styles.wordCategory}>{currentWord.category}</Text>
-            {currentWord.description && (
-              <Text style={styles.wordDescription}>{currentWord.description}</Text>
-            )}
           </View>
         </View>
       </View>
