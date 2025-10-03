@@ -557,6 +557,24 @@ const LearnScreen = ({ navigation }) => {
                   <Icon name="chevron-forward" size={24} color={theme.textSecondary} />
                 </View>
               </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.categoryCard}
+                onPress={() => navigateToWordCategory('frases_emociones')}
+              >
+                <View style={[styles.categoryIcon, { backgroundColor: '#45B7D120' }]}>
+                  <Text style={styles.categoryEmoji}>💬</Text>
+                </View>
+                <View style={styles.categoryContent}>
+                  <Text style={styles.categoryTitle}>Frases y Emociones</Text>
+                  <Text style={styles.categorySubtitle}>
+                    3 lecciones • 28 expresiones comunes
+                  </Text>
+                </View>
+                <View style={styles.categoryArrow}>
+                  <Icon name="chevron-forward" size={24} color={theme.textSecondary} />
+                </View>
+              </TouchableOpacity>
             </View>
           </ScrollView>
         </>

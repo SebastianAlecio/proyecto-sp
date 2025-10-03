@@ -84,6 +84,40 @@ const WordCategoryLessonsScreen = ({ route, navigation }) => {
     }
   ];
 
+  // Definir las lecciones de frases y emociones
+  const frasesEmocionesLessons = [
+    {
+      id: 'frases_lesson_1',
+      title: 'Frases 1',
+      subtitle: 'Saludos y Cortesía',
+      words: ['hola', 'adiós', 'buenos días', 'buenas tardes', 'buenas noches', 'gracias', 'de nada', 'por favor', 'disculpa', 'permiso'],
+      isUnlocked: true,
+      stars: 0,
+      completed: false,
+      requiredScore: 0
+    },
+    {
+      id: 'frases_lesson_2',
+      title: 'Frases 2',
+      subtitle: 'Presentación y Expresiones',
+      words: ['mi nombre', 'mi apodo es', 'mucho gusto', 'bienvenido', 'cómo estás', 'me gusta', 'ok', 'tal vez', 'sí'],
+      isUnlocked: false,
+      stars: 0,
+      completed: false,
+      requiredScore: 70
+    },
+    {
+      id: 'frases_lesson_3',
+      title: 'Frases 3',
+      subtitle: 'Frases Especiales',
+      words: ['feliz cumpleaños', 'buen provecho', 'dios te bendiga', 'aplausos', 'me equivoqué', 'no sé', 'no importa', 'entendiste', 'no'],
+      isUnlocked: false,
+      stars: 0,
+      completed: false,
+      requiredScore: 70
+    }
+  ];
+
   useEffect(() => {
     loadLessonsProgress();
   }, []);
@@ -102,7 +136,7 @@ const WordCategoryLessonsScreen = ({ route, navigation }) => {
       setIsLoading(true);
       
       const progress = await userService.getUserProgress(user.id);
-      const baseLessons = adjetivosLessons;
+      const baseLessons = categoryType === 'adjetivos' ? adjetivosLessons : frasesEmocionesLessons;
       
       const updatedLessons = baseLessons.map((lesson, index) => {
         const lessonProgress = progress.find(p => 
@@ -144,7 +178,7 @@ const WordCategoryLessonsScreen = ({ route, navigation }) => {
       setLessons(updatedLessons);
     } catch (error) {
       console.error('Error loading lessons progress:', error);
-      setLessons(adjetivosLessons);
+      setLessons(categoryType === 'adjetivos' ? adjetivosLessons : frasesEmocionesLessons);
     } finally {
       setIsLoading(false);
     }
@@ -209,7 +243,7 @@ const WordCategoryLessonsScreen = ({ route, navigation }) => {
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>{categoryName}</Text>
           <Text style={styles.headerSubtitle}>
-            🎨 Palabras que describen características
+            {categoryType === 'adjetivos' ? '🎨 Palabras que describen características' : '💬 Expresiones comunes y saludos'}
           </Text>
         </View>
         <View style={styles.headerSpacer} />
@@ -305,7 +339,7 @@ const WordCategoryLessonsScreen = ({ route, navigation }) => {
                       categoryType: categoryType
                     })}
                   >
-                    <Icon name="eye" size={16} color="#FF6B6B" />
+                    <Icon name="eye" size={16} color={categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1'} />
                     <Text style={styles.studyButtonText}>Ver Palabras</Text>
                   </TouchableOpacity>
                   
@@ -501,13 +535,13 @@ const createStyles = (theme) => StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: '#FF6B6B',
+    borderColor: '#45B7D1',
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 16,
   },
   studyButtonText: {
-    color: '#FF6B6B',
+    color: '#45B7D1',
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 6,
@@ -517,11 +551,11 @@ const createStyles = (theme) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#45B7D1',
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    shadowColor: '#FF6B6B',
+    shadowColor: '#45B7D1',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -548,7 +582,7 @@ const createStyles = (theme) => StyleSheet.create({
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#45B7D1',
     borderRadius: 2,
   },
   loadingContainer: {

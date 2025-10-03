@@ -400,7 +400,7 @@ const createStyles = (theme) => StyleSheet.create({
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     borderRadius: 2,
   },
   progressText: {
@@ -409,7 +409,7 @@ const createStyles = (theme) => StyleSheet.create({
     fontWeight: '500',
   },
   scoreContainer: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
@@ -441,7 +441,7 @@ const createStyles = (theme) => StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 40,
     borderWidth: 3,
-    borderColor: '#FF6B6B',
+    borderColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -608,7 +608,7 @@ const createStyles = (theme) => StyleSheet.create({
   scoreBig: {
     fontSize: 48,
     fontWeight: '700',
-    color: '#FF6B6B',
+    color: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     marginBottom: 4,
   },
   scorePercentage: {
@@ -634,13 +634,13 @@ const createStyles = (theme) => StyleSheet.create({
     marginHorizontal: 4,
   },
   continueButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     borderRadius: 16,
     paddingVertical: 16,
     paddingHorizontal: 32,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#FF6B6B',
+    shadowColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     shadowOffset: {
       width: 0,
       height: 4,

@@ -290,7 +290,7 @@ const createStyles = (theme) => StyleSheet.create({
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     borderRadius: 2,
   },
   progressText: {
@@ -367,7 +367,7 @@ const createStyles = (theme) => StyleSheet.create({
   wordTitle: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#FF6B6B',
+    color: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     marginBottom: 8,
     textTransform: 'capitalize',
   },
@@ -408,8 +408,8 @@ const createStyles = (theme) => StyleSheet.create({
     borderColor: theme.border,
   },
   dotActive: {
-    backgroundColor: '#FF6B6B',
-    borderColor: '#FF6B6B',
+    backgroundColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
+    borderColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
   },
   dotText: {
     fontSize: 14,
@@ -423,13 +423,13 @@ const createStyles = (theme) => StyleSheet.create({
     paddingHorizontal: 24,
   },
   quizButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     borderRadius: 16,
     paddingVertical: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#FF6B6B',
+    shadowColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     shadowOffset: {
       width: 0,
       height: 4,
