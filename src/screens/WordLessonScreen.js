@@ -24,11 +24,20 @@ const WordLessonScreen = ({ route, navigation }) => {
   // Validar que route.params existe
   if (!route.params) {
     console.error('No route params provided to WordLessonScreen');
+    Alert.alert('Error', 'No se pudieron cargar los parámetros de la lección');
     navigation.goBack();
     return null;
   }
   
-  const { lessonId, lessonTitle, words, categoryType = 'adjetivos' } = route.params;
+  const { lessonId, lessonTitle, words, categoryType } = route.params;
+
+  // Validar parámetros requeridos
+  if (!words || !lessonId || !lessonTitle || !categoryType) {
+    console.error('Missing required params:', { lessonId, lessonTitle, words, categoryType });
+    Alert.alert('Error', 'Faltan parámetros requeridos para la lección');
+    navigation.goBack();
+    return null;
+  }
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [questions, setQuestions] = useState([]);
@@ -38,13 +47,6 @@ const WordLessonScreen = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [lessonResults, setLessonResults] = useState(null);
-
-  // Validar parámetros requeridos
-  if (!words || !lessonId || !lessonTitle) {
-    console.error('Missing required params:', { lessonId, lessonTitle, words, categoryType });
-    navigation.goBack();
-    return null;
-  }
 
   // Video player para la pregunta actual
   const currentQuestion = questions[currentQuestionIndex];

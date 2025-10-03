@@ -349,7 +349,7 @@ const WordCategoryLessonsScreen = ({ route, navigation }) => {
                       lessonId: lesson.id,
                       lessonTitle: lesson.title,
                       words: lesson.words,
-                      categoryType
+                      categoryType: categoryType
                     })}
                   >
                     <Icon name="school" size={16} color="#FFFFFF" />

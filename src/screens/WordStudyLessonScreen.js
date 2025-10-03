@@ -22,21 +22,23 @@ const WordStudyLessonScreen = ({ route, navigation }) => {
   // Validar que route.params existe
   if (!route.params) {
     console.error('No route params provided to WordStudyLessonScreen');
+    Alert.alert('Error', 'No se pudieron cargar los parámetros de la lección');
     navigation.goBack();
     return null;
   }
   
-  const { lessonId, lessonTitle, words, categoryType = 'adjetivos' } = route.params;
-  const [lessonWords, setLessonWords] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const { lessonId, lessonTitle, words, categoryType } = route.params;
 
   // Validar parámetros requeridos
-  if (!words || !lessonId || !lessonTitle) {
+  if (!words || !lessonId || !lessonTitle || !categoryType) {
     console.error('Missing required params:', { lessonId, lessonTitle, words, categoryType });
+    Alert.alert('Error', 'Faltan parámetros requeridos para la lección');
     navigation.goBack();
     return null;
   }
+  const [lessonWords, setLessonWords] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     loadLessonWords();
