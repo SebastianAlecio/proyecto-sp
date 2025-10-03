@@ -32,6 +32,10 @@ const WordStudyLessonScreen = ({ route, navigation }) => {
     }
   }, []);
 
+  useEffect(() => {
+    loadLessonWords();
+  }, []);
+
   // Crear video player para la palabra actual
   const currentWord = lessonWords[currentIndex];
   const videoPlayer = useVideoPlayer(
@@ -43,10 +47,6 @@ const WordStudyLessonScreen = ({ route, navigation }) => {
       }
     }
   );
-
-  useEffect(() => {
-    loadLessonWords();
-  }, []);
 
   const loadLessonWords = async () => {
     try {
@@ -86,7 +86,7 @@ const WordStudyLessonScreen = ({ route, navigation }) => {
     setCurrentIndex(index);
   };
 
-  const styles = createStyles(theme);
+  const styles = createStyles(theme, categoryType);
 
   if (isLoading) {
     return (
@@ -102,7 +102,7 @@ const WordStudyLessonScreen = ({ route, navigation }) => {
           <View style={styles.headerSpacer} />
         </View>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color={categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1'} />
           <Text style={styles.loadingText}>Cargando palabras...</Text>
         </View>
       </SafeAreaView>
@@ -248,7 +248,7 @@ const WordStudyLessonScreen = ({ route, navigation }) => {
   );
 };
 
-const createStyles = (theme) => StyleSheet.create({
+const createStyles = (theme, categoryType) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.background,
@@ -305,7 +305,7 @@ const createStyles = (theme) => StyleSheet.create({
   },
   progressBar: {
     height: '100%',
-    backgroundColor: (categoryType === 'adjetivos') ? '#FF6B6B' : '#45B7D1',
+    backgroundColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     borderRadius: 2,
   },
   progressText: {
@@ -369,7 +369,7 @@ const createStyles = (theme) => StyleSheet.create({
     borderRadius: 20,
     marginBottom: 24,
     borderWidth: 3,
-    borderColor: '#FF6B6B',
+    borderColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     overflow: 'hidden',
   },
   video: {
@@ -382,7 +382,7 @@ const createStyles = (theme) => StyleSheet.create({
   wordTitle: {
     fontSize: 32,
     fontWeight: '700',
-    color: (categoryType === 'adjetivos') ? '#FF6B6B' : '#45B7D1',
+    color: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     marginBottom: 8,
     textTransform: 'capitalize',
   },
@@ -423,8 +423,8 @@ const createStyles = (theme) => StyleSheet.create({
     borderColor: theme.border,
   },
   dotActive: {
-    backgroundColor: (categoryType === 'adjetivos') ? '#FF6B6B' : '#45B7D1',
-    borderColor: (categoryType === 'adjetivos') ? '#FF6B6B' : '#45B7D1',
+    backgroundColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
+    borderColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
   },
   dotText: {
     fontSize: 14,
@@ -438,13 +438,13 @@ const createStyles = (theme) => StyleSheet.create({
     paddingHorizontal: 24,
   },
   quizButton: {
-    backgroundColor: (categoryType === 'adjetivos') ? '#FF6B6B' : '#45B7D1',
+    backgroundColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     borderRadius: 16,
     paddingVertical: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: (categoryType === 'adjetivos') ? '#FF6B6B' : '#45B7D1',
+    shadowColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
     shadowOffset: {
       width: 0,
       height: 4,
