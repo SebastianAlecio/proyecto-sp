@@ -20,7 +20,7 @@ const { width } = Dimensions.get('window');
 const WordLessonScreen = ({ route, navigation }) => {
   const { theme } = useTheme();
   const { markProgress } = useAuth();
-  const { lessonId, lessonTitle, words, categoryType } = route.params || {};
+  const { lessonId, lessonTitle, words, categoryType = 'adjetivos' } = route.params || {};
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [questions, setQuestions] = useState([]);
@@ -409,7 +409,7 @@ const createStyles = (theme) => StyleSheet.create({
   },
   progressBar: {
     height: '100%',
-    backgroundColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
+    backgroundColor: (categoryType === 'adjetivos') ? '#FF6B6B' : '#45B7D1',
     borderRadius: 2,
   },
   progressText: {
@@ -418,7 +418,7 @@ const createStyles = (theme) => StyleSheet.create({
     fontWeight: '500',
   },
   scoreContainer: {
-    backgroundColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
+    backgroundColor: (categoryType === 'adjetivos') ? '#FF6B6B' : '#45B7D1',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
@@ -450,7 +450,7 @@ const createStyles = (theme) => StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 40,
     borderWidth: 3,
-    borderColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
+    borderColor: (categoryType === 'adjetivos') ? '#FF6B6B' : '#45B7D1',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -617,7 +617,7 @@ const createStyles = (theme) => StyleSheet.create({
   scoreBig: {
     fontSize: 48,
     fontWeight: '700',
-    color: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
+    color: (categoryType === 'adjetivos') ? '#FF6B6B' : '#45B7D1',
     marginBottom: 4,
   },
   scorePercentage: {
@@ -643,13 +643,13 @@ const createStyles = (theme) => StyleSheet.create({
     marginHorizontal: 4,
   },
   continueButton: {
-    backgroundColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
+    backgroundColor: (categoryType === 'adjetivos') ? '#FF6B6B' : '#45B7D1',
     borderRadius: 16,
     paddingVertical: 16,
     paddingHorizontal: 32,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1',
+    shadowColor: (categoryType === 'adjetivos') ? '#FF6B6B' : '#45B7D1',
     shadowOffset: {
       width: 0,
       height: 4,

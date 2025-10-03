@@ -336,7 +336,7 @@ const WordCategoryLessonsScreen = ({ route, navigation }) => {
                       lessonId: lesson.id,
                       lessonTitle: lesson.title,
                       words: lesson.words,
-                      categoryType
+                      categoryType: categoryType
                     })}
                   >
                     <Icon name="eye" size={16} color={categoryType === 'adjetivos' ? '#FF6B6B' : '#45B7D1'} />
