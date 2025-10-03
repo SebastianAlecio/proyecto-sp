@@ -31,10 +31,15 @@ const WordLessonScreen = ({ route, navigation }) => {
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [lessonResults, setLessonResults] = useState(null);
 
-  // Debug: verificar parámetros
-  console.log('WordLesson params:', route.params);
-  console.log('Words received:', words);
-  console.log('CategoryType:', categoryType);
+  // Validar parámetros
+  useEffect(() => {
+    if (!route.params || !words || !lessonId) {
+      console.error('Missing required params:', route.params);
+      navigation.goBack();
+      return;
+    }
+  }, []);
+
   // Video player para la pregunta actual
   const currentQuestion = questions[currentQuestionIndex];
   const videoPlayer = useVideoPlayer(

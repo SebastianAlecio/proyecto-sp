@@ -23,10 +23,14 @@ const WordStudyLessonScreen = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Debug: verificar parámetros
-  console.log('WordStudyLesson params:', route.params);
-  console.log('Words received:', words);
-  console.log('CategoryType:', categoryType);
+  // Validar parámetros
+  useEffect(() => {
+    if (!route.params || !words || !lessonId) {
+      console.error('Missing required params:', route.params);
+      navigation.goBack();
+      return;
+    }
+  }, []);
 
   // Crear video player para la palabra actual
   const currentWord = lessonWords[currentIndex];
