@@ -359,7 +359,7 @@ const LearnScreen = ({ navigation }) => {
             </Text>
           </View>
           <Image
-            source={require("../../assets/logo_nombre.png")}
+            source={require("../../assets/icon_bg.png")}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -447,7 +447,7 @@ const LearnScreen = ({ navigation }) => {
           <Text style={styles.headerSubtitle}>Domina el lenguaje de señas</Text>
         </View>
         <Image
-          source={require("../../assets/logo_nombre.png")}
+          source={require("../../assets/icon_bg.png")}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -729,10 +729,10 @@ const createStyles = (theme) =>
       borderBottomColor: theme.border,
     },
     logo: {
-      width: 200,
-      height: 60,
+      width: 220,
+      height: 70,
       position: "relative",
-      right: 13,
+      left: 42,
     },
     headerTitle: {
       fontSize: 32,

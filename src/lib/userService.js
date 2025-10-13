@@ -11,8 +11,6 @@ export const userService = {
   // Inicializar usuario (guest o autenticado)
   async initializeUser() {
     try {
-      console.log("Initializing user...");
-
       // Verificar si hay usuario autenticado con timeout
       const sessionPromise = supabase.auth.getSession();
       const timeoutPromise = new Promise((_, reject) =>
@@ -26,15 +24,12 @@ export const userService = {
         sessionData = { data: { session: null } };
       }
       const user = sessionData.data.session?.user;
-      console.log("Current auth user:", user?.id);
 
       if (user) {
         // Usuario autenticado - buscar o crear perfil
-        console.log("User is authenticated, getting profile...");
         return await this.getOrCreateAuthenticatedProfile(user);
       } else {
         // Usuario guest - buscar o crear guest
-        console.log("No authenticated user, creating guest...");
         return await this.getOrCreateGuestProfile();
       }
     } catch (error) {
@@ -334,10 +329,6 @@ export const userService = {
         .eq("id", userProfileId);
 
       if (updateError) throw updateError;
-
-      console.log(
-        `🔥 Streak updated: ${newCurrentStreak} days (max: ${newMaxStreak})`,
-      );
     } catch (error) {
       console.error("Error updating user streak:", error);
     }
@@ -346,9 +337,6 @@ export const userService = {
   // Registrar usuario con email (migrar de guest)
   async registerWithEmail(email, password, currentProfile) {
     try {
-      console.log("Starting registration process...");
-      console.log("Current profile:", currentProfile);
-
       // Crear cuenta en Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
@@ -367,21 +355,15 @@ export const userService = {
 
       // Si hay sesión inmediatamente, el usuario fue confirmado automáticamente
       if (authData.session && authData.user) {
-        console.log(
-          "User confirmed automatically, proceeding with migration...",
-        );
-
         try {
           // Solo migrar si tenemos un perfil guest válido
           if (currentProfile && currentProfile.is_guest) {
-            console.log("Migrating guest profile to authenticated user...");
             await this.migrateGuestToAuth(
               currentProfile,
               authData.user,
               currentProfile.display_name,
             );
           } else {
-            console.log("Creating new authenticated profile...");
             await this.getOrCreateAuthenticatedProfile(authData.user);
           }
         } catch (migrationError) {
@@ -401,7 +383,6 @@ export const userService = {
         };
       } else {
         // Usuario creado pero necesita confirmación de email
-        // console.log("User created, needs email confirmation");
         return {
           success: true,
           user: authData.user,
@@ -423,13 +404,6 @@ export const userService = {
   // Migrar datos de guest a usuario autenticado
   async migrateGuestToAuth(guestProfile, authUser, displayName) {
     try {
-      console.log("Starting migration for profile:", guestProfile.id);
-      console.log("Auth user:", authUser.id);
-      console.log("Current profile data:", guestProfile);
-      console.log("Display name to save:", displayName);
-
-      console.log("Proceeding with migration (foreign key constraint removed)");
-
       // Actualizar perfil guest para convertirlo en usuario real
       const { data: updatedProfile, error: updateError } = await supabase
         .from("user_profiles")
@@ -447,9 +421,6 @@ export const userService = {
         console.error("Migration update error:", updateError);
         throw updateError;
       }
-
-      console.log("Migration successful:", updatedProfile);
-
       // Limpiar guest_id del AsyncStorage
       await AsyncStorage.removeItem("guest_id");
 

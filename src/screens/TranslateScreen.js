@@ -219,7 +219,7 @@ const TranslateScreen = ({ navigation }) => {
           <Text style={styles.headerSubtitle}>Texto a Lenguaje de Señas</Text>
         </View>
         <Image
-          source={require("../../assets/logo_nombre.png")}
+          source={require("../../assets/icon_bg.png")}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -307,8 +307,10 @@ const createStyles = (theme) =>
       borderBottomColor: theme.border,
     },
     logo: {
-      width: 200,
-      height: 60,
+      width: 220,
+      height: 70,
+      position: "relative",
+      left: 55,
     },
     headerTitle: {
       fontSize: 32,

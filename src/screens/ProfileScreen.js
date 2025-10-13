@@ -71,7 +71,7 @@ const ProfileScreen = () => {
           <Text style={styles.headerSubtitle}>Ajustes y preferencias</Text>
         </View>
         <Image
-          source={require("../../assets/logo_nombre.png")}
+          source={require("../../assets/logo_nombre_bg.png")}
           style={styles.logo}
           resizeMode="contain"
         />
