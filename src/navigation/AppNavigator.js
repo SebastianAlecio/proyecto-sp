@@ -14,6 +14,7 @@ import WordCategoryLessonsScreen from '../screens/WordCategoryLessonsScreen';
 import WordStudyLessonScreen from '../screens/WordStudyLessonScreen';
 import WordLessonScreen from '../screens/WordLessonScreen';
 import CameraScreen from '../screens/CameraScreen';
+import ModelSelectionScreen from '../screens/ModelSelectionScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -82,9 +83,9 @@ const MainTabNavigator = () => {
           tabBarLabel: 'Aprender',
         }}
       />
-      <Tab.Screen 
-        name="Camera" 
-        component={CameraScreen}
+      <Tab.Screen
+        name="Camera"
+        component={ModelSelectionScreen}
         options={{
           tabBarLabel: 'Cámara',
         }}
@@ -113,6 +114,7 @@ const AppNavigator = ({ initialRouteName }) => {
       <Stack.Screen name="WordCategoryLessons" component={WordCategoryLessonsScreen} />
       <Stack.Screen name="WordStudyLesson" component={WordStudyLessonScreen} />
       <Stack.Screen name="WordLesson" component={WordLessonScreen} />
+      <Stack.Screen name="ModelSelection" component={ModelSelectionScreen} />
       <Stack.Screen name="CameraScreen" component={CameraScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
     </Stack.Navigator>

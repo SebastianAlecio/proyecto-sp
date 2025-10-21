@@ -14,9 +14,10 @@ import { useTheme } from "../context/ThemeContext";
 
 const { width, height } = Dimensions.get("window");
 
-const CameraScreen = ({ navigation }) => {
+const CameraScreen = ({ navigation, route }) => {
   const { theme } = useTheme();
-  const [facing, setFacing] = useState("front"); // Cámara frontal
+  const { modelNumber } = route.params || { modelNumber: 1 };
+  const [facing, setFacing] = useState("front");
   const [permission, requestPermission] = useCameraPermissions();
   const [isRecording, setIsRecording] = useState(false);
   const [detectedSign, setDetectedSign] = useState(null);
@@ -64,8 +65,8 @@ const CameraScreen = ({ navigation }) => {
       });
 
       console.log("📤 Enviando al servidor...");
-      //Aqui remplazar IPV4
-      const response = await fetch("http://10.170.184.222:8000/predict", {
+      const port = modelNumber === 1 ? 8000 : 8001;
+      const response = await fetch(`http://10.170.184.222:${port}/predict`, {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
@@ -151,7 +152,7 @@ const CameraScreen = ({ navigation }) => {
         >
           <Icon name="chevron-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detectar Señas</Text>
+        <Text style={styles.headerTitle}>Detectar Señas - Modelo {modelNumber}</Text>
         <TouchableOpacity
           style={styles.flipButton}
           onPress={toggleCameraFacing}
