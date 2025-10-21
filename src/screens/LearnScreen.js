@@ -732,7 +732,7 @@ const createStyles = (theme) =>
       width: 220,
       height: 70,
       position: "relative",
-      left: 23,
+      left: 17,
     },
     headerTitle: {
       fontSize: 32,
