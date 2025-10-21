@@ -5,12 +5,10 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
-  Dimensions,
+  ScrollView,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useTheme } from "../context/ThemeContext";
-
-const { width } = Dimensions.get("window");
 
 const ModelSelectionScreen = ({ navigation }) => {
   const { theme } = useTheme();
@@ -34,7 +32,11 @@ const ModelSelectionScreen = ({ navigation }) => {
         <View style={styles.placeholder} />
       </View>
 
-      <View style={styles.content}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.titleContainer}>
           <Icon name="cube-outline" size={48} color={theme.primary} />
           <Text style={styles.title}>Elige un Modelo</Text>
@@ -56,9 +58,6 @@ const ModelSelectionScreen = ({ navigation }) => {
             <Text style={styles.modelDescription}>
               Modelo base de detección de señas
             </Text>
-            <View style={styles.modelBadge}>
-              <Text style={styles.badgeText}>Puerto 8000</Text>
-            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -73,12 +72,9 @@ const ModelSelectionScreen = ({ navigation }) => {
             <Text style={styles.modelDescription}>
               Modelo avanzado de detección de señas
             </Text>
-            <View style={styles.modelBadge}>
-              <Text style={styles.badgeText}>Puerto 8001</Text>
-            </View>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -94,8 +90,8 @@ const createStyles = (theme) =>
       alignItems: "center",
       justifyContent: "space-between",
       paddingHorizontal: 24,
-      paddingTop: 16,
-      paddingBottom: 16,
+      paddingTop: 8,
+      paddingBottom: 12,
     },
     backButton: {
       width: 44,
@@ -118,14 +114,17 @@ const createStyles = (theme) =>
     placeholder: {
       width: 44,
     },
-    content: {
+    scrollView: {
       flex: 1,
+    },
+    scrollContent: {
       paddingHorizontal: 24,
+      paddingBottom: 32,
     },
     titleContainer: {
       alignItems: "center",
-      marginTop: 32,
-      marginBottom: 48,
+      marginTop: 16,
+      marginBottom: 32,
     },
     title: {
       fontSize: 28,
@@ -176,18 +175,6 @@ const createStyles = (theme) =>
       color: theme.textSecondary,
       textAlign: "center",
       lineHeight: 21,
-      marginBottom: 16,
-    },
-    modelBadge: {
-      backgroundColor: theme.primary,
-      paddingHorizontal: 16,
-      paddingVertical: 8,
-      borderRadius: 20,
-    },
-    badgeText: {
-      color: "#FFFFFF",
-      fontSize: 13,
-      fontWeight: "600",
     },
   });
 
