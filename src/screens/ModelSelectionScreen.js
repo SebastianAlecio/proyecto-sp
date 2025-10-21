@@ -90,7 +90,7 @@ const createStyles = (theme) =>
       alignItems: "center",
       justifyContent: "space-between",
       paddingHorizontal: 24,
-      paddingTop: 30,
+      paddingTop: 35,
       paddingBottom: 16,
     },
     backButton: {
