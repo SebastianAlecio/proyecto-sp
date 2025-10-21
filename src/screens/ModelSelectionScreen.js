@@ -22,8 +22,6 @@ const ModelSelectionScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-          <Icon name="chevron-back" size={24} color={theme.text} />
-        </TouchableOpacity>
         <Text style={styles.headerTitle}>Seleccionar Modelo</Text>
         <View style={styles.placeholder} />
       </View>
