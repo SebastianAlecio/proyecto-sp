@@ -90,8 +90,8 @@ const createStyles = (theme) =>
       alignItems: "center",
       justifyContent: "space-between",
       paddingHorizontal: 24,
-      paddingTop: 8,
-      paddingBottom: 12,
+      paddingTop: 20,
+      paddingBottom: 16,
     },
     backButton: {
       width: 44,
