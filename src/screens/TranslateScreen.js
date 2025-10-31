@@ -33,7 +33,7 @@ const TranslateScreen = ({ navigation }) => {
         try {
           const geminiApiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
           const geminiResponse = await fetch(
-            `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`,
+            `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`,
             {
               method: "POST",
               headers: {
@@ -42,20 +42,15 @@ const TranslateScreen = ({ navigation }) => {
               body: JSON.stringify({
                 contents: [{
                   parts: [{
-                    text: `Eres un corrector ortográfico. Tu ÚNICA tarea es añadir las tildes (acentos) que faltan en español según el contexto de la oración.
+                    text: `Añade las tildes que faltan en español. Solo responde con el texto corregido:
 
-REGLAS ESTRICTAS:
-1. SOLO añade tildes donde falten
-2. NO cambies ninguna palabra
-3. NO añadas ni quites espacios, puntuación o mayúsculas
-4. Responde ÚNICAMENTE con el texto corregido, sin comillas, sin explicaciones
-
-Texto a corregir: ${textToProcess}`
+${textToProcess}`
                   }]
                 }],
                 generationConfig: {
                   temperature: 0.1,
-                  maxOutputTokens: 300,
+                  maxOutputTokens: 500,
+                  candidateCount: 1,
                 },
               }),
             }
