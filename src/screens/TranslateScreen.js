@@ -28,8 +28,32 @@ const TranslateScreen = ({ navigation }) => {
       Keyboard.dismiss();
 
       try {
+        // Corregir tildes usando IA antes de procesar
+        let textToProcess = inputText.trim();
+        try {
+          const accentCorrectionUrl = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/correct-accents`;
+          const accentResponse = await fetch(accentCorrectionUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ text: textToProcess }),
+          });
+
+          if (accentResponse.ok) {
+            const accentData = await accentResponse.json();
+            textToProcess = accentData.correctedText;
+            console.log("Texto original:", inputText.trim());
+            console.log("Texto corregido:", textToProcess);
+          } else {
+            console.warn("No se pudo corregir tildes, usando texto original");
+          }
+        } catch (accentError) {
+          console.warn("Error corrigiendo tildes, usando texto original:", accentError);
+        }
+
         // Limpiar el texto de puntuación y dividir en palabras
-        const cleanText = inputText
+        const cleanText = textToProcess
           .toLowerCase()
           .trim()
           .replace(/[.,;:!?¿¡]/g, "");
