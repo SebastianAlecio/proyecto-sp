@@ -60,9 +60,12 @@ const TranslateScreen = ({ navigation }) => {
             console.log("Texto original:", inputText.trim());
             console.log("Texto corregido:", textToProcess);
           } else {
+            const errorText = await openaiResponse.text();
+            console.error("Error de OpenAI:", openaiResponse.status, errorText);
             console.warn("No se pudo corregir tildes, usando texto original");
           }
         } catch (accentError) {
+          console.error("Error completo corrigiendo tildes:", accentError);
           console.warn("Error corrigiendo tildes, usando texto original:", accentError);
         }
 
