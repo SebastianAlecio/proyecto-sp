@@ -42,8 +42,26 @@ const TranslateScreen = ({ navigation }) => {
               body: JSON.stringify({
                 contents: [{
                   parts: [{
-                    text: `Añade ÚNICAMENTE las tildes (acentos) que faltan en este texto en español. NO agregues ni quites signos de puntuación, comillas, interrogación o exclamación. NO cambies mayúsculas ni minúsculas. SOLO añade las tildes faltantes:
+                    text: `Tu trabajo es añadir SOLO las tildes que faltan. No modifiques nada más.
 
+REGLAS OBLIGATORIAS:
+- NO agregues comas, puntos, dos puntos (:)
+- NO agregues comillas (" ")
+- NO agregues signos de interrogación (¿?)
+- NO agregues signos de exclamación (¡!)
+- MANTÉN exactamente los mismos espacios
+- MANTÉN exactamente las mismas mayúsculas y minúsculas
+- SOLO añade las vocales acentuadas: á é í ó ú
+
+Ejemplo INCORRECTO:
+Entrada: hola como estas
+Salida: "Hola, ¿cómo estás?"  ❌ MAL
+
+Ejemplo CORRECTO:
+Entrada: hola como estas
+Salida: hola como estás  ✓ BIEN
+
+Texto a corregir:
 ${textToProcess}`
                   }]
                 }],
