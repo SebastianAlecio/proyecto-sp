@@ -31,18 +31,32 @@ const TranslateScreen = ({ navigation }) => {
         // Corregir tildes usando IA antes de procesar
         let textToProcess = inputText.trim();
         try {
-          const accentCorrectionUrl = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/correct-accents`;
-          const accentResponse = await fetch(accentCorrectionUrl, {
+          const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
             headers: {
+              "Authorization": `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ text: textToProcess }),
+            body: JSON.stringify({
+              model: "gpt-3.5-turbo",
+              messages: [
+                {
+                  role: "system",
+                  content: "Eres un asistente que corrige ÚNICAMENTE las tildes (acentos ortográficos) en textos en español según el contexto. NO modifiques ninguna otra cosa. Responde ÚNICAMENTE con el texto corregido, sin explicaciones."
+                },
+                {
+                  role: "user",
+                  content: `Corrige únicamente las tildes: "${textToProcess}"`
+                }
+              ],
+              temperature: 0.3,
+              max_tokens: 200,
+            }),
           });
 
-          if (accentResponse.ok) {
-            const accentData = await accentResponse.json();
-            textToProcess = accentData.correctedText;
+          if (openaiResponse.ok) {
+            const openaiData = await openaiResponse.json();
+            textToProcess = openaiData.choices[0]?.message?.content?.trim() || textToProcess;
             console.log("Texto original:", inputText.trim());
             console.log("Texto corregido:", textToProcess);
           } else {
