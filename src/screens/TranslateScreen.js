@@ -42,13 +42,13 @@ const TranslateScreen = ({ navigation }) => {
               body: JSON.stringify({
                 contents: [{
                   parts: [{
-                    text: `Añade las tildes que faltan en español. Solo responde con el texto corregido:
+                    text: `Añade ÚNICAMENTE las tildes (acentos) que faltan en este texto en español. NO agregues ni quites signos de puntuación, comillas, interrogación o exclamación. NO cambies mayúsculas ni minúsculas. SOLO añade las tildes faltantes:
 
 ${textToProcess}`
                   }]
                 }],
                 generationConfig: {
-                  temperature: 0.1,
+                  temperature: 0,
                   maxOutputTokens: 500,
                   candidateCount: 1,
                 },
