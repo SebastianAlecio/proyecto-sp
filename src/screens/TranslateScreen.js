@@ -63,7 +63,10 @@ Texto a corregir: ${textToProcess}`
 
           if (geminiResponse.ok) {
             const geminiData = await geminiResponse.json();
+            console.log("📥 Respuesta completa de Gemini:", JSON.stringify(geminiData, null, 2));
+
             let correctedText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+            console.log("📝 Texto extraído:", correctedText);
 
             if (correctedText) {
               // Limpiar el texto de comillas y espacios extra
@@ -72,13 +75,15 @@ Texto a corregir: ${textToProcess}`
                 .replace(/^\s+|\s+$/g, '')      // Quitar espacios extra
                 .trim();
 
+              console.log("🧹 Texto limpio:", correctedText);
+              console.log("🔄 Comparación - Original:", textToProcess, "| Corregido:", correctedText);
+
               // Solo usar el texto corregido si es diferente y tiene contenido
               if (correctedText && correctedText !== textToProcess) {
-                console.log("✓ Texto original:", inputText.trim());
-                console.log("✓ Texto corregido:", correctedText);
+                console.log("✅ Texto con tildes aplicado:", correctedText);
                 textToProcess = correctedText;
               } else {
-                console.log("ℹ Sin cambios en tildes para:", inputText.trim());
+                console.log("ℹ️ Sin cambios en tildes para:", inputText.trim());
               }
             }
           } else {
