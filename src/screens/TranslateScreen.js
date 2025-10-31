@@ -59,7 +59,7 @@ Salida: "Hola, ¿cómo estás?"  ❌ MAL
 
 Ejemplo CORRECTO:
 Entrada: hola como estas
-Salida: hola como estás  ✓ BIEN
+Salida: hola cómo estás  ✓ BIEN
 
 Texto a corregir:
 ${textToProcess}`
