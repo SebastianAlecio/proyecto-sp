@@ -31,37 +31,39 @@ const TranslateScreen = ({ navigation }) => {
         // Corregir tildes usando IA antes de procesar
         let textToProcess = inputText.trim();
         try {
-          const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: "gpt-3.5-turbo",
-              messages: [
-                {
-                  role: "system",
-                  content: "Eres un asistente que corrige ÚNICAMENTE las tildes (acentos ortográficos) en textos en español según el contexto. NO modifiques ninguna otra cosa. Responde ÚNICAMENTE con el texto corregido, sin explicaciones."
+          const geminiApiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+          const geminiResponse = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                contents: [{
+                  parts: [{
+                    text: `Corrige ÚNICAMENTE las tildes (acentos ortográficos) en el siguiente texto en español. NO cambies nada más. Responde SOLO con el texto corregido, sin explicaciones:\n\n"${textToProcess}"`
+                  }]
+                }],
+                generationConfig: {
+                  temperature: 0.3,
+                  maxOutputTokens: 200,
                 },
-                {
-                  role: "user",
-                  content: `Corrige únicamente las tildes: "${textToProcess}"`
-                }
-              ],
-              temperature: 0.3,
-              max_tokens: 200,
-            }),
-          });
+              }),
+            }
+          );
 
-          if (openaiResponse.ok) {
-            const openaiData = await openaiResponse.json();
-            textToProcess = openaiData.choices[0]?.message?.content?.trim() || textToProcess;
-            console.log("Texto original:", inputText.trim());
-            console.log("Texto corregido:", textToProcess);
+          if (geminiResponse.ok) {
+            const geminiData = await geminiResponse.json();
+            const correctedText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+            if (correctedText) {
+              textToProcess = correctedText.replace(/^"|"$/g, '');
+              console.log("Texto original:", inputText.trim());
+              console.log("Texto corregido:", textToProcess);
+            }
           } else {
-            const errorText = await openaiResponse.text();
-            console.error("Error de OpenAI:", openaiResponse.status, errorText);
+            const errorText = await geminiResponse.text();
+            console.error("Error de Gemini:", geminiResponse.status, errorText);
             console.warn("No se pudo corregir tildes, usando texto original");
           }
         } catch (accentError) {
