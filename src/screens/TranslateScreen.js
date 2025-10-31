@@ -42,12 +42,20 @@ const TranslateScreen = ({ navigation }) => {
               body: JSON.stringify({
                 contents: [{
                   parts: [{
-                    text: `Corrige ÚNICAMENTE las tildes (acentos ortográficos) en el siguiente texto en español. NO cambies nada más. Responde SOLO con el texto corregido, sin explicaciones:\n\n"${textToProcess}"`
+                    text: `Eres un corrector ortográfico. Tu ÚNICA tarea es añadir las tildes (acentos) que faltan en español según el contexto de la oración.
+
+REGLAS ESTRICTAS:
+1. SOLO añade tildes donde falten
+2. NO cambies ninguna palabra
+3. NO añadas ni quites espacios, puntuación o mayúsculas
+4. Responde ÚNICAMENTE con el texto corregido, sin comillas, sin explicaciones
+
+Texto a corregir: ${textToProcess}`
                   }]
                 }],
                 generationConfig: {
-                  temperature: 0.3,
-                  maxOutputTokens: 200,
+                  temperature: 0.1,
+                  maxOutputTokens: 300,
                 },
               }),
             }
@@ -55,11 +63,23 @@ const TranslateScreen = ({ navigation }) => {
 
           if (geminiResponse.ok) {
             const geminiData = await geminiResponse.json();
-            const correctedText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+            let correctedText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
             if (correctedText) {
-              textToProcess = correctedText.replace(/^"|"$/g, '');
-              console.log("Texto original:", inputText.trim());
-              console.log("Texto corregido:", textToProcess);
+              // Limpiar el texto de comillas y espacios extra
+              correctedText = correctedText
+                .replace(/^["'`]|["'`]$/g, '')  // Quitar comillas al inicio/final
+                .replace(/^\s+|\s+$/g, '')      // Quitar espacios extra
+                .trim();
+
+              // Solo usar el texto corregido si es diferente y tiene contenido
+              if (correctedText && correctedText !== textToProcess) {
+                console.log("✓ Texto original:", inputText.trim());
+                console.log("✓ Texto corregido:", correctedText);
+                textToProcess = correctedText;
+              } else {
+                console.log("ℹ Sin cambios en tildes para:", inputText.trim());
+              }
             }
           } else {
             const errorText = await geminiResponse.text();
