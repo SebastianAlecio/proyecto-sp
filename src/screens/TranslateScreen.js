@@ -76,37 +76,23 @@ ${textToProcess}`
 
           if (geminiResponse.ok) {
             const geminiData = await geminiResponse.json();
-            console.log("📥 Respuesta completa de Gemini:", JSON.stringify(geminiData, null, 2));
-
             let correctedText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-            console.log("📝 Texto extraído:", correctedText);
 
             if (correctedText) {
               // Limpiar el texto de comillas y espacios extra
               correctedText = correctedText
-                .replace(/^["'`]|["'`]$/g, '')  // Quitar comillas al inicio/final
-                .replace(/^\s+|\s+$/g, '')      // Quitar espacios extra
+                .replace(/^["'`]|["'`]$/g, '')
+                .replace(/^\s+|\s+$/g, '')
                 .trim();
-
-              console.log("🧹 Texto limpio:", correctedText);
-              console.log("🔄 Comparación - Original:", textToProcess, "| Corregido:", correctedText);
 
               // Solo usar el texto corregido si es diferente y tiene contenido
               if (correctedText && correctedText !== textToProcess) {
-                console.log("✅ Texto con tildes aplicado:", correctedText);
                 textToProcess = correctedText;
-              } else {
-                console.log("ℹ️ Sin cambios en tildes para:", inputText.trim());
               }
             }
-          } else {
-            const errorText = await geminiResponse.text();
-            console.error("Error de Gemini:", geminiResponse.status, errorText);
-            console.warn("No se pudo corregir tildes, usando texto original");
           }
         } catch (accentError) {
-          console.error("Error completo corrigiendo tildes:", accentError);
-          console.warn("Error corrigiendo tildes, usando texto original:", accentError);
+          // Silenciar errores y continuar con texto original
         }
 
         // Limpiar el texto de puntuación y dividir en palabras
@@ -238,7 +224,7 @@ ${textToProcess}`
           originalText: inputText.trim(),
         });
       } catch (error) {
-        console.error("Error translating text:", error);
+        // Error silenciado
       } finally {
         setIsLoading(false);
       }
