@@ -33,7 +33,7 @@ const TranslateScreen = ({ navigation }) => {
         try {
           const geminiApiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
           const geminiResponse = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+            `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`,
             {
               method: "POST",
               headers: {
