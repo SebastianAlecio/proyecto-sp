@@ -79,7 +79,7 @@ const CameraLessonScreen = ({ navigation, route }) => {
         type: "image/jpeg",
       });
 
-      const response = await fetch(`http://10.170.184.222:8000/predict`, {
+      const response = await fetch(`http://192.168.1.28:8000/predict`, {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
