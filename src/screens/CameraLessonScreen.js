@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,10 +8,14 @@ import {
   Modal,
   Alert,
   Dimensions,
+  Image,
+  ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useTheme } from "../context/ThemeContext";
+import { signLanguageAPI } from "../lib/supabase";
 
 const { width } = Dimensions.get("window");
 
@@ -25,10 +29,29 @@ const CameraLessonScreen = ({ navigation, route }) => {
   const [showCamera, setShowCamera] = useState(false);
   const [detectedLetter, setDetectedLetter] = useState(null);
   const [isDetecting, setIsDetecting] = useState(false);
+  const [currentSignData, setCurrentSignData] = useState(null);
+  const [isLoadingSign, setIsLoadingSign] = useState(false);
   const cameraRef = useRef(null);
 
   const currentLetter = letters[currentIndex];
   const progress = ((currentIndex + 1) / letters.length) * 100;
+
+  useEffect(() => {
+    loadSignImage();
+  }, [currentIndex]);
+
+  const loadSignImage = async () => {
+    try {
+      setIsLoadingSign(true);
+      const signData = await signLanguageAPI.getSignByCharacter(currentLetter);
+      setCurrentSignData(signData);
+    } catch (error) {
+      console.error("Error cargando imagen de seña:", error);
+      setCurrentSignData(null);
+    } finally {
+      setIsLoadingSign(false);
+    }
+  };
 
   const openCamera = () => {
     if (!permission?.granted) {
@@ -56,7 +79,7 @@ const CameraLessonScreen = ({ navigation, route }) => {
         type: "image/jpeg",
       });
 
-      const response = await fetch(`http://192.168.1.28:8000/predict`, {
+      const response = await fetch(`http://10.170.184.222:8000/predict`, {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
@@ -155,12 +178,33 @@ const CameraLessonScreen = ({ navigation, route }) => {
         <Text style={styles.progressText}>{progress.toFixed(0)}%</Text>
       </View>
 
-      <View style={styles.content}>
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.instructionCard}>
           <Text style={styles.instructionTitle}>Haz la seña de:</Text>
           <View style={styles.letterContainer}>
             <Text style={styles.letterText}>{currentLetter}</Text>
           </View>
+
+          {isLoadingSign ? (
+            <View style={styles.imageLoadingContainer}>
+              <ActivityIndicator size="large" color={theme.primary} />
+              <Text style={styles.loadingImageText}>Cargando imagen...</Text>
+            </View>
+          ) : currentSignData?.image_url ? (
+            <View style={styles.signImageContainer}>
+              <Text style={styles.signImageTitle}>Así se hace:</Text>
+              <Image
+                source={{ uri: currentSignData.image_url }}
+                style={styles.signImage}
+                resizeMode="contain"
+              />
+            </View>
+          ) : null}
+
           <Text style={styles.instructionSubtitle}>
             Presiona el botón para abrir la cámara
           </Text>
@@ -174,8 +218,10 @@ const CameraLessonScreen = ({ navigation, route }) => {
           <Icon name="camera" size={32} color="#FFFFFF" />
           <Text style={styles.cameraButtonText}>Abrir Cámara</Text>
         </TouchableOpacity>
+      </ScrollView>
 
-        {detectedLetter && !showCamera && (
+      {detectedLetter && !showCamera && (
+        <View style={styles.resultOverlay}>
           <View style={styles.resultCard}>
             <Text style={styles.resultTitle}>Detectamos:</Text>
             <Text style={styles.resultLetter}>{detectedLetter}</Text>
@@ -196,8 +242,8 @@ const CameraLessonScreen = ({ navigation, route }) => {
               </TouchableOpacity>
             </View>
           </View>
-        )}
-      </View>
+        </View>
+      )}
 
       <Modal
         visible={showCamera}
@@ -357,8 +403,11 @@ const createStyles = (theme) =>
     },
     content: {
       flex: 1,
+    },
+    contentContainer: {
       paddingHorizontal: 24,
       paddingTop: 40,
+      paddingBottom: 40,
       alignItems: "center",
     },
     instructionCard: {
@@ -409,6 +458,32 @@ const createStyles = (theme) =>
       color: theme.textSecondary,
       textAlign: "center",
     },
+    imageLoadingContainer: {
+      paddingVertical: 24,
+      alignItems: "center",
+    },
+    loadingImageText: {
+      fontSize: 14,
+      color: theme.textSecondary,
+      marginTop: 12,
+    },
+    signImageContainer: {
+      width: "100%",
+      marginVertical: 16,
+      alignItems: "center",
+    },
+    signImageTitle: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: theme.text,
+      marginBottom: 12,
+    },
+    signImage: {
+      width: width * 0.6,
+      height: width * 0.6,
+      borderRadius: 16,
+      backgroundColor: theme.background,
+    },
     cameraButton: {
       flexDirection: "row",
       alignItems: "center",
@@ -431,21 +506,27 @@ const createStyles = (theme) =>
       color: "#FFFFFF",
       marginLeft: 12,
     },
-    resultCard: {
-      width: "100%",
+    resultOverlay: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
       backgroundColor: theme.surface,
-      borderRadius: 24,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
       padding: 24,
-      alignItems: "center",
-      marginTop: 32,
       shadowColor: "#000",
       shadowOffset: {
         width: 0,
-        height: 4,
+        height: -4,
       },
-      shadowOpacity: 0.1,
+      shadowOpacity: 0.15,
       shadowRadius: 12,
-      elevation: 4,
+      elevation: 8,
+    },
+    resultCard: {
+      width: "100%",
+      alignItems: "center",
     },
     resultTitle: {
       fontSize: 16,
