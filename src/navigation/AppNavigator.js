@@ -15,6 +15,9 @@ import WordStudyLessonScreen from '../screens/WordStudyLessonScreen';
 import WordLessonScreen from '../screens/WordLessonScreen';
 import CameraScreen from '../screens/CameraScreen';
 import ModelSelectionScreen from '../screens/ModelSelectionScreen';
+import CameraPracticeMenuScreen from '../screens/CameraPracticeMenuScreen';
+import CameraLessonScreen from '../screens/CameraLessonScreen';
+import CameraLessonResultsScreen from '../screens/CameraLessonResultsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -116,6 +119,9 @@ const AppNavigator = ({ initialRouteName }) => {
       <Stack.Screen name="WordLesson" component={WordLessonScreen} />
       <Stack.Screen name="ModelSelection" component={ModelSelectionScreen} />
       <Stack.Screen name="CameraScreen" component={CameraScreen} />
+      <Stack.Screen name="CameraPracticeMenu" component={CameraPracticeMenuScreen} />
+      <Stack.Screen name="CameraLesson" component={CameraLessonScreen} />
+      <Stack.Screen name="CameraLessonResults" component={CameraLessonResultsScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
     </Stack.Navigator>
   );

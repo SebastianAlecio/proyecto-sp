@@ -591,6 +591,33 @@ const LearnScreen = ({ navigation }) => {
                   />
                 </View>
               </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.categoryCard}
+                onPress={() => navigation.navigate("CameraPracticeMenu")}
+              >
+                <View
+                  style={[
+                    styles.categoryIcon,
+                    { backgroundColor: "#4CAF5020" },
+                  ]}
+                >
+                  <Text style={styles.categoryEmoji}>📷</Text>
+                </View>
+                <View style={styles.categoryContent}>
+                  <Text style={styles.categoryTitle}>Práctica con Cámara</Text>
+                  <Text style={styles.categorySubtitle}>
+                    Detecta señas con tu cámara
+                  </Text>
+                </View>
+                <View style={styles.categoryArrow}>
+                  <Icon
+                    name="chevron-forward"
+                    size={24}
+                    color={theme.textSecondary}
+                  />
+                </View>
+              </TouchableOpacity>
             </View>
 
             {/* Word Categories Section */}
