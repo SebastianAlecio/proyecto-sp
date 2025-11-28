@@ -265,7 +265,7 @@ const CameraLessonScreen = ({ navigation, route }) => {
           </View>
 
           <View style={styles.cameraContainer}>
-            <CameraView ref={cameraRef} style={styles.camera} facing="front">
+            <CameraView ref={cameraRef} style={styles.camera} facing="front" orientation="portrait">
               <View style={styles.cameraOverlay}>
                 <View style={styles.detectionFrame}>
                   <View style={styles.frameCorner} />
