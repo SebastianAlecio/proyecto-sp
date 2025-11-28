@@ -67,6 +67,20 @@ const ModelSelectionScreen = ({ navigation }) => {
               Modelo avanzado de detección de señas
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.modelCard}
+            onPress={() => handleModelSelect(3)}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.modelIconContainer, { backgroundColor: theme.primary + "15" }]}>
+              <Icon name="rocket" size={40} color={theme.primary} />
+            </View>
+            <Text style={styles.modelTitle}>MODELO 3</Text>
+            <Text style={styles.modelDescription}>
+              Modelo optimizado de detección de señas
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>

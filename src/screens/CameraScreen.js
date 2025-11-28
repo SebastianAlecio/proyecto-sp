@@ -65,7 +65,12 @@ const CameraScreen = ({ navigation, route }) => {
       });
 
       console.log("📤 Enviando al servidor...");
-      const port = modelNumber === 1 ? 8000 : 8001;
+      let port = 8000;
+      if (modelNumber === 2) {
+        port = 8001;
+      } else if (modelNumber === 3) {
+        port = 8002;
+      }
       const response = await fetch(`http://10.170.184.222:${port}/predict`, {
         method: "POST",
         headers: {
