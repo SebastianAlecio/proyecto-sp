@@ -16,6 +16,7 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useTheme } from "../context/ThemeContext";
 import { signLanguageAPI } from "../lib/supabase";
+import * as ImageManipulator from "expo-image-manipulator";
 
 const { width } = Dimensions.get("window");
 
@@ -72,9 +73,15 @@ const CameraLessonScreen = ({ navigation, route }) => {
         base64: true,
       });
 
+      const rotatedPhoto = await ImageManipulator.manipulateAsync(
+        photo.uri,
+        [{ rotate: -90 }],
+        { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
+      );
+
       const formData = new FormData();
       formData.append("file", {
-        uri: photo.uri,
+        uri: rotatedPhoto.uri,
         name: "hand.jpg",
         type: "image/jpeg",
       });
@@ -265,7 +272,7 @@ const CameraLessonScreen = ({ navigation, route }) => {
           </View>
 
           <View style={styles.cameraContainer}>
-            <CameraView ref={cameraRef} style={styles.camera} facing="front" orientation="portrait">
+            <CameraView ref={cameraRef} style={styles.camera} facing="front">
               <View style={styles.cameraOverlay}>
                 <View style={styles.detectionFrame}>
                   <View style={styles.frameCorner} />
