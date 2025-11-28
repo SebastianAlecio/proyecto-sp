@@ -75,7 +75,7 @@ const CameraLessonScreen = ({ navigation, route }) => {
 
       const rotatedPhoto = await ImageManipulator.manipulateAsync(
         photo.uri,
-        [{ rotate: 90 }],
+        [{ rotate: 0 }],
         { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
       );
 
