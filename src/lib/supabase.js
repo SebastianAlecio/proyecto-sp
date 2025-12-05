@@ -1,13 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 import { getInfinitiveForm, normalizeWord } from '../utils/verbConjugations';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase environment variables');
+  console.error('SUPABASE_URL:', supabaseUrl);
+  console.error('SUPABASE_ANON_KEY:', supabaseAnonKey ? 'exists' : 'missing');
   throw new Error('Missing Supabase environment variables');
 }
+
+console.log('Supabase client initialized with URL:', supabaseUrl);
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
@@ -15,6 +21,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+  },
+  global: {
+    headers: Platform.OS === 'web' ? { 'x-client-info': 'supabase-js-web' } : undefined,
   },
 });
 
@@ -70,18 +79,33 @@ export const signLanguageAPI = {
   // Get multiple signs by characters (for translating words)
   async getSignsByCharacters(characters) {
     const upperCaseChars = characters.map(char => char.toUpperCase());
-    
-    const { data, error } = await supabase
-      .from('letters')
-      .select('*')
-      .in('character', upperCaseChars);
-    
-    if (error) throw error;
-    
-    // Return in the same order as requested
-    return upperCaseChars.map(char => 
-      data.find(item => item.character === char)
-    ).filter(Boolean);
+
+    let retries = 3;
+    let lastError;
+
+    while (retries > 0) {
+      try {
+        const { data, error } = await supabase
+          .from('letters')
+          .select('*')
+          .in('character', upperCaseChars);
+
+        if (error) throw error;
+
+        // Return in the same order as requested
+        return upperCaseChars.map(char =>
+          data.find(item => item.character === char)
+        ).filter(Boolean);
+      } catch (error) {
+        lastError = error;
+        retries--;
+        if (retries > 0) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    }
+
+    throw lastError;
   },
 
   // Get all signs (letters, numbers, and special)

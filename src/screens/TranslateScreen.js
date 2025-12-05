@@ -9,6 +9,7 @@ import {
   Keyboard,
   ActivityIndicator,
   Image,
+  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useTheme } from "../context/ThemeContext";
@@ -20,6 +21,7 @@ const TranslateScreen = ({ navigation }) => {
   const { theme } = useTheme();
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleTranslate = async () => {
     if (inputText.trim()) {
@@ -224,7 +226,13 @@ ${textToProcess}`
           originalText: inputText.trim(),
         });
       } catch (error) {
-        // Error silenciado
+        console.error("Error en traducción:", error);
+        setErrorMessage("Hubo un problema al traducir. Intenta nuevamente.");
+        Alert.alert(
+          "Error de conexión",
+          "No se pudo conectar con el servidor. Por favor verifica tu conexión a internet e intenta nuevamente.",
+          [{ text: "OK", onPress: () => setErrorMessage("") }]
+        );
       } finally {
         setIsLoading(false);
       }
@@ -258,18 +266,26 @@ ${textToProcess}`
 
     // Obtener las señas de la base de datos solo para los caracteres
     const charactersOnly = elements.map((el) => el.character);
-    const signs = await signLanguageAPI.getSignsByCharacters(charactersOnly);
+    console.log("Fetching characters:", charactersOnly);
 
-    // Crear array de señas para esta palabra
-    const wordSigns = [];
-    elements.forEach((element, index) => {
-      const sign = signs[index];
-      if (sign) {
-        wordSigns.push({ type: "sign", ...sign });
-      }
-    });
+    try {
+      const signs = await signLanguageAPI.getSignsByCharacters(charactersOnly);
+      console.log("Fetched signs:", signs);
 
-    return wordSigns;
+      // Crear array de señas para esta palabra
+      const wordSigns = [];
+      elements.forEach((element, index) => {
+        const sign = signs[index];
+        if (sign) {
+          wordSigns.push({ type: "sign", ...sign });
+        }
+      });
+
+      return wordSigns;
+    } catch (error) {
+      console.error("Error fetching signs for word:", word, error);
+      throw error;
+    }
   };
 
   const clearText = () => {
@@ -311,6 +327,13 @@ ${textToProcess}`
               </TouchableOpacity>
             )}
           </View>
+
+          {errorMessage ? (
+            <View style={styles.errorContainer}>
+              <Icon name="alert-circle" size={16} color="#EF4444" />
+              <Text style={styles.errorText}>{errorMessage}</Text>
+            </View>
+          ) : null}
 
           <TouchableOpacity
             style={[
@@ -426,6 +449,20 @@ const createStyles = (theme) =>
       top: 16,
       right: 16,
       padding: 4,
+    },
+    errorContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: "#FEE2E2",
+      padding: 12,
+      borderRadius: 8,
+      marginBottom: 12,
+      gap: 8,
+    },
+    errorText: {
+      color: "#EF4444",
+      fontSize: 14,
+      flex: 1,
     },
     translateButton: {
       backgroundColor: theme.primary,
